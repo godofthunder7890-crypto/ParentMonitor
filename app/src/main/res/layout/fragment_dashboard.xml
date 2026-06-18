@@ -313,8 +313,8 @@
                         android:textSize="11sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#1A0030"
-                        android:strokeColor="#AA00FF"
-                        android:strokeWidth="1dp"
+                        app:strokeColor="#AA00FF"
+                        app:strokeWidth="1dp"
                         android:textColor="#AA00FF"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                     <Button
@@ -327,8 +327,8 @@
                         android:textSize="11sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#001A33"
-                        android:strokeColor="#00E5FF"
-                        android:strokeWidth="1dp"
+                        app:strokeColor="#00E5FF"
+                        app:strokeWidth="1dp"
                         android:textColor="#00E5FF"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                 </LinearLayout>
