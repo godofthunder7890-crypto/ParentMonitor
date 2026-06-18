@@ -21,9 +21,12 @@ import org.json.JSONObject
 class SettingsFragment : Fragment() {
 
     private val qrScanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
-        result.contents?.let { scannedUrl ->
-            if (scannedUrl.startsWith("ws://") || scannedUrl.startsWith("wss://")) {
-                applyNewUrl(scannedUrl)
+        result.contents?.let { scanned ->
+            val parts = scanned.split("|")
+            val url = parts[0].trim()
+            if (url.startsWith("ws://") || url.startsWith("wss://")) {
+                val code = if (parts.size > 1) parts[1].trim() else ""
+                applyNewUrl(url, code)
             } else {
                 updateInfo("Invalid QR — must be a wss:// URL")
             }
@@ -31,81 +34,82 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
-
         val activity = requireActivity() as MainActivity
-        val prefs = activity.getSharedPreferences("config", Context.MODE_PRIVATE)
-        val etUrl = view.findViewById<EditText>(R.id.etServerUrl)
-        val currentUrl = prefs.getString("server_url",
-            "wss://dbb8b339-6f63-4353-b557-828369c2aaf6-00-1ox04gta0r1v2.sisko.replit.dev/api/ws")!!
+        val prefs = activity.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+
+        val etUrl      = view.findViewById<EditText>(R.id.etServerUrl)
+        val etPairCode = view.findViewById<EditText>(R.id.etPairCode)
+
+        val currentUrl  = prefs.getString(MainActivity.KEY_SERVER_URL, MainActivity.DEFAULT_URL)!!
+        val currentCode = prefs.getString(MainActivity.KEY_PAIR_CODE, "")!!
 
         etUrl.setText(currentUrl)
-        generateQrCode(view, currentUrl)
+        etPairCode.setText(currentCode)
+        // QR encodes "url|paircode" — child app scans this to get both at once
+        generateQrCode(view, "$currentUrl|$currentCode")
 
-        // Scan QR button
         view.findViewById<Button>(R.id.btnScanQr).setOnClickListener {
             val options = ScanOptions().apply {
                 setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                 setPrompt("Server URL wala QR scan karo")
-                setCameraId(0)
-                setBeepEnabled(false)
-                setBarcodeImageEnabled(false)
+                setCameraId(0); setBeepEnabled(false); setBarcodeImageEnabled(false)
             }
             qrScanLauncher.launch(options)
         }
 
-        // Save + auto push to child
         view.findViewById<Button>(R.id.btnSaveUrl).setOnClickListener {
-            val newUrl = etUrl.text.toString().trim()
-            if (newUrl.isNotEmpty()) {
-                applyNewUrl(newUrl)
-            }
+            val newUrl  = etUrl.text.toString().trim()
+            val newCode = etPairCode.text.toString().trim()
+            if (newUrl.isNotEmpty()) applyNewUrl(newUrl, newCode)
         }
 
-        // Manual push to child button
         view.findViewById<Button>(R.id.btnPushToChild).setOnClickListener {
-            val url = etUrl.text.toString().trim()
+            val url  = etUrl.text.toString().trim()
+            val code = etPairCode.text.toString().trim()
             if (url.isNotEmpty()) {
-                pushUrlToChild(url)
-                updateInfo("📡 URL pushed to child!")
+                pushUrlToChild(url, code)
+                updateInfo("📡 URL + pair code pushed to child!")
             }
         }
 
         return view
     }
 
-    private fun applyNewUrl(newUrl: String) {
+    private fun applyNewUrl(newUrl: String, newCode: String) {
         val activity = requireActivity() as MainActivity
-        val prefs = activity.getSharedPreferences("config", Context.MODE_PRIVATE)
-        prefs.edit().putString("server_url", newUrl).apply()
-        activity.wsManager?.updateUrl(newUrl)
-        // Auto push new URL to child device
-        pushUrlToChild(newUrl)
+        val prefs = activity.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(MainActivity.KEY_SERVER_URL, newUrl)
+            .putString(MainActivity.KEY_PAIR_CODE, newCode)
+            .apply()
+        activity.wsManager?.updateUrl(newUrl, newCode)
+        pushUrlToChild(newUrl, newCode)
         view?.findViewById<EditText>(R.id.etServerUrl)?.setText(newUrl)
-        generateQrCode(view, newUrl)
+        view?.findViewById<EditText>(R.id.etPairCode)?.setText(newCode)
+        generateQrCode(view, "$newUrl|$newCode")
         updateInfo("✅ Saved & pushed to child!")
     }
 
-    private fun pushUrlToChild(url: String) {
+    private fun pushUrlToChild(url: String, code: String) {
         try {
             val act = requireActivity() as MainActivity
             act.wsManager?.sendCommandObj(JSONObject().apply {
                 put("command", "update_url")
                 put("url", url)
+                put("pair_code", code)
             })
         } catch (_: Exception) {}
     }
 
-    private fun generateQrCode(view: View?, url: String) {
+    private fun generateQrCode(view: View?, content: String) {
         try {
             val encoder = BarcodeEncoder()
-            val bitmap: Bitmap = encoder.encodeBitmap(url, BarcodeFormat.QR_CODE, 400, 400)
+            val bitmap: Bitmap = encoder.encodeBitmap(content, BarcodeFormat.QR_CODE, 400, 400)
             view?.findViewById<ImageView>(R.id.ivQrCode)?.setImageBitmap(bitmap)
-        } catch (e: Exception) { }
+        } catch (_: Exception) {}
     }
 
     fun updateInfo(info: String) {
