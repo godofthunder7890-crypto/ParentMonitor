@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#060612">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- SOS ALERT -->
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#1A0000"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp">
+            <View android:id="@+id/sosIndicator"
+                android:layout_width="12dp" android:layout_height="12dp"
+                android:background="@drawable/circle_red"
+                android:layout_marginEnd="10dp"/>
+            <TextView android:id="@+id/tvSosStatus"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="SOS: No alert (3 hard shakes = SOS)"
+                android:textColor="#666" android:textSize="13sp"/>
+        </LinearLayout>
+
+        <!-- Location Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📍 CURRENT LOCATION"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="12dp"/>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LAT  " android:textColor="#444" android:textSize="12sp"/>
+                    <TextView android:id="@+id/tvTrackLat"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="--" android:textColor="#00E5FF"
+                        android:textSize="14sp" android:fontFamily="monospace"/>
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LNG  " android:textColor="#444" android:textSize="12sp"/>
+                    <TextView android:id="@+id/tvTrackLng"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="--" android:textColor="#00E5FF"
+                        android:textSize="14sp" android:fontFamily="monospace"/>
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ACC  " android:textColor="#444" android:textSize="12sp"/>
+                    <TextView android:id="@+id/tvTrackAccuracy"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="--" android:textColor="#888" android:textSize="12sp"/>
+                </LinearLayout>
+
+                <TextView android:id="@+id/tvTrackStatus"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="Tap Fetch to get location"
+                    android:textColor="#444" android:textSize="11sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button android:id="@+id/btnGetLocation"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:text="📡 Fetch GPS"
+                        android:textSize="12sp" android:textColor="#000"
+                        android:backgroundTint="#00E5FF" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnOpenMaps"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="🗺 Open Maps"
+                        android:textSize="12sp" android:textColor="#FFF"
+                        android:backgroundTint="#0D47A1" android:stateListAnimator="@null"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Geofence Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔵 GEOFENCE (SAFE ZONE)"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="8dp"/>
+
+                <TextView android:id="@+id/tvGeofenceStatus"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="No geofence set"
+                    android:textColor="#555" android:textSize="12sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <Button android:id="@+id/btnUseCurrentAsGeo"
+                    android:layout_width="match_parent" android:layout_height="40dp"
+                    android:text="Use Current Location as Center"
+                    android:textSize="12sp" android:textColor="#00E5FF"
+                    android:backgroundTint="#0A1A2F"
+                    android:layout_marginBottom="8dp"
+                    android:stateListAnimator="@null"/>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/etGeoLat"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="Lat" android:padding="10dp"
+                        android:textSize="12sp" android:inputType="numberDecimal" android:singleLine="true"/>
+                    <EditText android:id="@+id/etGeoLng"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="Lng" android:padding="10dp"
+                        android:textSize="12sp" android:inputType="numberDecimal|numberSigned" android:singleLine="true"/>
+                    <EditText android:id="@+id/etGeoRadius"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="m" android:text="200" android:padding="10dp"
+                        android:textSize="12sp" android:inputType="number" android:singleLine="true"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button android:id="@+id/btnSetGeofence"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:text="✅ Set Geofence"
+                        android:textSize="12sp" android:textColor="#000"
+                        android:backgroundTint="#00E5FF" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnDisableGeofence"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="❌ Remove"
+                        android:textSize="12sp" android:textColor="#888"
+                        android:backgroundTint="#1A1A2E" android:stateListAnimator="@null"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Location History -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📜 LOCATION HISTORY"
+                        android:textColor="#555" android:textSize="10sp"
+                        android:letterSpacing="0.12"/>
+                    <Button android:id="@+id/btnClearHistory"
+                        android:layout_width="wrap_content" android:layout_height="28dp"
+                        android:text="Clear"
+                        android:textSize="10sp" android:textColor="#888"
+                        android:backgroundTint="#1A1A2E"
+                        android:minWidth="0dp" android:minHeight="0dp"
+                        android:stateListAnimator="@null"/>
+                </LinearLayout>
+
+                <ListView android:id="@+id/lvLocationHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:background="#0A0A1E"
+                    android:divider="#1A1A2E" android:dividerHeight="1dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>
