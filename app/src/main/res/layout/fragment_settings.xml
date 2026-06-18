@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0A0A">
+    android:background="#060612">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,124 +12,183 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Settings"
-            android:textColor="#00D4FF"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:text="SETTINGS"
+            android:textColor="#00E5FF"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.15"
             android:layout_marginBottom="16dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Current URL QR Code"
-            android:textColor="#888888"
-            android:textSize="12sp"
-            android:layout_marginBottom="8dp"/>
-
+        <!-- QR Card -->
         <androidx.cardview.widget.CardView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="#1A1A2E"
-            app:cardCornerRadius="10dp">
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="16dp">
-                <ImageView
-                    android:id="@+id/ivQrCode"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="QR Code"/>
+                android:padding="20dp">
+
                 <TextView
-                    android:id="@+id/tvQrHint"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Child app se scan karo to connect"
-                    android:textColor="#888888"
+                    android:text="CHILD APP QR CODE"
+                    android:textColor="#555"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.12"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp"/>
+
+                <ImageView
+                    android:id="@+id/ivQrCode"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:background="#FFF"
+                    android:padding="8dp"
+                    android:contentDescription="QR Code"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Child app se is QR ko scan karo — URL + pair code dono mil jayenge"
+                    android:textColor="#444"
                     android:textSize="11sp"
                     android:gravity="center"
-                    android:layout_marginTop="8dp"/>
+                    android:lineSpacingMultiplier="1.4"
+                    android:layout_marginTop="12dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Actions -->
+        <Button
+            android:id="@+id/btnScanQr"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="📷  Scan New URL via QR"
+            android:backgroundTint="#6A1B9A"
+            android:textColor="#FFF"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="14sp"
+            android:layout_marginBottom="12dp"
+            android:stateListAnimator="@null"/>
+
+        <!-- URL Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SERVER URL"
+                    android:textColor="#555"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="8dp"/>
+
+                <EditText
+                    android:id="@+id/etServerUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="#1A1A35"
+                    android:textColor="#EEE"
+                    android:textSize="13sp"
+                    android:padding="12dp"
+                    android:hint="wss://your-app.replit.app/api/ws"
+                    android:textColorHint="#333"
+                    android:inputType="textUri"
+                    android:singleLine="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="PAIR CODE"
+                    android:textColor="#555"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <EditText
+                    android:id="@+id/etPairCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="#1A1A35"
+                    android:textColor="#EEE"
+                    android:textSize="13sp"
+                    android:padding="12dp"
+                    android:hint="Secret pair code (same as server PAIR_CODE)"
+                    android:textColorHint="#333"
+                    android:inputType="text"
+                    android:singleLine="true"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <Button
-            android:id="@+id/btnScanQr"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="📷  Scan QR Code to Update URL"
-            android:backgroundTint="#9C27B0"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Or enter URL manually"
-            android:textColor="#888888"
-            android:textSize="12sp"
-            android:layout_marginBottom="4dp"/>
-
-        <EditText
-            android:id="@+id/etServerUrl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#1A1A2E"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:padding="12dp"
-            android:hint="wss://your-url"
-            android:textColorHint="#555555"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- Save + auto push to child -->
-        <Button
             android:id="@+id/btnSaveUrl"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="💾 Save and Reconnect"
-            android:backgroundTint="#00D4FF"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp"/>
+            android:layout_height="50dp"
+            android:text="💾  Save and Reconnect"
+            android:backgroundTint="#00E5FF"
+            android:textColor="#000"
+            android:fontFamily="sans-serif-bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"
+            android:stateListAnimator="@null"/>
 
-        <!-- Manual push to child if child was offline when saved -->
         <Button
             android:id="@+id/btnPushToChild"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="📡 Push URL to Child"
-            android:backgroundTint="#FF9800"
-            android:textColor="#000000"
-            android:layout_marginBottom="24dp"/>
+            android:layout_height="50dp"
+            android:text="📡  Push URL + Code to Child"
+            android:backgroundTint="#E65100"
+            android:textColor="#FFF"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"
+            android:stateListAnimator="@null"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="💡 Save URL automatically pushes to child. Use Push button if child was offline."
-            android:textColor="#666666"
+            android:text="💡 After deploying, copy your *.replit.app URL here. QR lets child scan once and auto-connect forever."
+            android:textColor="#333"
             android:textSize="11sp"
+            android:lineSpacingMultiplier="1.4"
             android:layout_marginBottom="12dp"/>
 
+        <!-- Status -->
         <androidx.cardview.widget.CardView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#1A1A2E"
-            app:cardCornerRadius="8dp">
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="12dp">
             <TextView
                 android:id="@+id/tvConnectionInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="Not connected"
-                android:textColor="#888888"
+                android:textColor="#555"
                 android:textSize="13sp"/>
         </androidx.cardview.widget.CardView>
 
