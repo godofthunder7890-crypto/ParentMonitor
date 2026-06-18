@@ -14,35 +14,51 @@
 
         <!-- ═══ STATUS CARD ═══ -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="#0D0D21"
             app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            android:layout_marginBottom="10dp">
+            app:cardElevation="12dp"
+            android:layout_marginBottom="10dp"
+            android:alpha="0">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="18dp"
+                android:padding="20dp"
                 android:gravity="center_vertical">
+
+                <!-- Pulse ring + dot -->
                 <FrameLayout
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginEnd="14dp">
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginEnd="16dp">
+                    <!-- Outer glow ring -->
                     <View
                         android:id="@+id/statusRing"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
                         android:background="@drawable/circle_red"
-                        android:alpha="0.25"/>
+                        android:alpha="0.2"/>
+                    <!-- Inner dot -->
                     <View
                         android:id="@+id/bigStatusDot"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:layout_gravity="center"
                         android:background="@drawable/circle_red"/>
+                    <!-- Shine overlay -->
+                    <View
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="top|start"
+                        android:layout_margin="14dp"
+                        android:background="@drawable/circle_white_shine"
+                        android:alpha="0.25"/>
                 </FrameLayout>
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -54,35 +70,38 @@
                         android:layout_height="wrap_content"
                         android:text="OFFLINE"
                         android:textColor="#FF1744"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Child Device"
-                        android:textColor="#4D4D70"
-                        android:textSize="11sp"
-                        android:fontFamily="monospace"/>
+                        android:textColor="#6666AA"
+                        android:textSize="12sp"
+                        android:layout_marginTop="1dp"/>
                     <TextView
                         android:id="@+id/tvLastSeen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Waiting..."
-                        android:textColor="#555566"
+                        android:text="Waiting for connection..."
+                        android:textColor="#555577"
                         android:textSize="11sp"
                         android:fontFamily="monospace"
-                        android:layout_marginTop="2dp"/>
+                        android:layout_marginTop="3dp"/>
                 </LinearLayout>
+
                 <Button
                     android:id="@+id/btnDashLock"
-                    android:layout_width="60dp"
-                    android:layout_height="44dp"
+                    android:layout_width="58dp"
+                    android:layout_height="46dp"
                     android:text="LOCK"
                     android:backgroundTint="#FF1744"
                     android:textColor="#FFFFFF"
                     android:textSize="9sp"
                     android:fontFamily="monospace"
+                    android:stateListAnimator="@null"
                     style="@style/Widget.MaterialComponents.Button"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -93,85 +112,94 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
+
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardBattery"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
                 app:cardBackgroundColor="#0D0D21"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                android:alpha="0">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="10dp">
+                    android:padding="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BATTERY"
-                        android:textColor="#4D4D70"
+                        android:textColor="#6677AA"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
-                        android:letterSpacing="0.1"/>
+                        android:letterSpacing="0.12"/>
                     <TextView
                         android:id="@+id/tvDashBattery"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
                         android:textColor="#00C853"
-                        android:textSize="26sp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"/>
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="4dp"/>
                     <Button
                         android:id="@+id/btnDashBattery"
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="28dp"
                         android:text="REFRESH"
                         android:textSize="8sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1A1A33"
-                        android:textColor="#555566"
+                        android:backgroundTint="#1E1E3A"
+                        android:textColor="#6677AA"
+                        android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardPing"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 app:cardBackgroundColor="#0D0D21"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                android:alpha="0">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="10dp">
+                    android:padding="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PING"
-                        android:textColor="#4D4D70"
+                        android:textColor="#6677AA"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
-                        android:letterSpacing="0.1"/>
+                        android:letterSpacing="0.12"/>
                     <TextView
                         android:id="@+id/tvDashPing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
                         android:textColor="#00E5FF"
-                        android:textSize="26sp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"/>
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="4dp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="latency"
-                        android:textColor="#333355"
+                        android:textColor="#444466"
                         android:textSize="9sp"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -184,93 +212,103 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp">
+
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardApp"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
                 app:cardBackgroundColor="#0D0D21"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                android:alpha="0">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="10dp">
+                    android:padding="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ACTIVE APP"
-                        android:textColor="#4D4D70"
+                        android:textColor="#6677AA"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
-                        android:letterSpacing="0.1"/>
+                        android:letterSpacing="0.12"/>
                     <TextView
                         android:id="@+id/tvDashCurrentApp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textColor="#AA00FF"
-                        android:textSize="14sp"
+                        android:textColor="#CC44FF"
+                        android:textSize="15sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:maxLines="1"
-                        android:ellipsize="end"/>
+                        android:ellipsize="end"
+                        android:layout_marginTop="4dp"/>
                     <Button
                         android:id="@+id/btnDashCurrentApp"
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="28dp"
                         android:text="CHECK"
                         android:textSize="8sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1A1A33"
-                        android:textColor="#555566"
+                        android:backgroundTint="#1E1E3A"
+                        android:textColor="#6677AA"
+                        android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardLocation"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
                 app:cardBackgroundColor="#0D0D21"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                android:alpha="0">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="10dp">
+                    android:padding="12dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="LOCATION"
-                        android:textColor="#4D4D70"
+                        android:textColor="#6677AA"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
-                        android:letterSpacing="0.1"/>
+                        android:letterSpacing="0.12"/>
                     <TextView
                         android:id="@+id/tvDashLocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
                         android:textColor="#FFD600"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:maxLines="2"
-                        android:gravity="center"/>
+                        android:gravity="center"
+                        android:layout_marginTop="4dp"/>
                     <Button
                         android:id="@+id/btnDashLocation"
                         android:layout_width="match_parent"
-                        android:layout_height="26dp"
+                        android:layout_height="28dp"
                         android:text="TRACK"
                         android:textSize="8sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1A1A33"
-                        android:textColor="#555566"
+                        android:backgroundTint="#1E1E3A"
+                        android:textColor="#6677AA"
+                        android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -278,81 +316,90 @@
 
         <!-- ═══ QUICK ACTIONS ═══ -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="#0D0D21"
             app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            android:layout_marginBottom="10dp">
+            app:cardElevation="10dp"
+            android:layout_marginBottom="10dp"
+            android:alpha="0">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="16dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="QUICK ACTIONS"
-                    android:textColor="#333355"
+                    android:textColor="#4455AA"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
-                    android:letterSpacing="0.15"
-                    android:layout_marginBottom="12dp"/>
+                    android:letterSpacing="0.2"
+                    android:layout_marginBottom="14dp"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="10dp">
                     <Button
                         android:id="@+id/btnDashCamera"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="52dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginEnd="6dp"
                         android:text="📷  PHOTO"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1A0030"
+                        android:backgroundTint="#1A0035"
                         app:strokeColor="#AA00FF"
-                        app:strokeWidth="1dp"
-                        android:textColor="#AA00FF"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#CC44FF"
+                        android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                     <Button
                         android:id="@+id/btnDashGrantPerms"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="52dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="6dp"
                         android:text="🛡  GRANT"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#001A33"
-                        app:strokeColor="#00E5FF"
-                        app:strokeWidth="1dp"
-                        android:textColor="#00E5FF"
+                        android:backgroundTint="#001A35"
+                        app:strokeColor="#00D4FF"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#00D4FF"
+                        android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                 </LinearLayout>
                 <Button
                     android:id="@+id/btnDashEmergencyLock"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
+                    android:layout_height="56dp"
                     android:text="⚡  EMERGENCY LOCK NOW"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:fontFamily="monospace"
-                    android:backgroundTint="#FF1744"
+                    android:backgroundTint="#CC0033"
                     android:textColor="#FFFFFF"
+                    android:letterSpacing="0.05"
+                    android:stateListAnimator="@null"
                     style="@style/Widget.MaterialComponents.Button"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <!-- ═══ ACTIVITY LOG ═══ -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D21"
+            app:cardBackgroundColor="#0A0A1E"
             app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
+            app:cardElevation="6dp"
+            android:layout_marginBottom="6dp"
+            android:alpha="0">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -362,20 +409,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ACTIVITY LOG"
-                    android:textColor="#333355"
+                    android:textColor="#4455AA"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
-                    android:letterSpacing="0.15"
-                    android:layout_marginBottom="8dp"/>
+                    android:letterSpacing="0.2"
+                    android:layout_marginBottom="10dp"/>
                 <TextView
                     android:id="@+id/tvActivityLog"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="— No activity yet —"
-                    android:textColor="#2A2A44"
+                    android:text="— Waiting for events —"
+                    android:textColor="#5566AA"
                     android:textSize="12sp"
                     android:fontFamily="monospace"
-                    android:lineSpacingExtra="6dp"/>
+                    android:lineSpacingExtra="7dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
