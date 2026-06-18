@@ -13,8 +13,6 @@ class ControlFragment : Fragment() {
     private var tvTouchCoords: TextView? = null
     private var lastTouchX = 0f
     private var lastTouchY = 0f
-
-    // Assume child screen is 1080x1920; coords will be normalised by touchpad size
     private val targetW = 1080f
     private val targetH = 1920f
 
@@ -35,30 +33,21 @@ class ControlFragment : Fragment() {
             val rx = (event.x / view.width  * targetW).coerceIn(0f, targetW)
             val ry = (event.y / view.height * targetH).coerceIn(0f, targetH)
             tvTouchCoords?.text = "x:${rx.toInt()} y:${ry.toInt()}"
-
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> { lastTouchX = rx; lastTouchY = ry }
                 MotionEvent.ACTION_MOVE -> {
-                    val dx = Math.abs(rx - lastTouchX)
-                    val dy = Math.abs(ry - lastTouchY)
-                    if (dx > 5 || dy > 5) {
-                        act.wsManager?.sendCommandObj(JSONObject().apply {
-                            put("command", "swipe")
-                            put("x1", lastTouchX); put("y1", lastTouchY)
-                            put("x2", rx);         put("y2", ry)
-                            put("duration", 80)
+                    if (Math.abs(rx - lastTouchX) > 5 || Math.abs(ry - lastTouchY) > 5) {
+                        act.sendCommandObj(JSONObject().apply {
+                            put("command","swipe"); put("x1",lastTouchX); put("y1",lastTouchY)
+                            put("x2",rx); put("y2",ry); put("duration",80)
                         })
                         lastTouchX = rx; lastTouchY = ry
                     }
                 }
                 MotionEvent.ACTION_UP -> {
-                    // If barely moved → it's a tap
-                    val dx = Math.abs(rx - lastTouchX)
-                    val dy = Math.abs(ry - lastTouchY)
-                    if (dx < 20 && dy < 20) {
-                        act.wsManager?.sendCommandObj(JSONObject().apply {
-                            put("command", "touch")
-                            put("x", rx); put("y", ry)
+                    if (Math.abs(rx - lastTouchX) < 20 && Math.abs(ry - lastTouchY) < 20) {
+                        act.sendCommandObj(JSONObject().apply {
+                            put("command","touch"); put("x",rx); put("y",ry)
                         })
                     }
                 }
@@ -69,14 +58,11 @@ class ControlFragment : Fragment() {
 
     private fun setupButtons(v: View) {
         val act = requireActivity() as MainActivity
-        v.findViewById<Button>(R.id.btnNavBack).setOnClickListener    { act.wsManager?.sendCommand("key_back") }
-        v.findViewById<Button>(R.id.btnNavHome).setOnClickListener    { act.wsManager?.sendCommand("key_home") }
-        v.findViewById<Button>(R.id.btnNavRecents).setOnClickListener { act.wsManager?.sendCommand("key_recents") }
-        v.findViewById<Button>(R.id.btnCtrlLock).setOnClickListener   { act.wsManager?.sendCommand("lock_screen") }
-        v.findViewById<Button>(R.id.btnCtrlLocation).setOnClickListener { act.wsManager?.sendCommand("get_location") }
-        v.findViewById<Button>(R.id.btnCtrlBattery).setOnClickListener { act.wsManager?.sendCommand("get_battery") }
+        v.findViewById<Button>(R.id.btnNavBack).setOnClickListener    { act.sendCommand("key_back") }
+        v.findViewById<Button>(R.id.btnNavHome).setOnClickListener    { act.sendCommand("key_home") }
+        v.findViewById<Button>(R.id.btnNavRecents).setOnClickListener { act.sendCommand("key_recents") }
+        v.findViewById<Button>(R.id.btnCtrlLock).setOnClickListener   { act.sendCommand("lock_screen") }
+        v.findViewById<Button>(R.id.btnCtrlLocation).setOnClickListener { act.sendCommand("get_location") }
+        v.findViewById<Button>(R.id.btnCtrlBattery).setOnClickListener  { act.sendCommand("get_battery") }
     }
-
-    fun updateBattery(level: Int) { /* shown in dashboard */ }
-    fun updateLocation(lat: Double, lng: Double) { /* shown in dashboard */ }
 }
