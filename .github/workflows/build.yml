@@ -1,4 +1,4 @@
-name: Build Parent APK
+name: Build ParentMonitor APK
 
 on:
   push:
@@ -8,28 +8,48 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java 17
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Setup Gradle
+
+    - name: Setup Gradle 8.3
       uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: '8.3'
+
+    - name: Create local.properties (Android SDK path)
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
     - name: Make gradlew executable
-      run: chmod +x gradlew
-    - name: Download Gradle Wrapper JAR
+      run: chmod +x ./gradlew
+
+    - name: Generate Gradle Wrapper JAR (if missing)
       run: |
-        mkdir -p gradle/wrapper
-        curl -L -o gradle/wrapper/gradle-wrapper.jar \
-        https://github.com/gradle/gradle/raw/v8.3.0/gradle/wrapper/gradle-wrapper.jar
-    - name: Build APK
-      run: ./gradlew assembleDebug --stacktrace
-    - name: Upload APK
+        if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+          echo "Wrapper JAR missing - generating..."
+          gradle wrapper --gradle-version=8.3 --distribution-type=bin
+        else
+          echo "Wrapper JAR already exists"
+        fi
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --stacktrace --no-daemon
+
+    - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: ParentMonitor-Debug
         path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
+
+    - name: Show APK info
+      run: |
+        echo "=== Build Complete ==="
+        find app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
