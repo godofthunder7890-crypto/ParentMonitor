@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     // ─── Prefs ───────────────────────────────────────────────────────────────
     private lateinit var prefs: SharedPreferences
-    private var serverUrl = "wss://your-app.replit.app/api/ws"
+    private var serverUrl = "wss://bhai-secret--bs5129628.replit.app/api/ws"
     private var pairCode  = "123456"
 
     // ─── State ───────────────────────────────────────────────────────────────
