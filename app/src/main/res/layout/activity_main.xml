@@ -5,88 +5,89 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#050508">
+    android:background="#060612">
 
-    <!-- ── TOP STATUS BAR ─────────────────────────────────────────────── -->
+    <!-- STATUS BAR -->
     <LinearLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#0D0D1A"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:layout_height="52dp"
+        android:background="#0A0A1E"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:elevation="8dp">
 
-        <!-- Status dot -->
+        <!-- Pulsing dot -->
         <View
             android:id="@+id/statusDot"
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:background="@drawable/circle_red"
-            android:layout_marginEnd="7dp"/>
+            android:layout_marginEnd="8dp"/>
 
         <TextView
             android:id="@+id/tvStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Offline"
+            android:text="● Offline"
             android:textColor="#F44336"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"/>
 
-        <!-- Battery -->
         <TextView
             android:id="@+id/tvBattery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔋 --%"
-            android:textColor="#888"
+            android:text="🔋--"
+            android:textColor="#666"
             android:textSize="12sp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="10dp"/>
 
-        <!-- Latency -->
         <TextView
             android:id="@+id/tvPing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📶 --ms"
-            android:textColor="#888"
+            android:text="📶--ms"
+            android:textColor="#666"
             android:textSize="12sp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="10dp"/>
 
-        <!-- Net toggle button -->
         <Button
             android:id="@+id/btnNetToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="72dp"
+            android:layout_height="32dp"
             android:text="NET ON"
-            android:textSize="10sp"
+            android:textSize="9sp"
             android:textColor="#000"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:backgroundTint="#00D4FF"
-            android:minWidth="0dp"/>
+            android:fontFamily="sans-serif-bold"
+            android:backgroundTint="#00E5FF"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:stateListAnimator="@null"/>
 
     </LinearLayout>
 
-    <!-- ── TAB BAR ─────────────────────────────────────────────────────── -->
+    <!-- TAB BAR -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="#0D0D1A"
-        app:tabTextColor="#666"
-        app:tabSelectedTextColor="#00D4FF"
-        app:tabIndicatorColor="#00D4FF"
+        android:layout_height="44dp"
+        android:background="#0A0A1E"
+        app:tabTextColor="#555"
+        app:tabSelectedTextColor="#00E5FF"
+        app:tabIndicatorColor="#00E5FF"
         app:tabIndicatorHeight="2dp"
         app:tabTextAppearance="@android:style/TextAppearance.Small"
-        app:tabMode="scrollable"/>
+        app:tabMode="scrollable"
+        app:tabGravity="fill"
+        app:tabPaddingStart="4dp"
+        app:tabPaddingEnd="4dp"/>
 
-    <!-- ── CONTENT ─────────────────────────────────────────────────────── -->
+    <!-- CONTENT -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
