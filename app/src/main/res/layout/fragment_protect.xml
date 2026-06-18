@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#060612">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- Header -->
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PROTECTION"
+                android:textColor="#00E5FF" android:textSize="13sp"
+                android:fontFamily="sans-serif-medium" android:letterSpacing="0.12"/>
+            <TextView android:id="@+id/tvProtectStatus"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Ready" android:textColor="#555" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <!-- Emergency Lock -->
+        <Button android:id="@+id/btnEmergencyLock"
+            android:layout_width="match_parent" android:layout_height="52dp"
+            android:text="🔴  EMERGENCY LOCK NOW"
+            android:textSize="14sp" android:textColor="#FFF"
+            android:fontFamily="sans-serif-bold"
+            android:backgroundTint="#B71C1C"
+            android:layout_marginBottom="16dp"
+            android:stateListAnimator="@null"/>
+
+        <!-- App Blocker Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="APP BLOCKER"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="10dp"/>
+
+                <!-- Quick blocks -->
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <Button android:id="@+id/btnBlockYoutube"
+                        android:layout_width="0dp" android:layout_height="36dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="▶ YT" android:textSize="11sp" android:textColor="#FFF"
+                        android:backgroundTint="#C62828" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnBlockInstagram"
+                        android:layout_width="0dp" android:layout_height="36dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="📷 IG" android:textSize="11sp" android:textColor="#FFF"
+                        android:backgroundTint="#6A1B9A" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnBlockTiktok"
+                        android:layout_width="0dp" android:layout_height="36dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="🎵 TT" android:textSize="11sp" android:textColor="#FFF"
+                        android:backgroundTint="#1A237E" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnBlockPubg"
+                        android:layout_width="0dp" android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:text="🎮 PG" android:textSize="11sp" android:textColor="#FFF"
+                        android:backgroundTint="#1B5E20" android:stateListAnimator="@null"/>
+                </LinearLayout>
+
+                <!-- Custom package input -->
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/etBlockApp"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="8dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="com.example.app"
+                        android:padding="10dp" android:textSize="12sp" android:singleLine="true"/>
+                    <Button android:id="@+id/btnAddBlock"
+                        android:layout_width="80dp" android:layout_height="44dp"
+                        android:text="+ Block"
+                        android:textSize="11sp" android:textColor="#000"
+                        android:backgroundTint="#00E5FF"
+                        android:stateListAnimator="@null"/>
+                </LinearLayout>
+
+                <!-- Blocked list -->
+                <ListView android:id="@+id/lvBlockedApps"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="#0A0A1E"
+                    android:divider="#1A1A2E"
+                    android:dividerHeight="1dp"/>
+
+                <Button android:id="@+id/btnClearBlocks"
+                    android:layout_width="match_parent" android:layout_height="36dp"
+                    android:text="Clear All Blocks"
+                    android:textSize="11sp" android:textColor="#888"
+                    android:backgroundTint="#1A1A2E"
+                    android:layout_marginTop="6dp"
+                    android:stateListAnimator="@null"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Contact Blocker Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CONTACT PROTECTION"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="10dp"/>
+
+                <Button android:id="@+id/btnBlockUnknown"
+                    android:layout_width="match_parent" android:layout_height="44dp"
+                    android:text="🚫 Block Unknown Callers"
+                    android:textSize="13sp" android:textColor="#FFF"
+                    android:backgroundTint="#1A1A2E"
+                    android:stateListAnimator="@null"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>
