@@ -3,6 +3,8 @@ package com.parent.monitor
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +19,14 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class SettingsFragment : Fragment() {
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var latestApkUrl = ""
+    private var latestTag    = ""
 
     private val qrScanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         result.contents?.let { scanned ->
@@ -28,91 +36,159 @@ class SettingsFragment : Fragment() {
                 val code = if (parts.size > 1) parts[1].trim() else ""
                 applyNewUrl(url, code)
             } else {
-                updateInfo("Invalid QR — must be a wss:// URL")
+                setInfo("Invalid QR — must be wss:// URL")
             }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_settings, container, false)
-        val activity = requireActivity() as MainActivity
-        val prefs = activity.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+    override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?): View? =
+        i.inflate(R.layout.fragment_settings, c, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val act   = requireActivity() as MainActivity
+        val prefs = act.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
 
         val etUrl      = view.findViewById<EditText>(R.id.etServerUrl)
-        val etPairCode = view.findViewById<EditText>(R.id.etPairCode)
+        val etCode     = view.findViewById<EditText>(R.id.etPairCode)
+        val etRepo     = view.findViewById<EditText>(R.id.etGithubRepo)
+        val btnSave    = view.findViewById<Button>(R.id.btnSaveUrl)
+        val btnScan    = view.findViewById<Button>(R.id.btnScanQr)
+        val btnPush    = view.findViewById<Button>(R.id.btnPushToChild)
+        val btnCheck   = view.findViewById<Button>(R.id.btnCheckUpdate)
+        val btnPushUpd = view.findViewById<Button>(R.id.btnPushUpdate)
+        val tvStatus   = view.findViewById<TextView>(R.id.tvConnectionInfo)
+        val tvUpdStat  = view.findViewById<TextView>(R.id.tvUpdateStatus)
+        val tvOtaVer   = view.findViewById<TextView>(R.id.tvOtaVersion)
 
-        val currentUrl  = prefs.getString(MainActivity.KEY_SERVER_URL, MainActivity.DEFAULT_URL)!!
-        val currentCode = prefs.getString(MainActivity.KEY_PAIR_CODE, "")!!
+        val curUrl  = prefs.getString(MainActivity.KEY_SERVER_URL, MainActivity.DEFAULT_URL) ?: MainActivity.DEFAULT_URL
+        val curCode = prefs.getString(MainActivity.KEY_PAIR_CODE, "") ?: ""
+        val curRepo = prefs.getString(MainActivity.KEY_GITHUB_REPO, "godofthunder7890-crypto/ChildMonitor") ?: ""
 
-        etUrl.setText(currentUrl)
-        etPairCode.setText(currentCode)
-        // QR encodes "url|paircode" — child app scans this to get both at once
-        generateQrCode(view, "$currentUrl|$currentCode")
+        etUrl.setText(curUrl)
+        etCode.setText(curCode)
+        etRepo.setText(curRepo)
+        generateQr(view, "$curUrl|$curCode")
 
-        view.findViewById<Button>(R.id.btnScanQr).setOnClickListener {
-            val options = ScanOptions().apply {
+        btnSave.setOnClickListener {
+            val u = etUrl.text.toString().trim()
+            val c = etCode.text.toString().trim()
+            if (u.isNotEmpty()) applyNewUrl(u, c)
+        }
+
+        btnScan.setOnClickListener {
+            val opts = ScanOptions().apply {
                 setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                 setPrompt("Server URL wala QR scan karo")
                 setCameraId(0); setBeepEnabled(false); setBarcodeImageEnabled(false)
             }
-            qrScanLauncher.launch(options)
+            qrScanLauncher.launch(opts)
         }
 
-        view.findViewById<Button>(R.id.btnSaveUrl).setOnClickListener {
-            val newUrl  = etUrl.text.toString().trim()
-            val newCode = etPairCode.text.toString().trim()
-            if (newUrl.isNotEmpty()) applyNewUrl(newUrl, newCode)
+        btnPush.setOnClickListener {
+            val u = etUrl.text.toString().trim()
+            val c = etCode.text.toString().trim()
+            if (u.isNotEmpty()) { pushUrlToChild(u, c); setInfo("📡 URL pushed to child!") }
         }
 
-        view.findViewById<Button>(R.id.btnPushToChild).setOnClickListener {
-            val url  = etUrl.text.toString().trim()
-            val code = etPairCode.text.toString().trim()
-            if (url.isNotEmpty()) {
-                pushUrlToChild(url, code)
-                updateInfo("📡 URL + pair code pushed to child!")
-            }
+        // ─── OTA: Check GitHub releases ────────────────────────────────────
+        btnCheck.setOnClickListener {
+            val repo = etRepo.text.toString().trim()
+            if (repo.isEmpty()) { tvUpdStat?.text = "Enter GitHub repo first (e.g. owner/ChildMonitor)"; return@setOnClickListener }
+            prefs.edit().putString(MainActivity.KEY_GITHUB_REPO, repo).apply()
+            tvUpdStat?.text = "⏳ Checking latest release..."
+            tvUpdStat?.setTextColor(0xFF888899.toInt())
+            btnPushUpd.isEnabled = false
+
+            Thread {
+                try {
+                    val conn = URL("https://api.github.com/repos/$repo/releases/latest")
+                        .openConnection() as HttpURLConnection
+                    conn.setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    conn.connectTimeout = 10000; conn.readTimeout = 10000
+                    val json = JSONObject(conn.inputStream.bufferedReader().readText())
+                    conn.disconnect()
+
+                    val tag    = json.optString("tag_name", "unknown")
+                    val assets = json.optJSONArray("assets")
+                    val apk    = (0 until (assets?.length() ?: 0))
+                        .map { assets!!.getJSONObject(it) }
+                        .firstOrNull { it.optString("name").endsWith(".apk") }
+
+                    latestTag    = tag
+                    latestApkUrl = apk?.optString("browser_download_url") ?: ""
+                    val apkName  = apk?.optString("name") ?: "no APK found"
+
+                    handler.post {
+                        tvOtaVer?.text = tag
+                        if (latestApkUrl.isNotEmpty()) {
+                            tvUpdStat?.text = "✅ Latest: $tag\n📦 $apkName\nPress PUSH APK to install on child"
+                            tvUpdStat?.setTextColor(0xFF00C853.toInt())
+                            btnPushUpd.isEnabled = true
+                        } else {
+                            tvUpdStat?.text = "⚠️ Release $tag found but no .apk asset\nUpload APK to GitHub release"
+                            tvUpdStat?.setTextColor(0xFFFFD600.toInt())
+                        }
+                    }
+                } catch (e: Exception) {
+                    handler.post {
+                        tvUpdStat?.text = "❌ Error: ${e.message}"
+                        tvUpdStat?.setTextColor(0xFFFF1744.toInt())
+                    }
+                }
+            }.start()
         }
 
-        return view
+        // ─── OTA: Push APK download URL to child ───────────────────────────
+        btnPushUpd.setOnClickListener {
+            if (latestApkUrl.isEmpty()) return@setOnClickListener
+            try {
+                act.sendCommandObj(JSONObject().apply {
+                    put("command", "update_from_url")
+                    put("url", latestApkUrl)
+                    put("version", latestTag)
+                })
+                tvUpdStat?.text = "🚀 Update $latestTag pushed!\nChild is downloading and installing APK..."
+                tvUpdStat?.setTextColor(0xFF00E5FF.toInt())
+                btnPushUpd.isEnabled = false
+            } catch (_: Exception) {}
+        }
     }
 
     private fun applyNewUrl(newUrl: String, newCode: String) {
-        val activity = requireActivity() as MainActivity
-        val prefs = activity.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        val act   = requireActivity() as MainActivity
+        val prefs = act.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit()
             .putString(MainActivity.KEY_SERVER_URL, newUrl)
-            .putString(MainActivity.KEY_PAIR_CODE, newCode)
+            .putString(MainActivity.KEY_PAIR_CODE,  newCode)
             .apply()
-        activity.wsManager?.updateUrl(newUrl, newCode)
+        act.reconnect(newUrl, newCode)
         pushUrlToChild(newUrl, newCode)
         view?.findViewById<EditText>(R.id.etServerUrl)?.setText(newUrl)
         view?.findViewById<EditText>(R.id.etPairCode)?.setText(newCode)
-        generateQrCode(view, "$newUrl|$newCode")
-        updateInfo("✅ Saved & pushed to child!")
+        generateQr(view, "$newUrl|$newCode")
+        setInfo("✅ Saved & reconnected!")
     }
 
     private fun pushUrlToChild(url: String, code: String) {
         try {
-            val act = requireActivity() as MainActivity
-            act.wsManager?.sendCommandObj(JSONObject().apply {
-                put("command", "update_url")
-                put("url", url)
+            (activity as? MainActivity)?.sendCommandObj(JSONObject().apply {
+                put("command",   "update_url")
+                put("url",       url)
                 put("pair_code", code)
             })
         } catch (_: Exception) {}
     }
 
-    private fun generateQrCode(view: View?, content: String) {
+    private fun generateQr(view: View?, content: String) {
         try {
-            val encoder = BarcodeEncoder()
-            val bitmap: Bitmap = encoder.encodeBitmap(content, BarcodeFormat.QR_CODE, 400, 400)
-            view?.findViewById<ImageView>(R.id.ivQrCode)?.setImageBitmap(bitmap)
+            val bmp: Bitmap = BarcodeEncoder().encodeBitmap(content, BarcodeFormat.QR_CODE, 400, 400)
+            view?.findViewById<ImageView>(R.id.ivQrCode)?.setImageBitmap(bmp)
         } catch (_: Exception) {}
     }
 
-    fun updateInfo(info: String) {
-        view?.findViewById<TextView>(R.id.tvConnectionInfo)?.text = info
+    private fun setInfo(msg: String) {
+        view?.findViewById<TextView>(R.id.tvConnectionInfo)?.text = msg
     }
 }
