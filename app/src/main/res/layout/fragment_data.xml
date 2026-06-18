@@ -4,79 +4,95 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#050508">
+    android:background="#060612">
 
-    <!-- Category buttons -->
+    <!-- Category tabs -->
     <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#0D0D1A"
+        android:layout_height="52dp"
+        android:background="#0A0A1E"
         android:paddingStart="8dp" android:paddingEnd="8dp"
-        android:paddingTop="8dp" android:paddingBottom="8dp">
+        android:paddingTop="8dp" android:paddingBottom="8dp"
+        android:fillViewport="true">
 
         <LinearLayout android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <Button android:id="@+id/btnDataGallery"
                 android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="🖼 Gallery" android:textSize="12sp" android:textColor="#000"
-                android:backgroundTint="#00D4FF" android:layout_marginEnd="6dp"/>
+                android:backgroundTint="#00E5FF"
+                android:layout_marginEnd="6dp"
+                android:stateListAnimator="@null"/>
 
             <Button android:id="@+id/btnDataCalls"
                 android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="📞 Calls" android:textSize="12sp" android:textColor="#FFF"
-                android:backgroundTint="#1A1A2E" android:layout_marginEnd="6dp"/>
+                android:text="📞 Calls" android:textSize="12sp" android:textColor="#AAA"
+                android:backgroundTint="#1A1A2E"
+                android:layout_marginEnd="6dp"
+                android:stateListAnimator="@null"/>
 
             <Button android:id="@+id/btnDataSms"
                 android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="💬 SMS" android:textSize="12sp" android:textColor="#FFF"
-                android:backgroundTint="#1A1A2E" android:layout_marginEnd="6dp"/>
+                android:text="💬 SMS" android:textSize="12sp" android:textColor="#AAA"
+                android:backgroundTint="#1A1A2E"
+                android:layout_marginEnd="6dp"
+                android:stateListAnimator="@null"/>
 
             <Button android:id="@+id/btnDataApps"
                 android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="📱 Apps" android:textSize="12sp" android:textColor="#FFF"
-                android:backgroundTint="#1A1A2E"/>
+                android:text="📱 Apps" android:textSize="12sp" android:textColor="#AAA"
+                android:backgroundTint="#1A1A2E"
+                android:stateListAnimator="@null"/>
 
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- Status / fetch button -->
+    <!-- Status + Fetch -->
     <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:orientation="horizontal"
         android:padding="10dp"
         android:gravity="center_vertical"
-        android:background="#080812">
+        android:background="#09091A">
 
         <TextView android:id="@+id/tvDataStatus"
             android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Select a category and tap Fetch"
-            android:textColor="#555" android:textSize="12sp"/>
+            android:textColor="#444" android:textSize="12sp"/>
 
         <Button android:id="@+id/btnDataFetch"
-            android:layout_width="wrap_content" android:layout_height="34dp"
-            android:text="Fetch" android:textSize="12sp"
-            android:backgroundTint="#00D4FF" android:textColor="#000"
-            android:paddingStart="16dp" android:paddingEnd="16dp"/>
+            android:layout_width="80dp" android:layout_height="34dp"
+            android:text="⬇ Fetch"
+            android:textSize="11sp"
+            android:backgroundTint="#00E5FF" android:textColor="#000"
+            android:fontFamily="sans-serif-bold"
+            android:minWidth="0dp"
+            android:stateListAnimator="@null"/>
 
     </LinearLayout>
 
-    <!-- Gallery grid (visible when gallery selected) -->
+    <!-- Gallery grid -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDataGallery"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:visibility="visible"
-        android:padding="4dp"/>
+        android:padding="3dp"
+        android:clipToPadding="false"/>
 
-    <!-- List (for calls/SMS/apps) -->
+    <!-- List (calls/sms/apps) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDataList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:padding="4dp"
+        android:clipToPadding="false"/>
 
 </LinearLayout>
