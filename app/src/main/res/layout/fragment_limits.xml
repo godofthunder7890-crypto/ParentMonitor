@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#060612">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- Status -->
+        <TextView android:id="@+id/tvLimitsStatus"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="LIMITS & SCHEDULE"
+            android:textColor="#00E5FF" android:textSize="13sp"
+            android:fontFamily="sans-serif-medium" android:letterSpacing="0.12"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Screen Time Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⏱ SCREEN TIME LIMITS"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="10dp"/>
+
+                <!-- Quick limits -->
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+                    <Button android:id="@+id/btnLimitYoutube30"
+                        android:layout_width="0dp" android:layout_height="38dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:text="YouTube 30min"
+                        android:textSize="11sp" android:textColor="#FFF"
+                        android:backgroundTint="#C62828" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnLimitGames60"
+                        android:layout_width="0dp" android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:text="Games 60min"
+                        android:textSize="11sp" android:textColor="#FFF"
+                        android:backgroundTint="#1B5E20" android:stateListAnimator="@null"/>
+                </LinearLayout>
+
+                <!-- Custom limit -->
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+                    <EditText android:id="@+id/etLimitPackage"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="2" android:layout_marginEnd="6dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="com.app.package"
+                        android:padding="10dp" android:textSize="11sp" android:singleLine="true"/>
+                    <EditText android:id="@+id/etLimitMinutes"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="mins"
+                        android:padding="10dp" android:textSize="12sp"
+                        android:inputType="number" android:singleLine="true"/>
+                    <Button android:id="@+id/btnSetLimit"
+                        android:layout_width="64dp" android:layout_height="44dp"
+                        android:text="Set"
+                        android:textSize="12sp" android:textColor="#000"
+                        android:backgroundTint="#00E5FF" android:stateListAnimator="@null"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Keyword Alerts Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔍 KEYWORD ALERTS"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="10dp"/>
+
+                <Button android:id="@+id/btnPresetKeywords"
+                    android:layout_width="match_parent" android:layout_height="40dp"
+                    android:text="Load Safety Keywords"
+                    android:textSize="12sp" android:textColor="#000"
+                    android:backgroundTint="#FFB300"
+                    android:layout_marginBottom="8dp"
+                    android:stateListAnimator="@null"/>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <EditText android:id="@+id/etKeyword"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="8dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:textColorHint="#333"
+                        android:hint="keyword to watch"
+                        android:padding="10dp" android:textSize="13sp" android:singleLine="true"/>
+                    <Button android:id="@+id/btnAddKeyword"
+                        android:layout_width="72dp" android:layout_height="44dp"
+                        android:text="+ Add"
+                        android:textSize="11sp" android:textColor="#000"
+                        android:backgroundTint="#00E5FF" android:stateListAnimator="@null"/>
+                </LinearLayout>
+
+                <ListView android:id="@+id/lvKeywords"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:background="#0A0A1E"
+                    android:divider="#1A1A2E" android:dividerHeight="1dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Internet Schedule Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="14dp">
+
+                <TextView android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🌙 INTERNET SCHEDULE"
+                    android:textColor="#555" android:textSize="10sp"
+                    android:letterSpacing="0.12" android:layout_marginBottom="10dp"/>
+
+                <Button android:id="@+id/btnNightMode"
+                    android:layout_width="match_parent" android:layout_height="44dp"
+                    android:text="🌙 Night Mode (10pm – 7am)"
+                    android:textSize="13sp" android:textColor="#FFF"
+                    android:backgroundTint="#0D47A1"
+                    android:layout_marginBottom="8dp"
+                    android:stateListAnimator="@null"/>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Off from " android:textColor="#888" android:textSize="13sp"/>
+                    <EditText android:id="@+id/etOffStart"
+                        android:layout_width="48dp" android:layout_height="40dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:text="23"
+                        android:padding="8dp" android:textSize="14sp"
+                        android:inputType="number" android:gravity="center" android:singleLine="true"/>
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=":00  to  " android:textColor="#888" android:textSize="13sp"/>
+                    <EditText android:id="@+id/etOffEnd"
+                        android:layout_width="48dp" android:layout_height="40dp"
+                        android:background="#1A1A35"
+                        android:textColor="#EEE" android:text="6"
+                        android:padding="8dp" android:textSize="14sp"
+                        android:inputType="number" android:gravity="center" android:singleLine="true"/>
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=":00" android:textColor="#888" android:textSize="13sp"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button android:id="@+id/btnSetSchedule"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:text="✅ Set Schedule"
+                        android:textSize="12sp" android:textColor="#000"
+                        android:backgroundTint="#00E5FF" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnDisableSchedule"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="❌ Disable"
+                        android:textSize="12sp" android:textColor="#888"
+                        android:backgroundTint="#1A1A2E" android:stateListAnimator="@null"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>
