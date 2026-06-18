@@ -19,24 +19,17 @@ class WebSocketManager(
     var pingMs: Long = 0
     private var pingTime: Long = 0
 
-    fun connect() {
-        shouldReconnect = true
-        connectInternal()
-    }
+    fun connect() { shouldReconnect = true; connectInternal() }
 
     private fun connectInternal() {
         try {
             client?.close()
             client = object : WebSocketClient(URI(serverUrl)) {
                 override fun onOpen(h: ServerHandshake?) {
-                    send(JSONObject().apply {
-                        put("type", "register")
-                        put("role", "parent")
-                    }.toString())
+                    send(JSONObject().apply { put("type","register"); put("role","parent") }.toString())
                     handler.post { onConnected() }
                     startPing()
                 }
-
                 override fun onMessage(message: String?) {
                     message?.let {
                         try {
@@ -46,29 +39,20 @@ class WebSocketManager(
                             } else {
                                 handler.post { onMessage(data) }
                             }
-                        } catch (e: Exception) { }
+                        } catch (_: Exception) {}
                     }
                 }
-
-                override fun onClose(
-                    code: Int, reason: String?, remote: Boolean) {
+                override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     handler.post { onDisconnected() }
-                    if (shouldReconnect) {
-                        handler.postDelayed({ connectInternal() }, 3000)
-                    }
+                    if (shouldReconnect) handler.postDelayed({ connectInternal() }, 3000)
                 }
-
                 override fun onError(ex: Exception?) {
-                    if (shouldReconnect) {
-                        handler.postDelayed({ connectInternal() }, 3000)
-                    }
+                    if (shouldReconnect) handler.postDelayed({ connectInternal() }, 3000)
                 }
             }
             client?.connect()
-        } catch (e: Exception) {
-            if (shouldReconnect) {
-                handler.postDelayed({ connectInternal() }, 3000)
-            }
+        } catch (_: Exception) {
+            if (shouldReconnect) handler.postDelayed({ connectInternal() }, 3000)
         }
     }
 
@@ -77,36 +61,32 @@ class WebSocketManager(
             override fun run() {
                 if (client?.isOpen == true) {
                     pingTime = System.currentTimeMillis()
-                    try {
-                        client?.send(JSONObject().apply {
-                            put("type", "ping")
-                        }.toString())
-                    } catch (e: Exception) { }
+                    try { client?.send(JSONObject().apply { put("type","ping") }.toString()) }
+                    catch (_: Exception) {}
                     handler.postDelayed(this, 5000)
                 }
             }
         }, 5000)
     }
 
+    /** Send a simple string command */
     fun sendCommand(command: String) {
         try {
             client?.send(JSONObject().apply {
-                put("type", "command")
-                put("command", command)
+                put("type", "command"); put("command", command)
             }.toString())
-        } catch (e: Exception) { }
+        } catch (_: Exception) {}
     }
 
-    fun updateUrl(newUrl: String) {
-        serverUrl = newUrl
-        disconnect()
-        connect()
+    /** Send a command with extra params (for touch/swipe/type) */
+    fun sendCommandObj(data: JSONObject) {
+        try {
+            data.put("type", "command")
+            client?.send(data.toString())
+        } catch (_: Exception) {}
     }
 
-    fun disconnect() {
-        shouldReconnect = false
-        client?.close()
-    }
-
+    fun updateUrl(newUrl: String) { serverUrl = newUrl; disconnect(); connect() }
+    fun disconnect() { shouldReconnect = false; client?.close() }
     fun isConnected() = client?.isOpen == true
 }
