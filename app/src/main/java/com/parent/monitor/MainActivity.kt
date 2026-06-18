@@ -51,6 +51,14 @@ class MainActivity : AppCompatActivity() {
     private var pairCode  = "123456"
     private var netEnabled = true
 
+    // Backward-compat shim — fragments call act.wsManager?.sendCommand(...)
+    inner class WsCompat {
+        fun sendCommand(cmd: String) = this@MainActivity.sendCommand(cmd)
+        fun sendCommandObj(data: org.json.JSONObject) = this@MainActivity.sendCommandObj(data)
+        fun isConnected() = connected
+    }
+    val wsManager = WsCompat()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
