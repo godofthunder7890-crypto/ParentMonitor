@@ -20,10 +20,61 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
+        <!-- Current URL as QR Code -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Server URL"
+            android:text="Current URL QR Code"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:layout_marginBottom="8dp"/>
+
+        <androidx.cardview.widget.CardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#1A1A2E"
+            app:cardCornerRadius="10dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+                <ImageView
+                    android:id="@+id/ivQrCode"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="QR Code"/>
+                <TextView
+                    android:id="@+id/tvQrHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Child app se scan karo to connect"
+                    android:textColor="#888888"
+                    android:textSize="11sp"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Scan QR Button -->
+        <Button
+            android:id="@+id/btnScanQr"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="📷  Scan QR Code to Update URL"
+            android:backgroundTint="#9C27B0"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Manual URL entry -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Or enter URL manually"
             android:textColor="#888888"
             android:textSize="12sp"
             android:layout_marginBottom="4dp"/>
