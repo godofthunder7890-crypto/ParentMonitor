@@ -4,109 +4,132 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#050508"
-    android:padding="12dp">
+    android:background="#060612">
 
-    <TextView android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="🎮  Remote Control"
-        android:textColor="#00D4FF" android:textSize="16sp" android:textStyle="bold"
-        android:layout_marginBottom="10dp"/>
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#0A0A1E"
+        android:paddingHorizontal="14dp"
+        android:gravity="center_vertical">
+
+        <TextView android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="REMOTE CONTROL"
+            android:textColor="#00E5FF"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.1"/>
+
+        <TextView android:id="@+id/tvTouchCoords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="x:0  y:0"
+            android:textColor="#333"
+            android:textSize="12sp"
+            android:fontFamily="monospace"/>
+    </LinearLayout>
 
     <!-- TOUCHPAD -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="12dp"
-        app:cardBackgroundColor="#0D0D1A"
-        app:cardCornerRadius="16dp">
+        android:layout_margin="12dp"
+        app:cardBackgroundColor="#0A0A1E"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="4dp">
 
-        <LinearLayout android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <LinearLayout android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp" android:gravity="center_vertical">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Touchpad  (drag = swipe  •  tap = click)"
-                    android:textColor="#444" android:textSize="11sp"/>
-                <TextView android:id="@+id/tvTouchCoords"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="x:0 y:0"
-                    android:textColor="#333" android:textSize="11sp"/>
-            </LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <View
                 android:id="@+id/touchPad"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:background="#080816"/>
+                android:layout_height="match_parent"
+                android:background="#0A0A1E"/>
 
-        </LinearLayout>
+            <!-- Center crosshair hint -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Touch here to control\n\nDrag = swipe\nTap = click"
+                android:textColor="#1A1A3E"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.8"/>
+
+        </FrameLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- NAV BAR BUTTONS -->
-    <androidx.cardview.widget.CardView
+    <!-- NAV BUTTONS -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        app:cardBackgroundColor="#0D0D1A"
-        app:cardCornerRadius="12dp">
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="8dp">
 
-        <LinearLayout android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp">
+        <Button android:id="@+id/btnNavBack"
+            android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_marginEnd="6dp"
+            android:text="◀ Back"
+            android:textSize="13sp" android:textColor="#CCC"
+            android:backgroundTint="#1A1A2E"
+            android:stateListAnimator="@null"/>
 
-            <Button android:id="@+id/btnNavBack"
-                android:layout_width="0dp" android:layout_height="44dp"
-                android:layout_weight="1" android:layout_marginEnd="6dp"
-                android:text="◀  Back" android:textSize="13sp"
-                android:backgroundTint="#1A1A2E" android:textColor="#CCC"/>
+        <Button android:id="@+id/btnNavHome"
+            android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_marginEnd="6dp"
+            android:text="⬤ Home"
+            android:textSize="13sp" android:textColor="#CCC"
+            android:backgroundTint="#1A1A2E"
+            android:stateListAnimator="@null"/>
 
-            <Button android:id="@+id/btnNavHome"
-                android:layout_width="0dp" android:layout_height="44dp"
-                android:layout_weight="1" android:layout_marginEnd="6dp"
-                android:text="⬤  Home" android:textSize="13sp"
-                android:backgroundTint="#1A1A2E" android:textColor="#CCC"/>
+        <Button android:id="@+id/btnNavRecents"
+            android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="▣ Recent"
+            android:textSize="13sp" android:textColor="#CCC"
+            android:backgroundTint="#1A1A2E"
+            android:stateListAnimator="@null"/>
 
-            <Button android:id="@+id/btnNavRecents"
-                android:layout_width="0dp" android:layout_height="44dp"
-                android:layout_weight="1"
-                android:text="▣  Recents" android:textSize="13sp"
-                android:backgroundTint="#1A1A2E" android:textColor="#CCC"/>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
     <!-- ACTION BUTTONS -->
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="10dp">
 
         <Button android:id="@+id/btnCtrlLock"
-            android:layout_width="0dp" android:layout_height="44dp"
+            android:layout_width="0dp" android:layout_height="match_parent"
             android:layout_weight="1" android:layout_marginEnd="6dp"
-            android:text="🔒 Lock" android:textSize="12sp"
-            android:backgroundTint="#FF4444" android:textColor="#FFF"/>
+            android:text="🔒 Lock"
+            android:textSize="12sp" android:textColor="#FFF"
+            android:backgroundTint="#B71C1C"
+            android:stateListAnimator="@null"/>
 
         <Button android:id="@+id/btnCtrlLocation"
-            android:layout_width="0dp" android:layout_height="44dp"
+            android:layout_width="0dp" android:layout_height="match_parent"
             android:layout_weight="1" android:layout_marginEnd="6dp"
-            android:text="📍 Track" android:textSize="12sp"
-            android:backgroundTint="#0D47A1" android:textColor="#FFF"/>
+            android:text="📍 GPS"
+            android:textSize="12sp" android:textColor="#FFF"
+            android:backgroundTint="#0D47A1"
+            android:stateListAnimator="@null"/>
 
         <Button android:id="@+id/btnCtrlBattery"
-            android:layout_width="0dp" android:layout_height="44dp"
+            android:layout_width="0dp" android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="🔋 Batt" android:textSize="12sp"
-            android:backgroundTint="#1B5E20" android:textColor="#FFF"/>
+            android:text="🔋 Batt"
+            android:textSize="12sp" android:textColor="#FFF"
+            android:backgroundTint="#1B5E20"
+            android:stateListAnimator="@null"/>
 
     </LinearLayout>
 
