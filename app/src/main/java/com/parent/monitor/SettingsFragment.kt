@@ -16,6 +16,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
+import org.json.JSONObject
 
 class SettingsFragment : Fragment() {
 
@@ -40,7 +41,7 @@ class SettingsFragment : Fragment() {
         val prefs = activity.getSharedPreferences("config", Context.MODE_PRIVATE)
         val etUrl = view.findViewById<EditText>(R.id.etServerUrl)
         val currentUrl = prefs.getString("server_url",
-            "wss://optimal-inputs-beginners-opt.trycloudflare.com")!!
+            "wss://dbb8b339-6f63-4353-b557-828369c2aaf6-00-1ox04gta0r1v2.sisko.replit.dev/api/ws")!!
 
         etUrl.setText(currentUrl)
         generateQrCode(view, currentUrl)
@@ -57,11 +58,20 @@ class SettingsFragment : Fragment() {
             qrScanLauncher.launch(options)
         }
 
-        // Manual save button
+        // Save + auto push to child
         view.findViewById<Button>(R.id.btnSaveUrl).setOnClickListener {
             val newUrl = etUrl.text.toString().trim()
             if (newUrl.isNotEmpty()) {
                 applyNewUrl(newUrl)
+            }
+        }
+
+        // Manual push to child button
+        view.findViewById<Button>(R.id.btnPushToChild).setOnClickListener {
+            val url = etUrl.text.toString().trim()
+            if (url.isNotEmpty()) {
+                pushUrlToChild(url)
+                updateInfo("📡 URL pushed to child!")
             }
         }
 
@@ -73,9 +83,21 @@ class SettingsFragment : Fragment() {
         val prefs = activity.getSharedPreferences("config", Context.MODE_PRIVATE)
         prefs.edit().putString("server_url", newUrl).apply()
         activity.wsManager?.updateUrl(newUrl)
+        // Auto push new URL to child device
+        pushUrlToChild(newUrl)
         view?.findViewById<EditText>(R.id.etServerUrl)?.setText(newUrl)
         generateQrCode(view, newUrl)
-        updateInfo("Reconnecting to: $newUrl")
+        updateInfo("✅ Saved & pushed to child!")
+    }
+
+    private fun pushUrlToChild(url: String) {
+        try {
+            val act = requireActivity() as MainActivity
+            act.wsManager?.sendCommandObj(JSONObject().apply {
+                put("command", "update_url")
+                put("url", url)
+            })
+        } catch (_: Exception) {}
     }
 
     private fun generateQrCode(view: View?, url: String) {
