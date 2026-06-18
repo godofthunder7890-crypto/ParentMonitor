@@ -9,6 +9,7 @@ import java.net.URI
 
 class WebSocketManager(
     private var serverUrl: String,
+    private var pairCode: String,
     val onMessage: (JSONObject) -> Unit,
     val onConnected: () -> Unit,
     val onDisconnected: () -> Unit
@@ -26,7 +27,12 @@ class WebSocketManager(
             client?.close()
             client = object : WebSocketClient(URI(serverUrl)) {
                 override fun onOpen(h: ServerHandshake?) {
-                    send(JSONObject().apply { put("type","register"); put("role","parent") }.toString())
+                    // Send register + pair_code on connect
+                    send(JSONObject().apply {
+                        put("type", "register")
+                        put("role", "parent")
+                        put("pair_code", pairCode)
+                    }.toString())
                     handler.post { onConnected() }
                     startPing()
                 }
@@ -34,10 +40,18 @@ class WebSocketManager(
                     message?.let {
                         try {
                             val data = JSONObject(it)
-                            if (data.optString("type") == "pong") {
-                                pingMs = System.currentTimeMillis() - pingTime
-                            } else {
-                                handler.post { onMessage(data) }
+                            when (data.optString("type")) {
+                                "pong"    -> pingMs = System.currentTimeMillis() - pingTime
+                                "auth_ok" -> { /* silently accepted */ }
+                                "error"   -> {
+                                    // Wrong pair code — stop reconnecting, notify UI
+                                    val reason = data.optString("reason")
+                                    if (reason == "wrong_pair_code") {
+                                        shouldReconnect = false
+                                        handler.post { onDisconnected() }
+                                    }
+                                }
+                                else -> handler.post { onMessage(data) }
                             }
                         } catch (_: Exception) {}
                     }
@@ -61,7 +75,7 @@ class WebSocketManager(
             override fun run() {
                 if (client?.isOpen == true) {
                     pingTime = System.currentTimeMillis()
-                    try { client?.send(JSONObject().apply { put("type","ping") }.toString()) }
+                    try { client?.send(JSONObject().apply { put("type", "ping") }.toString()) }
                     catch (_: Exception) {}
                     handler.postDelayed(this, 5000)
                 }
@@ -69,7 +83,6 @@ class WebSocketManager(
         }, 5000)
     }
 
-    /** Send a simple string command */
     fun sendCommand(command: String) {
         try {
             client?.send(JSONObject().apply {
@@ -78,7 +91,6 @@ class WebSocketManager(
         } catch (_: Exception) {}
     }
 
-    /** Send a command with extra params (for touch/swipe/type) */
     fun sendCommandObj(data: JSONObject) {
         try {
             data.put("type", "command")
@@ -86,7 +98,13 @@ class WebSocketManager(
         } catch (_: Exception) {}
     }
 
-    fun updateUrl(newUrl: String) { serverUrl = newUrl; disconnect(); connect() }
+    fun updateUrl(newUrl: String, newPairCode: String = pairCode) {
+        serverUrl = newUrl
+        pairCode = newPairCode
+        disconnect()
+        connect()
+    }
+
     fun disconnect() { shouldReconnect = false; client?.close() }
     fun isConnected() = client?.isOpen == true
 }
