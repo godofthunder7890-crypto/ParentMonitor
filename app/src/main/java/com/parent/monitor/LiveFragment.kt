@@ -1,272 +1,243 @@
 package com.parent.monitor
 
-import android.animation.ObjectAnimator
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Base64
-import android.view.*
-import android.widget.Button
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import org.json.JSONObject
 
 class LiveFragment : Fragment() {
 
-    private var imgScreen: android.widget.ImageView? = null
-    private var imgCamera: android.widget.ImageView? = null
-    private var tvScreenInfo: TextView? = null
-    private var tvCameraInfo: TextView? = null
-    private var tvScreenFps: TextView? = null
-    private var tvCameraFps: TextView? = null
-    private var btnToggleScreen: Button? = null
-    private var btnToggleCamera: Button? = null
-    private var btnToggleMic: Button? = null
-    private var dotScreen: View? = null
-    private var dotCamera: View? = null
-    private var dotMic: View? = null
-    private var tvMicStatus: TextView? = null
-    private var tvScreenInterval: TextView? = null
-    private var btnScreenFaster: Button? = null
-    private var btnScreenSlower: Button? = null
+    private lateinit var btnTabScreen: Button
+    private lateinit var btnTabCamera: Button
+    private lateinit var btnTabMic: Button
+    private lateinit var panelScreen: LinearLayout
+    private lateinit var panelCamera: LinearLayout
+    private lateinit var panelMic: LinearLayout
+    private lateinit var imgScreen: ImageView
+    private lateinit var imgCamera: ImageView
+    private lateinit var dotScreen: View
+    private lateinit var dotCamera: View
+    private lateinit var dotMic: View
+    private lateinit var tvScreenInfo: TextView
+    private lateinit var tvCameraInfo: TextView
+    private lateinit var tvMicStatus: TextView
+    private lateinit var tvScreenFps: TextView
+    private lateinit var tvCameraFps: TextView
+    private lateinit var tvScreenInterval: TextView
+    private lateinit var btnToggleScreen: Button
+    private lateinit var btnToggleCamera: Button
+    private lateinit var btnToggleMic: Button
+    private lateinit var btnScreenFaster: Button
+    private lateinit var btnScreenSlower: Button
 
-    private var panelScreen: View? = null
-    private var panelCamera: View? = null
-    private var panelMic: View? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
-    private var screenRunning = false
-    private var cameraRunning = false
-    private var micRunning = false
-
-    // Bitmap recycling — prevent OOM crashes
-    private var lastScreenBitmap: Bitmap? = null
-    private var lastCameraBitmap: Bitmap? = null
+    private var screenStreaming = false
+    private var cameraStreaming = false
+    private var micStreaming    = false
+    private var screenInterval = 1000L
+    private var cameraInterval = 1500L
 
     // FPS tracking
-    private var screenFrameCount = 0
-    private var cameraFrameCount = 0
-    private var screenFps = 0
-    private var cameraFps = 0
-    private val fpsHandler = Handler(Looper.getMainLooper())
-    private val fpsRunnable = object : Runnable {
-        override fun run() {
-            screenFps = screenFrameCount; screenFrameCount = 0
-            cameraFps = cameraFrameCount; cameraFrameCount = 0
-            tvScreenFps?.text = "$screenFps fps"
-            tvCameraFps?.text = "$cameraFps fps"
-            fpsHandler.postDelayed(this, 1000)
-        }
-    }
+    private var screenFrameCount = 0L
+    private var cameraFrameCount = 0L
+    private var screenLastFps = System.currentTimeMillis()
+    private var cameraLastFps = System.currentTimeMillis()
 
-    // Screen interval control (ms)
-    private var screenIntervalMs = 1000L
-    private val intervalOptions = longArrayOf(500, 1000, 2000, 3000, 5000)
-    private var intervalIdx = 1
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_live, container, false)
 
-    override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?): View? {
-        val v = i.inflate(R.layout.fragment_live, c, false)
-
-        imgScreen      = v.findViewById(R.id.imgScreen)
-        imgCamera      = v.findViewById(R.id.imgCamera)
-        tvScreenInfo   = v.findViewById(R.id.tvScreenInfo)
-        tvCameraInfo   = v.findViewById(R.id.tvCameraInfo)
-        tvScreenFps    = v.findViewById(R.id.tvScreenFps)
-        tvCameraFps    = v.findViewById(R.id.tvCameraFps)
-        btnToggleScreen= v.findViewById(R.id.btnToggleScreen)
-        btnToggleCamera= v.findViewById(R.id.btnToggleCamera)
-        btnToggleMic   = v.findViewById(R.id.btnToggleMic)
-        dotScreen      = v.findViewById(R.id.dotScreen)
-        dotCamera      = v.findViewById(R.id.dotCamera)
-        dotMic         = v.findViewById(R.id.dotMic)
-        tvMicStatus    = v.findViewById(R.id.tvMicStatus)
-        tvScreenInterval = v.findViewById(R.id.tvScreenInterval)
-        btnScreenFaster  = v.findViewById(R.id.btnScreenFaster)
-        btnScreenSlower  = v.findViewById(R.id.btnScreenSlower)
-
-        panelScreen = v.findViewById(R.id.panelScreen)
-        panelCamera = v.findViewById(R.id.panelCamera)
-        panelMic    = v.findViewById(R.id.panelMic)
-
-        setupTabs(v)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindViews(view)
+        setupTabs()
         setupControls()
-        fpsHandler.post(fpsRunnable)
-        return v
-    }
-
-    private fun setupTabs(v: View) {
-        val btnTabScreen = v.findViewById<Button>(R.id.btnTabScreen)
-        val btnTabCamera = v.findViewById<Button>(R.id.btnTabCamera)
-        val btnTabMic    = v.findViewById<Button>(R.id.btnTabMic)
-
-        fun selectTab(selected: Int) {
-            val tabs = listOf(btnTabScreen, btnTabCamera, btnTabMic)
-            val panels = listOf(panelScreen, panelCamera, panelMic)
-            val colors = listOf(0xFF00E5FF.toInt(), 0xFF6A1B9A.toInt(), 0xFF00C853.toInt())
-            tabs.forEachIndexed { idx, btn ->
-                if (idx == selected) {
-                    btn.backgroundTintList = android.content.res.ColorStateList.valueOf(colors[idx])
-                    btn.setTextColor(0xFF000000.toInt())
-                    panels[idx]?.visibility = View.VISIBLE
-                } else {
-                    btn.backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF1A1A2E.toInt())
-                    btn.setTextColor(0xFFAAAAAA.toInt())
-                    panels[idx]?.visibility = View.GONE
-                }
-            }
-        }
-
-        btnTabScreen.setOnClickListener { selectTab(0) }
-        btnTabCamera.setOnClickListener { selectTab(1) }
-        btnTabMic.setOnClickListener   { selectTab(2) }
-    }
-
-    private fun setupControls() {
-        val act = activity as? MainActivity ?: return
-
-        // Screen interval controls
-        updateIntervalLabel()
-        btnScreenFaster?.setOnClickListener {
-            if (intervalIdx > 0) { intervalIdx--; updateIntervalLabel() }
-        }
-        btnScreenSlower?.setOnClickListener {
-            if (intervalIdx < intervalOptions.size - 1) { intervalIdx++; updateIntervalLabel() }
-        }
-
-        btnToggleScreen?.setOnClickListener {
-            if (!screenRunning) {
-                screenIntervalMs = intervalOptions[intervalIdx]
-                act.wsManager?.sendCommandObj(org.json.JSONObject().apply {
-                    put("command", "start_screen_stream")
-                    put("interval", screenIntervalMs)
-                })
-                screenRunning = true
-                btnToggleScreen?.text = "■ STOP SCREEN"
-                btnToggleScreen?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFFB71C1C.toInt())
-                btnToggleScreen?.setTextColor(0xFFFFFFFF.toInt())
-                dotScreen?.setBackgroundResource(R.drawable.circle_green)
-                pulseView(dotScreen)
-                tvScreenInfo?.text = "Receiving..."
-            } else {
-                act.wsManager?.sendCommand("stop_screen_stream")
-                screenRunning = false
-                btnToggleScreen?.text = "▶ START SCREEN"
-                btnToggleScreen?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFF00E5FF.toInt())
-                btnToggleScreen?.setTextColor(0xFF000000.toInt())
-                dotScreen?.setBackgroundResource(R.drawable.circle_red)
-                tvScreenInfo?.text = "Stopped"
-            }
-        }
-
-        btnToggleCamera?.setOnClickListener {
-            if (!cameraRunning) {
-                act.wsManager?.sendCommandObj(org.json.JSONObject().apply {
-                    put("command", "start_camera_stream")
-                    put("interval", 2000L)
-                })
-                cameraRunning = true
-                btnToggleCamera?.text = "■ STOP CAMERA"
-                btnToggleCamera?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFFB71C1C.toInt())
-                dotCamera?.setBackgroundResource(R.drawable.circle_green)
-                pulseView(dotCamera)
-                tvCameraInfo?.text = "Receiving..."
-            } else {
-                act.wsManager?.sendCommand("stop_camera_stream")
-                cameraRunning = false
-                btnToggleCamera?.text = "▶ START CAMERA"
-                btnToggleCamera?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFF6A1B9A.toInt())
-                dotCamera?.setBackgroundResource(R.drawable.circle_red)
-                tvCameraInfo?.text = "Stopped"
-            }
-        }
-
-        btnToggleMic?.setOnClickListener {
-            if (!micRunning) {
-                act.wsManager?.sendCommand("start_mic_stream")
-                micRunning = true
-                btnToggleMic?.text = "■ STOP LISTENING"
-                btnToggleMic?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFFB71C1C.toInt())
-                btnToggleMic?.setTextColor(0xFFFFFFFF.toInt())
-                dotMic?.setBackgroundResource(R.drawable.circle_green)
-                pulseView(dotMic)
-                tvMicStatus?.text = "Listening..."
-                tvMicStatus?.setTextColor(0xFF00C853.toInt())
-            } else {
-                act.wsManager?.sendCommand("stop_mic_stream")
-                micRunning = false
-                btnToggleMic?.text = "▶ START LISTENING"
-                btnToggleMic?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFF00C853.toInt())
-                btnToggleMic?.setTextColor(0xFF000000.toInt())
-                dotMic?.setBackgroundResource(R.drawable.circle_red)
-                tvMicStatus?.text = "Mic Off"
-                tvMicStatus?.setTextColor(0xFF555555.toInt())
-            }
-        }
-    }
-
-    private fun updateIntervalLabel() {
-        val ms = intervalOptions[intervalIdx]
-        tvScreenInterval?.text = when {
-            ms >= 1000 -> "${ms / 1000}s"
-            else -> "${ms}ms"
-        }
-    }
-
-    // ── Frame display — recycle old bitmap to prevent OOM ─────────────
-    fun onScreenFrame(b64: String) {
-        try {
-            val bytes = Base64.decode(b64, Base64.NO_WRAP)
-            val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return
-            val old = lastScreenBitmap
-            lastScreenBitmap = bmp
-            imgScreen?.setImageBitmap(bmp)
-            old?.recycle()
-            screenFrameCount++
-            if (!screenRunning) {
-                screenRunning = true
-                btnToggleScreen?.text = "■ STOP SCREEN"
-                btnToggleScreen?.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(0xFFB71C1C.toInt())
-                btnToggleScreen?.setTextColor(0xFFFFFFFF.toInt())
-                dotScreen?.setBackgroundResource(R.drawable.circle_green)
-            }
-            tvScreenInfo?.text = "Live"
-        } catch (_: Exception) {}
-    }
-
-    fun onCameraFrame(b64: String) {
-        try {
-            val bytes = Base64.decode(b64, Base64.NO_WRAP)
-            val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return
-            val old = lastCameraBitmap
-            lastCameraBitmap = bmp
-            imgCamera?.setImageBitmap(bmp)
-            old?.recycle()
-            cameraFrameCount++
-            tvCameraInfo?.text = "Live"
-        } catch (_: Exception) {}
-    }
-
-    private fun pulseView(v: View?) {
-        v ?: return
-        ObjectAnimator.ofFloat(v, "scaleX", 1f, 1.4f, 1f).apply {
-            duration = 600; repeatCount = ObjectAnimator.INFINITE; start()
-        }
-        ObjectAnimator.ofFloat(v, "scaleY", 1f, 1.4f, 1f).apply {
-            duration = 600; repeatCount = ObjectAnimator.INFINITE; start()
-        }
+        // Receive frames from MainActivity
+        (activity as? MainActivity)?.liveFragment = this
     }
 
     override fun onDestroyView() {
+        (activity as? MainActivity)?.liveFragment = null
         super.onDestroyView()
-        fpsHandler.removeCallbacks(fpsRunnable)
-        lastScreenBitmap?.recycle(); lastScreenBitmap = null
-        lastCameraBitmap?.recycle(); lastCameraBitmap = null
+    }
+
+    private fun bindViews(v: View) {
+        btnTabScreen = v.findViewById(R.id.btnTabScreen)
+        btnTabCamera = v.findViewById(R.id.btnTabCamera)
+        btnTabMic    = v.findViewById(R.id.btnTabMic)
+        panelScreen  = v.findViewById(R.id.panelScreen)
+        panelCamera  = v.findViewById(R.id.panelCamera)
+        panelMic     = v.findViewById(R.id.panelMic)
+        imgScreen    = v.findViewById(R.id.imgScreen)
+        imgCamera    = v.findViewById(R.id.imgCamera)
+        dotScreen    = v.findViewById(R.id.dotScreen)
+        dotCamera    = v.findViewById(R.id.dotCamera)
+        dotMic       = v.findViewById(R.id.dotMic)
+        tvScreenInfo = v.findViewById(R.id.tvScreenInfo)
+        tvCameraInfo = v.findViewById(R.id.tvCameraInfo)
+        tvMicStatus  = v.findViewById(R.id.tvMicStatus)
+        tvScreenFps  = v.findViewById(R.id.tvScreenFps)
+        tvCameraFps  = v.findViewById(R.id.tvCameraFps)
+        tvScreenInterval = v.findViewById(R.id.tvScreenInterval)
+        btnToggleScreen  = v.findViewById(R.id.btnToggleScreen)
+        btnToggleCamera  = v.findViewById(R.id.btnToggleCamera)
+        btnToggleMic     = v.findViewById(R.id.btnToggleMic)
+        btnScreenFaster  = v.findViewById(R.id.btnScreenFaster)
+        btnScreenSlower  = v.findViewById(R.id.btnScreenSlower)
+    }
+
+    private fun setupTabs() {
+        btnTabScreen.setOnClickListener { showPanel("screen") }
+        btnTabCamera.setOnClickListener { showPanel("camera") }
+        btnTabMic.setOnClickListener    { showPanel("mic") }
+        showPanel("screen")
+    }
+
+    private fun showPanel(tab: String) {
+        panelScreen.visibility = if (tab == "screen") View.VISIBLE else View.GONE
+        panelCamera.visibility = if (tab == "camera") View.VISIBLE else View.GONE
+        panelMic.visibility    = if (tab == "mic")    View.VISIBLE else View.GONE
+
+        val cyan  = 0xFF00E5FF.toInt()
+        val dim   = 0xFF1A1A2E.toInt()
+        val black = 0xFF000000.toInt()
+        btnTabScreen.setBackgroundColor(if (tab == "screen") cyan  else dim)
+        btnTabCamera.setBackgroundColor(if (tab == "camera") 0xFFAA00FF.toInt() else dim)
+        btnTabMic.setBackgroundColor(if (tab == "mic") 0xFF00C853.toInt() else dim)
+        btnTabScreen.setTextColor(if (tab == "screen") black else 0xFFAAAAAA.toInt())
+        btnTabCamera.setTextColor(if (tab == "camera") black else 0xFFAAAAAA.toInt())
+        btnTabMic.setTextColor(if (tab == "mic") black else 0xFFAAAAAA.toInt())
+    }
+
+    private fun setupControls() {
+        val intervals = listOf(300L, 500L, 750L, 1000L, 2000L, 3000L, 5000L)
+        var idx = intervals.indexOf(screenInterval).coerceAtLeast(3)
+
+        fun updateIntervalLabel() {
+            screenInterval = intervals[idx]
+            tvScreenInterval.text = if (screenInterval < 1000) "${screenInterval}ms" else "${screenInterval / 1000}s"
+        }
+
+        btnScreenFaster.setOnClickListener {
+            if (idx > 0) { idx--; updateIntervalLabel() }
+            if (screenStreaming) sendCommand(JSONObject().apply { put("command", "start_screen_stream"); put("interval", screenInterval) })
+        }
+        btnScreenSlower.setOnClickListener {
+            if (idx < intervals.lastIndex) { idx++; updateIntervalLabel() }
+            if (screenStreaming) sendCommand(JSONObject().apply { put("command", "start_screen_stream"); put("interval", screenInterval) })
+        }
+        updateIntervalLabel()
+
+        btnToggleScreen.setOnClickListener {
+            screenStreaming = !screenStreaming
+            if (screenStreaming) {
+                sendCommand(JSONObject().apply { put("command", "start_screen_stream"); put("interval", screenInterval) })
+                btnToggleScreen.text = "STOP SCREEN"
+                btnToggleScreen.setBackgroundColor(0xFFFF1744.toInt())
+                tvScreenInfo.text = "Streaming..."
+                setDotColor(dotScreen, true)
+            } else {
+                sendCommand(JSONObject().apply { put("command", "stop_screen_stream") })
+                btnToggleScreen.text = "START SCREEN"
+                btnToggleScreen.setBackgroundColor(0xFF00E5FF.toInt())
+                tvScreenInfo.text = "Stopped"
+                tvScreenFps.text = ""
+                setDotColor(dotScreen, false)
+            }
+        }
+
+        btnToggleCamera.setOnClickListener {
+            cameraStreaming = !cameraStreaming
+            if (cameraStreaming) {
+                sendCommand(JSONObject().apply { put("command", "start_camera_stream"); put("interval", cameraInterval) })
+                btnToggleCamera.text = "STOP CAMERA"
+                btnToggleCamera.setBackgroundColor(0xFFFF1744.toInt())
+                tvCameraInfo.text = "Streaming..."
+                setDotColor(dotCamera, true)
+            } else {
+                sendCommand(JSONObject().apply { put("command", "stop_camera_stream") })
+                btnToggleCamera.text = "START CAMERA"
+                btnToggleCamera.setBackgroundColor(0xFFAA00FF.toInt())
+                tvCameraInfo.text = "Stopped"
+                tvCameraFps.text = ""
+                setDotColor(dotCamera, false)
+            }
+        }
+
+        btnToggleMic.setOnClickListener {
+            micStreaming = !micStreaming
+            if (micStreaming) {
+                sendCommand(JSONObject().apply { put("command", "start_mic_stream") })
+                btnToggleMic.text = "STOP LISTENING"
+                btnToggleMic.setBackgroundColor(0xFFFF1744.toInt())
+                tvMicStatus.text = "Mic On"
+                tvMicStatus.setTextColor(0xFF00C853.toInt())
+                setDotColor(dotMic, true)
+            } else {
+                sendCommand(JSONObject().apply { put("command", "stop_mic_stream") })
+                btnToggleMic.text = "START LISTENING"
+                btnToggleMic.setBackgroundColor(0xFF00C853.toInt())
+                tvMicStatus.text = "Mic Off"
+                tvMicStatus.setTextColor(0xFF555566.toInt())
+                setDotColor(dotMic, false)
+            }
+        }
+    }
+
+    /** Called by MainActivity when a screen/camera frame arrives */
+    fun onScreenFrame(b64: String) {
+        // Decode JPEG on background thread to avoid blocking UI
+        Thread {
+            try {
+                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@Thread
+                // Update FPS
+                screenFrameCount++
+                val now = System.currentTimeMillis()
+                val elapsed = now - screenLastFps
+                val fps = if (elapsed > 0) screenFrameCount * 1000 / elapsed else 0
+                mainHandler.post {
+                    try {
+                        imgScreen.setImageBitmap(bmp)
+                        tvScreenFps.text = "${fps}fps"
+                    } catch (_: Exception) {}
+                }
+            } catch (_: Exception) {}
+        }.start()
+    }
+
+    fun onCameraFrame(b64: String) {
+        Thread {
+            try {
+                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@Thread
+                cameraFrameCount++
+                val now = System.currentTimeMillis()
+                val elapsed = now - cameraLastFps
+                val fps = if (elapsed > 0) cameraFrameCount * 1000 / elapsed else 0
+                mainHandler.post {
+                    try {
+                        imgCamera.setImageBitmap(bmp)
+                        tvCameraFps.text = "${fps}fps"
+                    } catch (_: Exception) {}
+                }
+            } catch (_: Exception) {}
+        }.start()
+    }
+
+    private fun setDotColor(dot: View, on: Boolean) {
+        dot.setBackgroundColor(if (on) 0xFF00C853.toInt() else 0xFFFF1744.toInt())
+    }
+
+    private fun sendCommand(cmd: JSONObject) {
+        (activity as? MainActivity)?.sendToChild(cmd)
     }
 }
