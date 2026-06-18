@@ -37,7 +37,13 @@ class NotificationsFragment : Fragment() {
         view.findViewById<Button>(R.id.btnClear).setOnClickListener {
             adapter.clear(); updateUi()
         }
+        (activity as? MainActivity)?.notificationsFragment = this
         return view
+    }
+
+    override fun onDestroyView() {
+        (activity as? MainActivity)?.notificationsFragment = null
+        super.onDestroyView()
     }
 
     fun addNotification(item: NotificationItem) {
