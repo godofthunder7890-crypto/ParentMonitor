@@ -10,29 +10,35 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DashboardFragment : Fragment() {
 
-    private lateinit var tvChildStatus: TextView
-    private lateinit var tvLastSeen: TextView
-    private lateinit var tvDashCurrentApp: TextView
-    private lateinit var tvDashBattery: TextView
-    private lateinit var tvDashPing: TextView
-    private lateinit var tvDashLocation: TextView
-    private lateinit var bigStatusDot: View
-    private lateinit var statusRing: View
-    private lateinit var btnDashLock: Button
-    private lateinit var btnDashCamera: Button
-    private lateinit var btnDashLocation: Button
-    private lateinit var btnDashBattery: Button
-    private lateinit var btnDashCurrentApp: Button
-    private lateinit var btnDashGrantPerms: Button
+    private var tvChildStatus: TextView? = null
+    private var tvLastSeen: TextView?    = null
+    private var tvDashCurrentApp: TextView? = null
+    private var tvDashBattery: TextView? = null
+    private var tvDashPing: TextView?    = null
+    private var tvDashLocation: TextView? = null
+    private var tvActivityLog: TextView? = null
+    private var bigStatusDot: View?  = null
+    private var statusRing: View?    = null
+    private var btnDashLock: Button? = null
+    private var btnDashCamera: Button? = null
+    private var btnDashLocation: Button? = null
+    private var btnDashBattery: Button? = null
+    private var btnDashCurrentApp: Button? = null
+    private var btnDashGrantPerms: Button? = null
+    private var btnDashEmergencyLock: Button? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var pingPulse: Runnable? = null
+    private val activityLog = mutableListOf<String>()
+    private val timeFmt = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_dashboard, container, false)
+    override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?): View? =
+        i.inflate(R.layout.fragment_dashboard, c, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,6 +49,7 @@ class DashboardFragment : Fragment() {
         tvDashBattery    = view.findViewById(R.id.tvDashBattery)
         tvDashPing       = view.findViewById(R.id.tvDashPing)
         tvDashLocation   = view.findViewById(R.id.tvDashLocation)
+        tvActivityLog    = view.findViewById(R.id.tvActivityLog)
         bigStatusDot     = view.findViewById(R.id.bigStatusDot)
         statusRing       = view.findViewById(R.id.statusRing)
         btnDashLock      = view.findViewById(R.id.btnDashLock)
@@ -51,80 +58,93 @@ class DashboardFragment : Fragment() {
         btnDashBattery   = view.findViewById(R.id.btnDashBattery)
         btnDashCurrentApp= view.findViewById(R.id.btnDashCurrentApp)
         btnDashGrantPerms= view.findViewById(R.id.btnDashGrantPerms)
+        btnDashEmergencyLock = view.findViewById(R.id.btnDashEmergencyLock)
 
         (activity as? MainActivity)?.dashboardFragment = this
 
-        btnDashLock.setOnClickListener      { sendCommand(JSONObject().apply { put("command", "lock_screen") }) }
-        btnDashCamera.setOnClickListener    { sendCommand(JSONObject().apply { put("command", "take_photo") }) }
-        btnDashLocation.setOnClickListener  { sendCommand(JSONObject().apply { put("command", "get_location") }) }
-        btnDashBattery.setOnClickListener   { sendCommand(JSONObject().apply { put("command", "get_battery") }) }
-        btnDashCurrentApp.setOnClickListener{ sendCommand(JSONObject().apply { put("command", "get_running_app") }) }
-        btnDashGrantPerms.setOnClickListener{ sendCommand(JSONObject().apply { put("command", "grant_permissions") }) }
+        btnDashLock?.setOnClickListener          { sendCmd("lock_screen") }
+        btnDashCamera?.setOnClickListener        { sendCmd("take_photo") }
+        btnDashLocation?.setOnClickListener      { sendCmd("get_location") }
+        btnDashBattery?.setOnClickListener       { sendCmd("get_battery") }
+        btnDashCurrentApp?.setOnClickListener    { sendCmd("get_running_app") }
+        btnDashGrantPerms?.setOnClickListener    { sendCmd("grant_permissions") }
+        btnDashEmergencyLock?.setOnClickListener {
+            sendCmd("emergency_lock")
+            addLog("⚡ Emergency lock sent")
+        }
     }
 
     override fun onDestroyView() {
         (activity as? MainActivity)?.dashboardFragment = null
+        stopPingPulse()
         super.onDestroyView()
     }
 
     fun updateOnline(online: Boolean) {
         if (!isAdded) return
-        if (online) {
-            tvChildStatus.text = "CHILD ONLINE"
-            tvChildStatus.setTextColor(0xFF00C853.toInt())
-            bigStatusDot.setBackgroundColor(0xFF00C853.toInt())
-            statusRing.setBackgroundColor(0xFF00C853.toInt())
-            tvLastSeen.text = "Connected just now"
-            startPingPulse()
-        } else {
-            tvChildStatus.text = "CHILD OFFLINE"
-            tvChildStatus.setTextColor(0xFFF44336.toInt())
-            bigStatusDot.setBackgroundColor(0xFFF44336.toInt())
-            statusRing.setBackgroundColor(0xFFF44336.toInt())
-            stopPingPulse()
-        }
+        val color = if (online) 0xFF00C853.toInt() else 0xFFFF1744.toInt()
+        tvChildStatus?.text = if (online) "ONLINE" else "OFFLINE"
+        tvChildStatus?.setTextColor(color)
+        bigStatusDot?.setBackgroundColor(color)
+        statusRing?.setBackgroundColor(color)
+        tvLastSeen?.text = if (online) "Connected ${timeFmt.format(Date())}" else "Last seen ${timeFmt.format(Date())}"
+        if (online) { addLog("✅ Child device connected"); startPingPulse() }
+        else        { addLog("❌ Child device disconnected"); stopPingPulse() }
     }
 
     fun updateBattery(pct: Int, charging: Boolean) {
         if (!isAdded) return
-        val label = "${pct}%"
-        tvDashBattery.text = label
-        tvDashBattery.setTextColor(when {
-            pct > 50  -> 0xFF00C853.toInt()
-            pct > 20  -> 0xFFFFD600.toInt()
-            else      -> 0xFFFF1744.toInt()
+        val symbol = if (charging) "⚡" else "%"
+        tvDashBattery?.text = "$pct$symbol"
+        tvDashBattery?.setTextColor(when {
+            pct > 50 -> 0xFF00C853.toInt()
+            pct > 20 -> 0xFFFFD600.toInt()
+            else     -> 0xFFFF1744.toInt()
         })
+        addLog("🔋 Battery: $pct%${if (charging) " (charging)" else ""}")
     }
 
     fun updatePing(ms: Long) {
         if (!isAdded) return
-        tvDashPing.text = "${ms}ms"
-        tvDashPing.setTextColor(when {
-            ms < 150  -> 0xFF00C853.toInt()
-            ms < 400  -> 0xFFFFD600.toInt()
-            else      -> 0xFFFF1744.toInt()
+        tvDashPing?.text = "${ms}ms"
+        tvDashPing?.setTextColor(when {
+            ms < 150 -> 0xFF00C853.toInt()
+            ms < 400 -> 0xFFFFD600.toInt()
+            else     -> 0xFFFF1744.toInt()
         })
     }
 
     fun updateLocation(lat: Double, lng: Double) {
         if (!isAdded) return
-        tvDashLocation.text = "%.4f, %.4f".format(lat, lng)
+        tvDashLocation?.text = "%.4f\n%.4f".format(lat, lng)
+        addLog("📍 Location: %.4f, %.4f".format(lat, lng))
     }
 
     fun updateCurrentApp(pkg: String) {
         if (!isAdded) return
         val name = pkg.substringAfterLast('.')
-        tvDashCurrentApp.text = "Using: $name"
+        tvDashCurrentApp?.text = name
+        addLog("📱 App: $name")
+    }
+
+    fun addLog(msg: String) {
+        if (!isAdded) return
+        val line = "[${timeFmt.format(Date())}] $msg"
+        activityLog.add(0, line)
+        if (activityLog.size > 8) activityLog.removeAt(activityLog.lastIndex)
+        tvActivityLog?.text = activityLog.joinToString("\n")
+        tvActivityLog?.setTextColor(0xFF555566.toInt())
     }
 
     private fun startPingPulse() {
+        stopPingPulse()
         pingPulse = object : Runnable {
             var up = true
             override fun run() {
                 try {
-                    statusRing.animate().alpha(if (up) 0.5f else 0.1f).setDuration(800).start()
+                    statusRing?.animate()?.alpha(if (up) 0.6f else 0.15f)?.setDuration(900)?.start()
                     up = !up
-                    handler.postDelayed(this, 900)
+                    handler.postDelayed(this, 950)
                 } catch (_: Exception) {}
             }
         }
@@ -133,8 +153,10 @@ class DashboardFragment : Fragment() {
 
     private fun stopPingPulse() {
         pingPulse?.let { handler.removeCallbacks(it) }
-        try { statusRing.alpha = 0.2f } catch (_: Exception) {}
+        try { statusRing?.alpha = 0.1f } catch (_: Exception) {}
     }
 
-    private fun sendCommand(cmd: JSONObject) { (activity as? MainActivity)?.sendToChild(cmd) }
+    private fun sendCmd(command: String) {
+        (activity as? MainActivity)?.sendCommand(command)
+    }
 }
