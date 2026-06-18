@@ -14,7 +14,7 @@
         <!-- Status -->
         <TextView android:id="@+id/tvLimitsStatus"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="LIMITS & SCHEDULE"
+            android:text="LIMITS AND SCHEDULE"
             android:textColor="#00E5FF" android:textSize="13sp"
             android:fontFamily="sans-serif-medium" android:letterSpacing="0.12"
             android:layout_marginBottom="12dp"/>
