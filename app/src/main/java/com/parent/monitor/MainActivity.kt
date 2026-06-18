@@ -29,6 +29,10 @@ class MainActivity : AppCompatActivity() {
     // ─── Fragment refs ────────────────────────────────────────────────────────
     var dashboardFragment: DashboardFragment? = null
     var liveFragment:      LiveFragment?      = null
+    var appsFragment:      AppsFragment?      = null
+    var callSmsFragment:   CallSmsFragment?   = null
+    var locationFragment:  LocationFragment?  = null
+    var filesFragment:     FilesFragment?     = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:   TextView
