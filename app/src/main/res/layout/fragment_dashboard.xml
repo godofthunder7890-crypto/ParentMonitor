@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#050508">
+    android:background="#060612"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,28 +12,42 @@
         android:orientation="vertical"
         android:padding="14dp">
 
-        <!-- BIG STATUS CARD -->
+        <!-- ── CHILD STATUS CARD ─────────────────────────────── -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#0D0D1A"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp"
+                android:padding="22dp"
                 android:gravity="center">
 
-                <View
-                    android:id="@+id/bigStatusDot"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:background="@drawable/circle_red"
-                    android:layout_marginBottom="8dp"/>
+                <!-- Pulsing status indicator -->
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp">
+
+                    <View
+                        android:id="@+id/statusRing"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/circle_red"
+                        android:alpha="0.2"/>
+
+                    <View
+                        android:id="@+id/bigStatusDot"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_red"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvChildStatus"
@@ -40,8 +55,10 @@
                     android:layout_height="wrap_content"
                     android:text="CHILD OFFLINE"
                     android:textColor="#F44336"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
@@ -49,27 +66,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Never connected"
-                    android:textColor="#555"
+                    android:textColor="#444"
                     android:textSize="12sp"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- STATS ROW -->
+        <!-- ── STATS ROW ──────────────────────────────────────── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="12dp">
 
-            <!-- Battery stat -->
+            <!-- Battery -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="80dp"
+                android:layout_height="88dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
-                app:cardBackgroundColor="#0D0D1A"
-                app:cardCornerRadius="12dp">
+                app:cardBackgroundColor="#0E0E24"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
                 <LinearLayout android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -77,47 +95,65 @@
                     android:padding="8dp">
                     <TextView android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🔋" android:textSize="22sp"/>
+                        android:text="🔋" android:textSize="24sp"
+                        android:layout_marginBottom="4dp"/>
                     <TextView android:id="@+id/tvDashBattery"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--%"
-                        android:textColor="#00FF88"
-                        android:textSize="14sp" android:textStyle="bold"/>
+                        android:textColor="#00E676"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BATTERY"
+                        android:textColor="#333"
+                        android:textSize="9sp"
+                        android:letterSpacing="0.12"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Latency stat -->
+            <!-- Ping -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="80dp"
+                android:layout_height="88dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
-                app:cardBackgroundColor="#0D0D1A"
-                app:cardCornerRadius="12dp">
+                app:cardBackgroundColor="#0E0E24"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
                 <LinearLayout android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
                     <TextView android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📶" android:textSize="22sp"/>
+                        android:text="📡" android:textSize="24sp"
+                        android:layout_marginBottom="4dp"/>
                     <TextView android:id="@+id/tvDashPing"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--ms"
-                        android:textColor="#00D4FF"
-                        android:textSize="14sp" android:textStyle="bold"/>
+                        android:textColor="#00E5FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LATENCY"
+                        android:textColor="#333"
+                        android:textSize="9sp"
+                        android:letterSpacing="0.12"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Current app stat -->
+            <!-- Current App -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="80dp"
+                android:layout_height="88dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="#0D0D1A"
-                app:cardCornerRadius="12dp">
+                app:cardBackgroundColor="#0E0E24"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
                 <LinearLayout android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -125,7 +161,8 @@
                     android:padding="6dp">
                     <TextView android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📱" android:textSize="22sp"/>
+                        android:text="📱" android:textSize="24sp"
+                        android:layout_marginBottom="4dp"/>
                     <TextView android:id="@+id/tvDashCurrentApp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -133,102 +170,140 @@
                         android:textColor="#FFB300"
                         android:textSize="11sp"
                         android:maxLines="1"
-                        android:ellipsize="end"/>
+                        android:ellipsize="end"
+                        android:gravity="center"/>
+                    <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ACTIVE APP"
+                        android:textColor="#333"
+                        android:textSize="9sp"
+                        android:letterSpacing="0.12"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
-        <!-- QUICK ACTIONS -->
+        <!-- ── QUICK ACTIONS ──────────────────────────────────── -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#0D0D1A"
-            app:cardCornerRadius="12dp">
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="14dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quick Actions"
-                    android:textColor="#00D4FF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="10dp"/>
+                    android:text="QUICK ACTIONS"
+                    android:textColor="#00E5FF"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.15"
+                    android:layout_marginBottom="12dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <Button android:id="@+id/btnDashLock"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:text="🔒 Lock"
+                        android:textSize="12sp" android:textColor="#FFF"
+                        android:backgroundTint="#C62828"
+                        android:stateListAnimator="@null"/>
+
+                    <Button android:id="@+id/btnDashBattery"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1" android:layout_marginEnd="6dp"
+                        android:text="🔋 Battery"
+                        android:textSize="12sp" android:textColor="#00E676"
+                        android:backgroundTint="#0A1F10"
+                        android:stateListAnimator="@null"/>
+
+                    <Button android:id="@+id/btnDashLocation"
+                        android:layout_width="0dp" android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="📍 Locate"
+                        android:textSize="12sp" android:textColor="#00E5FF"
+                        android:backgroundTint="#0A1A2F"
+                        android:stateListAnimator="@null"/>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <Button android:id="@+id/btnDashLock"
-                        android:layout_width="0dp" android:layout_height="40dp"
-                        android:layout_weight="1" android:layout_marginEnd="6dp"
-                        android:text="🔒 Lock" android:textSize="12sp"
-                        android:backgroundTint="#FF4444" android:textColor="#FFF"/>
-
-                    <Button android:id="@+id/btnDashBattery"
-                        android:layout_width="0dp" android:layout_height="40dp"
-                        android:layout_weight="1" android:layout_marginEnd="6dp"
-                        android:text="🔋 Battery" android:textSize="12sp"
-                        android:backgroundTint="#1A1A3E" android:textColor="#00FF88"/>
-
-                    <Button android:id="@+id/btnDashLocation"
-                        android:layout_width="0dp" android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:text="📍 Track" android:textSize="12sp"
-                        android:backgroundTint="#1A1A3E" android:textColor="#00D4FF"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="6dp">
-
                     <Button android:id="@+id/btnDashCamera"
-                        android:layout_width="0dp" android:layout_height="40dp"
+                        android:layout_width="0dp" android:layout_height="44dp"
                         android:layout_weight="1" android:layout_marginEnd="6dp"
-                        android:text="📷 Photo" android:textSize="12sp"
-                        android:backgroundTint="#1A1A3E" android:textColor="#9C27B0"/>
+                        android:text="📷 Snap"
+                        android:textSize="12sp" android:textColor="#CE93D8"
+                        android:backgroundTint="#1A0A2E"
+                        android:stateListAnimator="@null"/>
 
                     <Button android:id="@+id/btnDashCurrentApp"
-                        android:layout_width="0dp" android:layout_height="40dp"
+                        android:layout_width="0dp" android:layout_height="44dp"
                         android:layout_weight="1" android:layout_marginEnd="6dp"
-                        android:text="📱 App?" android:textSize="12sp"
-                        android:backgroundTint="#1A1A3E" android:textColor="#FFB300"/>
+                        android:text="📱 App?"
+                        android:textSize="12sp" android:textColor="#FFB300"
+                        android:backgroundTint="#1F1600"
+                        android:stateListAnimator="@null"/>
 
                     <Button android:id="@+id/btnDashGrantPerms"
-                        android:layout_width="0dp" android:layout_height="40dp"
+                        android:layout_width="0dp" android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:text="🔑 Perms" android:textSize="12sp"
-                        android:backgroundTint="#1A1A3E" android:textColor="#FF9800"/>
+                        android:text="🔑 Perms"
+                        android:textSize="12sp" android:textColor="#FFB74D"
+                        android:backgroundTint="#1F1000"
+                        android:stateListAnimator="@null"/>
 
                 </LinearLayout>
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- LOCATION CARD -->
+        <!-- ── LOCATION ───────────────────────────────────────── -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D1A"
-            app:cardCornerRadius="12dp">
-            <TextView
-                android:id="@+id/tvDashLocation"
+            app:cardBackgroundColor="#0E0E24"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:padding="14dp"
-                android:text="📍 Location: --"
-                android:textColor="#888"
-                android:textSize="13sp"/>
+                android:gravity="center_vertical">
+
+                <TextView android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="10dp"/>
+
+                <TextView
+                    android:id="@+id/tvDashLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Location not fetched"
+                    android:textColor="#555"
+                    android:textSize="13sp"/>
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
