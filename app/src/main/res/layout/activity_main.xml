@@ -1,87 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0A0A">
+    android:orientation="vertical"
+    android:background="#050508">
 
+    <!-- ── TOP STATUS BAR ─────────────────────────────────────────────── -->
     <LinearLayout
+        android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:background="#0D0D1A"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <!-- Status Bar -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Status dot -->
+        <View
+            android:id="@+id/statusDot"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/circle_red"
+            android:layout_marginEnd="7dp"/>
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#111111"
-            android:padding="12dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:text="Offline"
+            android:textColor="#F44336"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
 
-            <View
-                android:id="@+id/statusDot"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:background="@drawable/circle_red"
-                android:layout_marginEnd="8dp"/>
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Disconnected"
-                android:textColor="#F44336"
-                android:textSize="13sp"/>
-
-            <TextView
-                android:id="@+id/tvBattery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔋 --%"
-                android:textColor="#888888"
-                android:textSize="13sp"/>
-
-            <TextView
-                android:id="@+id/tvPing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" | 📶 --ms"
-                android:textColor="#888888"
-                android:textSize="13sp"/>
-
-        </LinearLayout>
-
-        <!-- Tab Layout -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
+        <!-- Battery -->
+        <TextView
+            android:id="@+id/tvBattery"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#1A1A2E"
-            app:tabTextColor="#888888"
-            app:tabSelectedTextColor="#00D4FF"
-            app:tabIndicatorColor="#00D4FF"/>
+            android:text="🔋 --%"
+            android:textColor="#888"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp"/>
 
-        <!-- ViewPager -->
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
+        <!-- Latency -->
+        <TextView
+            android:id="@+id/tvPing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📶 --ms"
+            android:textColor="#888"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Net toggle button -->
+        <Button
+            android:id="@+id/btnNetToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="NET ON"
+            android:textSize="10sp"
+            android:textColor="#000"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:backgroundTint="#00D4FF"
+            android:minWidth="0dp"/>
 
     </LinearLayout>
 
-    <!-- FAB Settings Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_manage"
-        app:backgroundTint="#00D4FF"
-        app:tint="#000000"/>
+    <!-- ── TAB BAR ─────────────────────────────────────────────────────── -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#0D0D1A"
+        app:tabTextColor="#666"
+        app:tabSelectedTextColor="#00D4FF"
+        app:tabIndicatorColor="#00D4FF"
+        app:tabIndicatorHeight="2dp"
+        app:tabTextAppearance="@android:style/TextAppearance.Small"
+        app:tabMode="scrollable"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!-- ── CONTENT ─────────────────────────────────────────────────────── -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+</LinearLayout>
