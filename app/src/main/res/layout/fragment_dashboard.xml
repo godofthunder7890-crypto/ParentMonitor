@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#070714"
@@ -10,260 +10,374 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="12dp">
 
-        <!-- STATUS CARD -->
-        <LinearLayout
+        <!-- ═══ STATUS CARD ═══ -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:background="#0E0E22"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="18dp"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#0D0D21"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
             android:layout_marginBottom="10dp">
-
-            <!-- Pulse ring + dot -->
-            <FrameLayout
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginEnd="16dp">
-                <View
-                    android:id="@+id/statusRing"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="18dp"
+                android:gravity="center_vertical">
+                <FrameLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:background="@drawable/circle_red"
-                    android:alpha="0.2"
-                    android:layout_gravity="center"/>
-                <View
-                    android:id="@+id/bigStatusDot"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/circle_red"
-                    android:layout_gravity="center"/>
-            </FrameLayout>
-
-            <!-- Status text -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/tvChildStatus"
-                    android:layout_width="wrap_content"
+                    android:layout_marginEnd="14dp">
+                    <View
+                        android:id="@+id/statusRing"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/circle_red"
+                        android:alpha="0.25"/>
+                    <View
+                        android:id="@+id/bigStatusDot"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_red"/>
+                </FrameLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="CHILD OFFLINE"
-                    android:textColor="#F44336"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.05"/>
-                <TextView
-                    android:id="@+id/tvLastSeen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Never connected"
-                    android:textColor="#4D4D70"
-                    android:textSize="11sp"
-                    android:layout_marginTop="4dp"/>
-                <TextView
-                    android:id="@+id/tvDashCurrentApp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
-                    android:textColor="#00E5FF"
-                    android:textSize="12sp"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvChildStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OFFLINE"
+                        android:textColor="#FF1744"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Child Device"
+                        android:textColor="#4D4D70"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"/>
+                    <TextView
+                        android:id="@+id/tvLastSeen"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Waiting..."
+                        android:textColor="#555566"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/btnDashLock"
+                    android:layout_width="60dp"
+                    android:layout_height="44dp"
+                    android:text="LOCK"
+                    android:backgroundTint="#FF1744"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:fontFamily="monospace"
+                    style="@style/Widget.MaterialComponents.Button"/>
             </LinearLayout>
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-        <!-- STATS ROW -->
+        <!-- ═══ STATS ROW 1: Battery + Ping ═══ -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                app:cardBackgroundColor="#0D0D21"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BATTERY"
+                        android:textColor="#4D4D70"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
+                    <TextView
+                        android:id="@+id/tvDashBattery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textColor="#00C853"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"/>
+                    <Button
+                        android:id="@+id/btnDashBattery"
+                        android:layout_width="match_parent"
+                        android:layout_height="26dp"
+                        android:text="REFRESH"
+                        android:textSize="8sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#1A1A33"
+                        android:textColor="#555566"
+                        style="@style/Widget.MaterialComponents.Button"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                app:cardBackgroundColor="#0D0D21"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PING"
+                        android:textColor="#4D4D70"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
+                    <TextView
+                        android:id="@+id/tvDashPing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textColor="#00E5FF"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="latency"
+                        android:textColor="#333355"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- ═══ STATS ROW 2: App + Location ═══ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp">
-
-            <!-- Battery -->
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:layout_weight="1"
-                android:background="#0E0E22"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginEnd="6dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BATTERY"
-                    android:textColor="#4D4D70"
-                    android:textSize="9sp"
-                    android:letterSpacing="0.1"/>
-                <TextView
-                    android:id="@+id/tvDashBattery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
-                    android:textColor="#00E676"
-                    android:textSize="22sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <!-- Ping -->
-            <LinearLayout
+                android:layout_marginEnd="5dp"
+                app:cardBackgroundColor="#0D0D21"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ACTIVE APP"
+                        android:textColor="#4D4D70"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
+                    <TextView
+                        android:id="@+id/tvDashCurrentApp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textColor="#AA00FF"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:maxLines="1"
+                        android:ellipsize="end"/>
+                    <Button
+                        android:id="@+id/btnDashCurrentApp"
+                        android:layout_width="match_parent"
+                        android:layout_height="26dp"
+                        android:text="CHECK"
+                        android:textSize="8sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#1A1A33"
+                        android:textColor="#555566"
+                        style="@style/Widget.MaterialComponents.Button"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:layout_weight="1"
-                android:background="#0E0E22"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="PING"
-                    android:textColor="#4D4D70"
-                    android:textSize="9sp"
-                    android:letterSpacing="0.1"/>
-                <TextView
-                    android:id="@+id/tvDashPing"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
-                    android:textColor="#00E5FF"
-                    android:textSize="22sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <!-- Location -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:background="#0E0E22"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginStart="6dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LOCATION"
-                    android:textColor="#4D4D70"
-                    android:textSize="9sp"
-                    android:letterSpacing="0.1"/>
-                <TextView
-                    android:id="@+id/tvDashLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
-                    android:textColor="#69F0AE"
-                    android:textSize="11sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
+                android:layout_marginStart="5dp"
+                app:cardBackgroundColor="#0D0D21"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOCATION"
+                        android:textColor="#4D4D70"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
+                    <TextView
+                        android:id="@+id/tvDashLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--"
+                        android:textColor="#FFD600"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:maxLines="2"
+                        android:gravity="center"/>
+                    <Button
+                        android:id="@+id/btnDashLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="26dp"
+                        android:text="TRACK"
+                        android:textSize="8sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#1A1A33"
+                        android:textColor="#555566"
+                        style="@style/Widget.MaterialComponents.Button"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-        <!-- QUICK ACTIONS LABEL -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="QUICK ACTIONS"
-            android:textColor="#4D4D70"
-            android:textSize="10sp"
-            android:letterSpacing="0.15"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- QUICK ACTIONS GRID ROW 1 -->
-        <LinearLayout
+        <!-- ═══ QUICK ACTIONS ═══ -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            app:cardBackgroundColor="#0D0D21"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="10dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="QUICK ACTIONS"
+                    android:textColor="#333355"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.15"
+                    android:layout_marginBottom="12dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <Button
+                        android:id="@+id/btnDashCamera"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:text="📷  PHOTO"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#1A0030"
+                        android:strokeColor="#AA00FF"
+                        android:strokeWidth="1dp"
+                        android:textColor="#AA00FF"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    <Button
+                        android:id="@+id/btnDashGrantPerms"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:text="🛡  GRANT"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#001A33"
+                        android:strokeColor="#00E5FF"
+                        android:strokeWidth="1dp"
+                        android:textColor="#00E5FF"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/btnDashEmergencyLock"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:text="⚡  EMERGENCY LOCK NOW"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:backgroundTint="#FF1744"
+                    android:textColor="#FFFFFF"
+                    style="@style/Widget.MaterialComponents.Button"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <Button
-                android:id="@+id/btnDashLock"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="LOCK"
-                android:textSize="11sp"
-                android:textColor="#000"
-                android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#FF1744"
-                android:stateListAnimator="@null"
-                android:layout_marginEnd="6dp"/>
-
-            <Button
-                android:id="@+id/btnDashCamera"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="PHOTO"
-                android:textSize="11sp"
-                android:textColor="#000"
-                android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#AA00FF"
-                android:stateListAnimator="@null"
-                android:layout_marginEnd="6dp"/>
-
-            <Button
-                android:id="@+id/btnDashLocation"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="LOCATE"
-                android:textSize="11sp"
-                android:textColor="#000"
-                android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#00E5FF"
-                android:stateListAnimator="@null"/>
-        </LinearLayout>
-
-        <!-- QUICK ACTIONS GRID ROW 2 -->
-        <LinearLayout
+        <!-- ═══ ACTIVITY LOG ═══ -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
-
-            <Button
-                android:id="@+id/btnDashBattery"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="BATTERY"
-                android:textSize="11sp"
-                android:textColor="#000"
-                android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#FFD600"
-                android:stateListAnimator="@null"
-                android:layout_marginEnd="6dp"/>
-
-            <Button
-                android:id="@+id/btnDashCurrentApp"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="CURR APP"
-                android:textSize="11sp"
-                android:textColor="#000"
-                android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#00C853"
-                android:stateListAnimator="@null"
-                android:layout_marginEnd="6dp"/>
-
-            <Button
-                android:id="@+id/btnDashGrantPerms"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="PERMS"
-                android:textSize="11sp"
-                android:textColor="#000"
-                android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#FF6D00"
-                android:stateListAnimator="@null"/>
-        </LinearLayout>
+            app:cardBackgroundColor="#0D0D21"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ACTIVITY LOG"
+                    android:textColor="#333355"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.15"
+                    android:layout_marginBottom="8dp"/>
+                <TextView
+                    android:id="@+id/tvActivityLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="— No activity yet —"
+                    android:textColor="#2A2A44"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:lineSpacingExtra="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </ScrollView>
