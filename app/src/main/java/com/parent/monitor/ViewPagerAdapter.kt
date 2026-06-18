@@ -8,19 +8,25 @@ class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
 
     val dashboardFragment   = DashboardFragment()
     val liveFragment        = LiveFragment()
+    val protectFragment     = ProtectFragment()
+    val limitsFragment      = LimitsFragment()
+    val trackFragment       = TrackFragment()
     val dataFragment        = DataFragment()
-    val controlFragment     = ControlFragment()
+    val reportsFragment     = ReportsFragment()
     val notifFragment       = NotificationsFragment()
     val settingsFragment    = SettingsFragment()
 
-    override fun getItemCount() = 6
+    override fun getItemCount() = 9
 
     override fun createFragment(position: Int): Fragment = when (position) {
         0 -> dashboardFragment
         1 -> liveFragment
-        2 -> dataFragment
-        3 -> controlFragment
-        4 -> notifFragment
+        2 -> protectFragment
+        3 -> limitsFragment
+        4 -> trackFragment
+        5 -> dataFragment
+        6 -> reportsFragment
+        7 -> notifFragment
         else -> settingsFragment
     }
 }
