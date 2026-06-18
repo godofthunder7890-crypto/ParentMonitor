@@ -37,24 +37,21 @@ class WebSocketManager(
                     startPing()
                 }
                 override fun onMessage(message: String?) {
-                    message?.let {
-                        try {
-                            val data = JSONObject(it)
-                            when (data.optString("type")) {
-                                "pong"    -> pingMs = System.currentTimeMillis() - pingTime
-                                "auth_ok" -> { /* silently accepted */ }
-                                "error"   -> {
-                                    // Wrong pair code — stop reconnecting, notify UI
-                                    val reason = data.optString("reason")
-                                    if (reason == "wrong_pair_code") {
-                                        shouldReconnect = false
-                                        handler.post { onDisconnected() }
-                                    }
+                    if (message == null) return
+                    try {
+                        val data = JSONObject(message)
+                        when (data.optString("type")) {
+                            "pong"    -> pingMs = System.currentTimeMillis() - pingTime
+                            "auth_ok" -> { }
+                            "error"   -> {
+                                if (data.optString("reason") == "wrong_pair_code") {
+                                    shouldReconnect = false
+                                    handler.post { onDisconnected() }
                                 }
-                                else -> handler.post { onMessage(data) }
                             }
-                        } catch (_: Exception) {}
-                    }
+                            else -> handler.post { onMessage(data) }
+                        }
+                    } catch (_: Exception) {}
                 }
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     handler.post { onDisconnected() }
