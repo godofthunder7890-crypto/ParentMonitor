@@ -96,6 +96,11 @@ class SettingsFragment : Fragment() {
                 setPrompt("Server URL wala QR scan karo")
                 setCameraId(0); setBeepEnabled(false); setBarcodeImageEnabled(false)
             }
+            if (requireActivity().checkSelfPermission(android.Manifest.permission.CAMERA) !=
+                android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 202)
+                return@setOnClickListener
+            }
             qrScanLauncher.launch(opts)
         }
 
