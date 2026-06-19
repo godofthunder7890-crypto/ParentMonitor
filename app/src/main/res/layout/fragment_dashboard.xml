@@ -35,21 +35,18 @@
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     android:layout_marginEnd="16dp">
-                    <!-- Outer glow ring -->
                     <View
                         android:id="@+id/statusRing"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         android:background="@drawable/circle_red"
                         android:alpha="0.2"/>
-                    <!-- Inner dot -->
                     <View
                         android:id="@+id/bigStatusDot"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
                         android:layout_gravity="center"
                         android:background="@drawable/circle_red"/>
-                    <!-- Shine overlay -->
                     <View
                         android:layout_width="16dp"
                         android:layout_height="16dp"
@@ -387,6 +384,215 @@
                     android:letterSpacing="0.05"
                     android:stateListAnimator="@null"
                     style="@style/Widget.MaterialComponents.Button"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ═══ DIAGNOSTIC CARD ═══ -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardDiagnostic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#0D1A0D"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="10dp"
+            android:alpha="0">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="DIAGNOSTICS"
+                        android:textColor="#00C853"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.2"/>
+                    <TextView
+                        android:id="@+id/tvDiagBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="● HEALTHY"
+                        android:textColor="#00C853"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"/>
+                </LinearLayout>
+
+                <!-- Crash + Restart counters row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#101A10"
+                        android:padding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CRASHES"
+                            android:textColor="#556655"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.1"/>
+                        <TextView
+                            android:id="@+id/tvDiagCrashes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#FF5252"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#1A2A1A"
+                        android:layout_marginHorizontal="6dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#101A10"
+                        android:padding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RESTARTS"
+                            android:textColor="#556655"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.1"/>
+                        <TextView
+                            android:id="@+id/tvDiagRestarts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#FFD600"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="#1A2A1A"
+                        android:layout_marginHorizontal="6dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#101A10"
+                        android:padding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ANDROID"
+                            android:textColor="#556655"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.1"/>
+                        <TextView
+                            android:id="@+id/tvDiagAndroid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#00E5FF"
+                            android:textSize="26sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Last event text -->
+                <TextView
+                    android:id="@+id/tvDiagLastEvent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="— No diagnostic data yet —"
+                    android:textColor="#446644"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Action buttons row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/btnDiagFetch"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:text="📋 FETCH LOGS"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#001A00"
+                        app:strokeColor="#00C853"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#00C853"
+                        android:stateListAnimator="@null"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    <Button
+                        android:id="@+id/btnDiagView"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:text="👁 VIEW"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#001A00"
+                        app:strokeColor="#4CAF50"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#4CAF50"
+                        android:stateListAnimator="@null"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    <Button
+                        android:id="@+id/btnDiagClear"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="0dp"
+                        android:text="🗑 CLEAR"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#1A0A00"
+                        app:strokeColor="#FF6D00"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#FF6D00"
+                        android:stateListAnimator="@null"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
