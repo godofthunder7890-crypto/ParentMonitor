@@ -53,23 +53,36 @@ class SettingsFragment : Fragment() {
         val etUrl      = view.findViewById<EditText>(R.id.etServerUrl)
         val etCode     = view.findViewById<EditText>(R.id.etPairCode)
         val etRepo     = view.findViewById<EditText>(R.id.etGithubRepo)
+        val etToken    = view.findViewById<EditText>(R.id.etGithubToken)
         val btnSave    = view.findViewById<Button>(R.id.btnSaveUrl)
         val btnScan    = view.findViewById<Button>(R.id.btnScanQr)
         val btnPush    = view.findViewById<Button>(R.id.btnPushToChild)
         val btnCheck   = view.findViewById<Button>(R.id.btnCheckUpdate)
         val btnPushUpd = view.findViewById<Button>(R.id.btnPushUpdate)
+        val btnSaveToken = view.findViewById<Button>(R.id.btnSaveGithubToken)
         val tvStatus   = view.findViewById<TextView>(R.id.tvConnectionInfo)
         val tvUpdStat  = view.findViewById<TextView>(R.id.tvUpdateStatus)
         val tvOtaVer   = view.findViewById<TextView>(R.id.tvOtaVersion)
 
-        val curUrl  = prefs.getString(MainActivity.KEY_SERVER_URL, MainActivity.DEFAULT_URL) ?: MainActivity.DEFAULT_URL
-        val curCode = prefs.getString(MainActivity.KEY_PAIR_CODE, "") ?: ""
-        val curRepo = prefs.getString(MainActivity.KEY_GITHUB_REPO, "godofthunder7890-crypto/ChildMonitor") ?: ""
+        val curUrl   = prefs.getString(MainActivity.KEY_SERVER_URL, MainActivity.DEFAULT_URL) ?: MainActivity.DEFAULT_URL
+        val curCode  = prefs.getString(MainActivity.KEY_PAIR_CODE, "") ?: ""
+        val curRepo  = prefs.getString(MainActivity.KEY_GITHUB_REPO, "godofthunder7890-crypto/ChildMonitor") ?: ""
+        val ghPrefs  = act.getSharedPreferences("github_prefs", android.content.Context.MODE_PRIVATE)
+        val curToken = ghPrefs.getString("github_token", "") ?: ""
 
         etUrl.setText(curUrl)
         etCode.setText(curCode)
         etRepo.setText(curRepo)
+        if (curToken.isNotEmpty()) etToken.setText(curToken)
         generateQr(view, "$curUrl|$curCode")
+
+        // BUG FIX: Token save karne ka koi UI nahi tha.
+        // Ab user token field mein type kare aur SAVE button dabaye.
+        btnSaveToken.setOnClickListener {
+            val tok = etToken.text.toString().trim()
+            ghPrefs.edit().putString("github_token", tok).apply()
+            setInfo(if (tok.isNotEmpty()) "✅ GitHub token saved!" else "🗑 GitHub token cleared")
+        }
 
         btnSave.setOnClickListener {
             val u = etUrl.text.toString().trim()

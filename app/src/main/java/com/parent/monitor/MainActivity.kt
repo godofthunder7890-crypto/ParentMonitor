@@ -37,6 +37,11 @@ class MainActivity : AppCompatActivity() {
     var locationFragment:        LocationFragment?        = null
     var filesFragment:           FilesFragment?           = null
     var notificationsFragment:   NotificationsFragment?   = null
+    var limitsFragment:          LimitsFragment?          = null
+    var protectFragment:         ProtectFragment?         = null
+    var trackFragment:           TrackFragment?           = null
+    var reportsFragment:         ReportsFragment?         = null
+    var dataFragment:            DataFragment?            = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:   TextView
@@ -91,21 +96,29 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewPager() {
         val pager = findViewById<ViewPager2>(R.id.viewPager)
         val tabs  = findViewById<TabLayout>(R.id.tabLayout)
-        val tabTitles = listOf("Dashboard","Live","Apps","Calls & SMS","Location","Files","Notifs","Controls","Shizuku","Settings")
+        val tabTitles = listOf(
+            "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
+            "Limits","Protect","Track","Reports","Data","Controls","Shizuku","Settings"
+        )
 
         pager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = tabTitles.size
             override fun createFragment(pos: Int): Fragment = when (pos) {
-                0 -> DashboardFragment()
-                1 -> LiveFragment()
-                2 -> AppsFragment()
-                3 -> CallSmsFragment()
-                4 -> LocationFragment()
-                5 -> FilesFragment()
-                6 -> NotificationsFragment()
-                7 -> ControlFragment()
-                8 -> ShizukuFragment()
-                9 -> SettingsFragment()
+                0  -> DashboardFragment()
+                1  -> LiveFragment()
+                2  -> AppsFragment()
+                3  -> CallSmsFragment()
+                4  -> LocationFragment()
+                5  -> FilesFragment()
+                6  -> NotificationsFragment()
+                7  -> LimitsFragment()
+                8  -> ProtectFragment()
+                9  -> TrackFragment()
+                10 -> ReportsFragment()
+                11 -> DataFragment()
+                12 -> ControlFragment()
+                13 -> ShizukuFragment()
+                14 -> SettingsFragment()
                 else -> DashboardFragment()
             }
         }
@@ -185,9 +198,11 @@ class MainActivity : AppCompatActivity() {
                 val lat = msg.optDouble("lat")
                 val lng = msg.optDouble("lng")
                 val acc = msg.optDouble("accuracy", 0.0).toFloat()
+                val geoInside = if (msg.has("geofence_inside")) msg.optBoolean("geofence_inside") else null
                 handler.post {
                     dashboardFragment?.updateLocation(lat, lng)
                     locationFragment?.onLocation(lat, lng, acc)
+                    trackFragment?.onLocationUpdate(lat, lng, acc, geoInside)
                 }
             }
             "current_app" -> {
@@ -196,19 +211,44 @@ class MainActivity : AppCompatActivity() {
             }
             "app_usage" -> {
                 val arr = msg.optJSONArray("stats")
-                if (arr != null) handler.post { appsFragment?.onData(arr) }
+                if (arr != null) handler.post {
+                    appsFragment?.onData(arr)
+                    dataFragment?.onList("Apps", arr) { obj ->
+                        val name = obj.optString("package").substringAfterLast('.')
+                        val mins = obj.optLong("minutes", 0)
+                        "$name — ${mins}min"
+                    }
+                }
             }
             "call_log" -> {
                 val arr = msg.optJSONArray("calls")
-                if (arr != null) handler.post { callSmsFragment?.onCallData(arr) }
+                if (arr != null) handler.post {
+                    callSmsFragment?.onCallData(arr)
+                    dataFragment?.onList("Calls", arr) { obj ->
+                        val num  = obj.optString("number", "Unknown")
+                        val type = obj.optString("type", "")
+                        val dur  = obj.optInt("duration", 0)
+                        "$num  [$type]  ${dur}s"
+                    }
+                }
             }
             "sms" -> {
                 val arr = msg.optJSONArray("messages")
-                if (arr != null) handler.post { callSmsFragment?.onSmsData(arr) }
+                if (arr != null) handler.post {
+                    callSmsFragment?.onSmsData(arr)
+                    dataFragment?.onList("SMS", arr) { obj ->
+                        val addr = obj.optString("address", "Unknown")
+                        val body = obj.optString("body", "").take(60)
+                        "$addr: $body"
+                    }
+                }
             }
             "gallery" -> {
                 val arr = msg.optJSONArray("photos")
-                if (arr != null) handler.post { filesFragment?.onFiles(arr) }
+                if (arr != null) handler.post {
+                    filesFragment?.onFiles(arr)
+                    dataFragment?.onGallery(arr)
+                }
             }
             "notification" -> {
                 val ts = msg.optLong("ts", System.currentTimeMillis())
@@ -231,6 +271,50 @@ class MainActivity : AppCompatActivity() {
                         if (ok) "Child updated to $ver successfully!"
                         else    "Update failed: $err"
                     )
+                }
+            }
+            // ── New fragment routing ──────────────────────────────────────────
+            "daily_report" -> handler.post { reportsFragment?.onDailyReport(msg) }
+            "app_blocked" -> {
+                val pkg    = msg.optString("package")
+                val reason = msg.optString("reason")
+                handler.post {
+                    protectFragment?.onAppBlocked(pkg, reason)
+                    reportsFragment?.addAlert("App Blocked", "${pkg.substringAfterLast('.')} ($reason)")
+                    dashboardFragment?.addLog("🚫 Blocked: ${pkg.substringAfterLast('.')} ($reason)")
+                }
+            }
+            "geofence_alert" -> {
+                val inside = msg.optBoolean("inside")
+                val distM  = msg.optInt("dist_m")
+                handler.post { trackFragment?.onGeofenceAlert(inside, distM) }
+            }
+            "schedule_event" -> {
+                val action = msg.optString("action")
+                val hour   = msg.optInt("hour")
+                handler.post { limitsFragment?.onScheduleEvent(action, hour) }
+            }
+            "keyword_alert" -> {
+                val keyword = msg.optString("keyword")
+                val pkg     = msg.optString("package")
+                val source  = msg.optString("source")
+                handler.post {
+                    reportsFragment?.addAlert("Keyword [$source]", "\"$keyword\" in ${pkg.substringAfterLast('.')}")
+                    dashboardFragment?.addLog("🔍 Keyword \"$keyword\" detected in ${pkg.substringAfterLast('.')}")
+                }
+            }
+            "device_info" -> handler.post { protectFragment?.onDeviceInfo(msg) }
+            "app_open" -> {
+                val pkg = msg.optString("package")
+                handler.post {
+                    reportsFragment?.addAlert("App Opened", pkg.substringAfterLast('.'))
+                }
+            }
+            "chat_content" -> {
+                val pkg     = msg.optString("package")
+                val content = msg.optString("content").take(80)
+                handler.post {
+                    reportsFragment?.addAlert("Chat [${pkg.substringAfterLast('.')}]", content)
                 }
             }
         }

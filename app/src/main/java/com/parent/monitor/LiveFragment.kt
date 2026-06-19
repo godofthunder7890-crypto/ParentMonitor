@@ -39,6 +39,9 @@ class LiveFragment : Fragment() {
     private lateinit var btnScreenSlower: Button
 
     private val mainHandler = Handler(Looper.getMainLooper())
+    // BUG FIX: Thread() per frame bad tha — 30fps pe 30 threads/sec ban-bigar rahe the.
+    // Single thread executor se ek hi background thread reuse hota hai.
+    private val decodeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
 
     private var screenStreaming = false
     private var cameraStreaming = false
@@ -66,6 +69,7 @@ class LiveFragment : Fragment() {
 
     override fun onDestroyView() {
         (activity as? MainActivity)?.liveFragment = null
+        decodeExecutor.shutdown()
         super.onDestroyView()
     }
 
@@ -204,13 +208,10 @@ class LiveFragment : Fragment() {
 
     /** Called by MainActivity when a screen/camera frame arrives */
     fun onScreenFrame(b64: String) {
-        // Decode JPEG on background thread to avoid blocking UI
-        Thread {
+        decodeExecutor.execute {
             try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
-                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@Thread
-                // BUG FIX: screenLastFps kabhi reset nahi hota tha — FPS 0 dikha deta tha.
-                // Ab har second ke baad counter reset hota hai for accurate FPS.
+                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@execute
                 screenFrameCount++
                 val now = System.currentTimeMillis()
                 val elapsed = now - screenLastFps
@@ -229,15 +230,14 @@ class LiveFragment : Fragment() {
                     } catch (_: Exception) {}
                 }
             } catch (_: Exception) {}
-        }.start()
+        }
     }
 
     fun onCameraFrame(b64: String) {
-        Thread {
+        decodeExecutor.execute {
             try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
-                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@Thread
-                // BUG FIX: Same fix — cameraLastFps reset hoga har second baad
+                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@execute
                 cameraFrameCount++
                 val now = System.currentTimeMillis()
                 val elapsed = now - cameraLastFps
@@ -256,7 +256,7 @@ class LiveFragment : Fragment() {
                     } catch (_: Exception) {}
                 }
             } catch (_: Exception) {}
-        }.start()
+        }
     }
 
     private fun setDotColor(dot: View, on: Boolean) {

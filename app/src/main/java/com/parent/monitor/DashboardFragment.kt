@@ -160,9 +160,12 @@ class DashboardFragment : Fragment() {
         activityLog.forEachIndexed { idx, (line, color) ->
             val start = ssb.length
             ssb.append(line)
-            ssb.setSpan(ForegroundColorSpan(color), start, ssb.length, 0)
-            val dimColor = Color.argb((255 * (1f - idx * 0.09f)).toInt(), 255, 255, 255)
-            ssb.setSpan(ForegroundColorSpan(if (idx == 0) color else Color.argb(120, Color.red(color), Color.green(color), Color.blue(color))), start, ssb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            // BUG FIX: Pehle do setSpan calls same range pe the — dusra pehle ko override karta tha.
+            // dimColor variable compute hota tha lekin use nahi hota tha.
+            // Ab sirf ek span: latest entry full color, purani entries fade hoti hain.
+            val finalColor = if (idx == 0) color
+                             else Color.argb(120, Color.red(color), Color.green(color), Color.blue(color))
+            ssb.setSpan(ForegroundColorSpan(finalColor), start, ssb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             if (idx < activityLog.lastIndex) ssb.append("\n")
         }
         tvActivityLog?.text = ssb
