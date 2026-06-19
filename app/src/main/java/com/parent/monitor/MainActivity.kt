@@ -490,14 +490,24 @@ class MainActivity : AppCompatActivity() {
 
             // ── Diagnostic Report ─────────────────────────────────────────────
             "diagnostic_report" -> {
-                handler.post {
-                    dashboardFragment?.onDiagnosticReport(msg)
-                }
+                handler.post { dashboardFragment?.onDiagnosticReport(msg) }
             }
             "diagnostic_cleared" -> {
                 handler.post {
                     dashboardFragment?.addLog("🗑 Diagnostic logs cleared on child device", 0xFFFF6D00.toInt())
                 }
+            }
+
+            // ── Service Health: real-time 15-indicator monitor ────────────────
+            "heartbeat" -> {
+                // Child sends every 30s — payload: uptime, conn_quality, crash/restart counts
+                val payload = msg.optJSONObject("payload") ?: msg
+                handler.post { dashboardFragment?.onHeartbeat(payload) }
+            }
+            "health_status" -> {
+                // Child sends every ~2.5 min — full 15-indicator health snapshot
+                val payload = msg.optJSONObject("payload") ?: msg
+                handler.post { dashboardFragment?.onHealthStatus(payload) }
             }
         }
     }
