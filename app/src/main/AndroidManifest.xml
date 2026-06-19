@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:label="Parent Monitor"
         android:theme="@style/Theme.App"
         android:supportsRtl="true">
@@ -19,7 +19,7 @@
             Google Maps SDK key.
             Replace "YOUR_MAPS_API_KEY" with a real key from Google Cloud Console:
             https://console.cloud.google.com/ → APIs & Services → Maps SDK for Android
-            Without a key, the map will show a watermark but still work for testing.
+            Without a key, the map will show a grey watermark but the app will NOT crash.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -28,7 +28,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
