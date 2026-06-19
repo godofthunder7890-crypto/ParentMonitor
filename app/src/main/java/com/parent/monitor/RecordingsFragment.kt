@@ -142,7 +142,7 @@ class RecordingsFragment : Fragment() {
         val totalChunks = data.optInt("total_chunks", 1)
         val chunkData   = data.optString("data")
 
-        val buf = chunkBuffers.getOrPut(filename) { mutableListOf() }
+        val buf = chunkBuffers.getOrPut(filename) { mutableListOf() }.also { if (it.size > 200) it.clear() }
         while (buf.size <= chunk) buf.add("")
         buf[chunk] = chunkData
 
@@ -203,6 +203,7 @@ class RecordingsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        chunkBuffers.clear() // BUG FIX: prevent base64 memory leak
         (activity as? MainActivity)?.recordingsFragment = null
         super.onDestroyView()
     }
