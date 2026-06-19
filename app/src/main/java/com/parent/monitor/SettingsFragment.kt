@@ -106,6 +106,13 @@ class SettingsFragment : Fragment() {
                     val conn = URL("https://api.github.com/repos/$repo/releases/latest")
                         .openConnection() as HttpURLConnection
                     conn.setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    // BUG FIX: Private repos ke liye auth header zaroori hai
+                    // Bina is header ke private repo 404 deta tha — OTA kabhi kaam nahi karta tha
+                    val token = context?.let {
+                        it.getSharedPreferences("github_prefs", android.content.Context.MODE_PRIVATE)
+                            .getString("github_token", "") ?: ""
+                    } ?: ""
+                    if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "token $token")
                     conn.connectTimeout = 10000; conn.readTimeout = 10000
                     val json = JSONObject(conn.inputStream.bufferedReader().readText())
                     conn.disconnect()
