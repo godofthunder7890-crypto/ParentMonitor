@@ -15,8 +15,12 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.Button
+import android.widget.ScrollView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,6 +42,17 @@ class DashboardFragment : Fragment() {
     private var btnDashCurrentApp: Button? = null
     private var btnDashGrantPerms: Button? = null
     private var btnDashEmergencyLock: Button? = null
+
+    // Diagnostic views
+    private var tvDiagBadge: TextView?     = null
+    private var tvDiagCrashes: TextView?   = null
+    private var tvDiagRestarts: TextView?  = null
+    private var tvDiagAndroid: TextView?   = null
+    private var tvDiagLastEvent: TextView? = null
+    private var btnDiagFetch: Button?      = null
+    private var btnDiagView: Button?       = null
+    private var btnDiagClear: Button?      = null
+    private var lastDiagReport: JSONObject? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var pulseAnim: AnimatorSet? = null
@@ -67,6 +82,16 @@ class DashboardFragment : Fragment() {
         btnDashGrantPerms= view.findViewById(R.id.btnDashGrantPerms)
         btnDashEmergencyLock = view.findViewById(R.id.btnDashEmergencyLock)
 
+        // Diagnostic views
+        tvDiagBadge     = view.findViewById(R.id.tvDiagBadge)
+        tvDiagCrashes   = view.findViewById(R.id.tvDiagCrashes)
+        tvDiagRestarts  = view.findViewById(R.id.tvDiagRestarts)
+        tvDiagAndroid   = view.findViewById(R.id.tvDiagAndroid)
+        tvDiagLastEvent = view.findViewById(R.id.tvDiagLastEvent)
+        btnDiagFetch    = view.findViewById(R.id.btnDiagFetch)
+        btnDiagView     = view.findViewById(R.id.btnDiagView)
+        btnDiagClear    = view.findViewById(R.id.btnDiagClear)
+
         (activity as? MainActivity)?.dashboardFragment = this
 
         btnDashLock?.setOnClickListener          { sendCmd("lock_screen"); popView(btnDashLock!!) }
@@ -81,6 +106,33 @@ class DashboardFragment : Fragment() {
             shakeView(btnDashEmergencyLock!!)
         }
 
+        // Diagnostic buttons
+        btnDiagFetch?.setOnClickListener {
+            sendCmd("get_diagnostic_report")
+            addLog("📋 Fetching diagnostic report...", 0xFF00C853.toInt())
+            btnDiagFetch?.text = "📋 FETCHING..."
+            btnDiagFetch?.isEnabled = false
+            handler.postDelayed({ btnDiagFetch?.text = "📋 FETCH LOGS"; btnDiagFetch?.isEnabled = true }, 5000)
+            popView(btnDiagFetch!!)
+        }
+        btnDiagView?.setOnClickListener {
+            showDiagnosticDialog()
+            popView(btnDiagView!!)
+        }
+        btnDiagClear?.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Clear Diagnostic Logs")
+                .setMessage("This will erase all crash and restart logs from the child device. Continue?")
+                .setPositiveButton("CLEAR") { _, _ ->
+                    sendCmd("clear_diagnostic_logs")
+                    lastDiagReport = null
+                    resetDiagUI()
+                    addLog("🗑 Diagnostic logs cleared", 0xFFFF6D00.toInt())
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         animateCardsIn(view)
     }
 
@@ -90,6 +142,154 @@ class DashboardFragment : Fragment() {
         super.onDestroyView()
     }
 
+    // ── Diagnostic report received from child device ───────────────────────────
+    fun onDiagnosticReport(report: JSONObject) {
+        if (!isAdded) return
+        lastDiagReport = report
+
+        val crashes  = report.optJSONArray("crashes")  ?: JSONArray()
+        val restarts = report.optJSONArray("restarts") ?: JSONArray()
+        val android  = report.optInt("android", 0)
+        val device   = report.optString("device", "Unknown")
+
+        val crashCount   = crashes.length()
+        val watchdogRestarts = (0 until restarts.length()).count {
+            restarts.getJSONObject(it).optString("type") == "WATCHDOG_RESTART"
+        }
+
+        tvDiagCrashes?.text  = crashCount.toString()
+        tvDiagRestarts?.text = watchdogRestarts.toString()
+        tvDiagAndroid?.text  = android.toString()
+
+        // Badge color: red = crashes, yellow = restarts, green = healthy
+        val badgeText: String
+        val badgeColor: Int
+        when {
+            crashCount > 0 -> {
+                badgeText  = "● $crashCount CRASH${if (crashCount > 1) "ES" else ""}"
+                badgeColor = 0xFFFF5252.toInt()
+            }
+            watchdogRestarts > 0 -> {
+                badgeText  = "● $watchdogRestarts RESTART${if (watchdogRestarts > 1) "S" else ""}"
+                badgeColor = 0xFFFFD600.toInt()
+            }
+            else -> {
+                badgeText  = "● HEALTHY"
+                badgeColor = 0xFF00C853.toInt()
+            }
+        }
+        tvDiagBadge?.text = badgeText
+        tvDiagBadge?.setTextColor(badgeColor)
+        tvDiagCrashes?.setTextColor(if (crashCount > 0) 0xFFFF5252.toInt() else 0xFF4CAF50.toInt())
+        tvDiagRestarts?.setTextColor(if (watchdogRestarts > 0) 0xFFFFD600.toInt() else 0xFF4CAF50.toInt())
+
+        // Last event line
+        val lastEvent = when {
+            crashes.length() > 0 -> {
+                val last = crashes.getJSONObject(crashes.length() - 1)
+                "Last crash: ${last.optString("time")} — ${last.optString("exception").substringAfterLast('.')}"
+            }
+            restarts.length() > 0 -> {
+                val last = restarts.getJSONObject(restarts.length() - 1)
+                "Last event: ${last.optString("time")} — ${last.optString("type")}"
+            }
+            else -> "$device · Android $android · All clear"
+        }
+        tvDiagLastEvent?.text = lastEvent
+
+        addLog("📋 Diagnostic: $crashCount crashes, $watchdogRestarts restarts | $device", badgeColor)
+
+        // Animate the card in if first report
+        view?.findViewById<View>(R.id.cardDiagnostic)?.let { card ->
+            if (card.alpha == 0f) {
+                card.animate().alpha(1f).setDuration(400).start()
+            }
+        }
+    }
+
+    private fun resetDiagUI() {
+        tvDiagCrashes?.text  = "--"
+        tvDiagRestarts?.text = "--"
+        tvDiagAndroid?.text  = "--"
+        tvDiagBadge?.text    = "● HEALTHY"
+        tvDiagBadge?.setTextColor(0xFF00C853.toInt())
+        tvDiagCrashes?.setTextColor(0xFF4CAF50.toInt())
+        tvDiagRestarts?.setTextColor(0xFF4CAF50.toInt())
+        tvDiagLastEvent?.text = "— Logs cleared —"
+    }
+
+    private fun showDiagnosticDialog() {
+        val ctx = requireContext()
+        val report = lastDiagReport
+
+        if (report == null) {
+            AlertDialog.Builder(ctx)
+                .setTitle("📋 No Data Yet")
+                .setMessage("Tap 'FETCH LOGS' first to pull diagnostic data from the child device.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val crashes  = report.optJSONArray("crashes")  ?: JSONArray()
+        val restarts = report.optJSONArray("restarts") ?: JSONArray()
+        val device   = report.optString("device", "Unknown")
+        val android  = report.optInt("android", 0)
+
+        val sb = StringBuilder()
+        sb.appendLine("DEVICE: $device")
+        sb.appendLine("ANDROID: $android")
+        sb.appendLine("REPORT TIME: ${report.optString("report_time")}")
+        sb.appendLine()
+
+        sb.appendLine("══ CRASHES (${crashes.length()}) ══")
+        if (crashes.length() == 0) {
+            sb.appendLine("  ✅ No crashes recorded")
+        } else {
+            for (i in 0 until crashes.length()) {
+                val c = crashes.getJSONObject(i)
+                sb.appendLine()
+                sb.appendLine("  [${c.optString("time")}]")
+                sb.appendLine("  Exception: ${c.optString("exception").substringAfterLast('.')}")
+                sb.appendLine("  Message: ${c.optString("message")}")
+                sb.appendLine("  Thread: ${c.optString("thread")}")
+                val stack = c.optString("stacktrace").lines().take(6).joinToString("\n  ")
+                sb.appendLine("  Stack:\n  $stack")
+            }
+        }
+
+        sb.appendLine()
+        sb.appendLine("══ RESTARTS (${restarts.length()}) ══")
+        if (restarts.length() == 0) {
+            sb.appendLine("  ✅ No forced restarts")
+        } else {
+            for (i in 0 until restarts.length()) {
+                val r = restarts.getJSONObject(i)
+                sb.appendLine("  [${r.optString("time")}] ${r.optString("type")} — ${r.optString("message").ifEmpty { r.optString("reason") }}")
+            }
+        }
+
+        val tv = TextView(ctx).apply {
+            text = sb.toString()
+            textSize = 11f
+            typeface = android.graphics.Typeface.MONOSPACE
+            setTextColor(0xFF00E5FF.toInt())
+            setPadding(32, 24, 32, 24)
+        }
+        val sv = ScrollView(ctx).apply { addView(tv) }
+
+        AlertDialog.Builder(ctx)
+            .setTitle("📋 Diagnostic Report")
+            .setView(sv)
+            .setPositiveButton("Close", null)
+            .setNeutralButton("Re-fetch") { _, _ ->
+                sendCmd("get_diagnostic_report")
+                addLog("📋 Re-fetching diagnostic report...", 0xFF00C853.toInt())
+            }
+            .show()
+    }
+
+    // ── Standard fragment methods ──────────────────────────────────────────────
     fun updateOnline(online: Boolean) {
         if (!isAdded) return
         val color = if (online) 0xFF00C853.toInt() else 0xFFFF1744.toInt()
@@ -160,9 +360,6 @@ class DashboardFragment : Fragment() {
         activityLog.forEachIndexed { idx, (line, color) ->
             val start = ssb.length
             ssb.append(line)
-            // BUG FIX: Pehle do setSpan calls same range pe the — dusra pehle ko override karta tha.
-            // dimColor variable compute hota tha lekin use nahi hota tha.
-            // Ab sirf ek span: latest entry full color, purani entries fade hoti hain.
             val finalColor = if (idx == 0) color
                              else Color.argb(120, Color.red(color), Color.green(color), Color.blue(color))
             ssb.setSpan(ForegroundColorSpan(finalColor), start, ssb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -179,11 +376,9 @@ class DashboardFragment : Fragment() {
         stopPulse()
         val ring = statusRing ?: return
         ring.scaleX = 1f; ring.scaleY = 1f; ring.alpha = 0.7f
-
         val scaleX = ObjectAnimator.ofFloat(ring, "scaleX", 1f, 1.45f, 1f)
         val scaleY = ObjectAnimator.ofFloat(ring, "scaleY", 1f, 1.45f, 1f)
         val alpha  = ObjectAnimator.ofFloat(ring, "alpha", 0.7f, 0.1f, 0.7f)
-
         pulseAnim = AnimatorSet().apply {
             playTogether(scaleX, scaleY, alpha)
             duration = 1400
@@ -198,17 +393,13 @@ class DashboardFragment : Fragment() {
     }
 
     private fun stopPulse() {
-        pulseAnim?.cancel()
-        pulseAnim = null
+        pulseAnim?.cancel(); pulseAnim = null
         statusRing?.animate()?.scaleX(1f)?.scaleY(1f)?.alpha(0.15f)?.setDuration(300)?.start()
     }
 
     private fun popView(v: View) {
         v.animate().scaleX(1.18f).scaleY(1.18f).setDuration(90)
-            .withEndAction {
-                v.animate().scaleX(1f).scaleY(1f)
-                    .setDuration(140).setInterpolator(OvershootInterpolator(3f)).start()
-            }.start()
+            .withEndAction { v.animate().scaleX(1f).scaleY(1f).setDuration(140).setInterpolator(OvershootInterpolator(3f)).start() }.start()
     }
 
     private fun shakeView(v: View) {
@@ -226,15 +417,15 @@ class DashboardFragment : Fragment() {
     private fun animateDotColor(v: View?, to: Int) {
         v?.animate()?.scaleX(0.7f)?.scaleY(0.7f)?.setDuration(120)?.withEndAction {
             v.setBackgroundColor(to)
-            v.animate().scaleX(1f).scaleY(1f)
-                .setDuration(200).setInterpolator(OvershootInterpolator(4f)).start()
+            v.animate().scaleX(1f).scaleY(1f).setDuration(200).setInterpolator(OvershootInterpolator(4f)).start()
         }?.start()
     }
 
     private fun animateCardsIn(root: View) {
         val ids = intArrayOf(
             R.id.cardStatus, R.id.cardBattery, R.id.cardPing,
-            R.id.cardApp, R.id.cardLocation, R.id.cardActions, R.id.cardLog
+            R.id.cardApp, R.id.cardLocation, R.id.cardActions,
+            R.id.cardDiagnostic, R.id.cardLog
         )
         ids.forEachIndexed { i, id ->
             val card = root.findViewById<View>(id) ?: return@forEachIndexed
