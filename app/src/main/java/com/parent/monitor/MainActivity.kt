@@ -42,6 +42,10 @@ class MainActivity : AppCompatActivity() {
     var trackFragment:           TrackFragment?           = null
     var reportsFragment:         ReportsFragment?         = null
     var dataFragment:            DataFragment?            = null
+    // ── New fragments (blueprint missing features) ────────────────────────────
+    var browserSafetyFragment:   BrowserSafetyFragment?  = null
+    var videoHistoryFragment:    VideoHistoryFragment?    = null
+    var recordingsFragment:      RecordingsFragment?      = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:   TextView
@@ -98,7 +102,8 @@ class MainActivity : AppCompatActivity() {
         val tabs  = findViewById<TabLayout>(R.id.tabLayout)
         val tabTitles = listOf(
             "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
-            "Limits","Protect","Track","Reports","Data","Controls","Shizuku","Settings"
+            "Limits","Protect","Track","Reports","Data","Controls","Shizuku",
+            "Browser","Videos","Recordings","Settings"
         )
 
         pager.adapter = object : FragmentStateAdapter(this) {
@@ -118,7 +123,10 @@ class MainActivity : AppCompatActivity() {
                 11 -> DataFragment()
                 12 -> ControlFragment()
                 13 -> ShizukuFragment()
-                14 -> SettingsFragment()
+                14 -> BrowserSafetyFragment()
+                15 -> VideoHistoryFragment()
+                16 -> RecordingsFragment()
+                17 -> SettingsFragment()
                 else -> DashboardFragment()
             }
         }
@@ -315,6 +323,70 @@ class MainActivity : AppCompatActivity() {
                 val content = msg.optString("content").take(80)
                 handler.post {
                     reportsFragment?.addAlert("Chat [${pkg.substringAfterLast('.')}]", content)
+                }
+            }
+
+            // ── New events from blueprint features ────────────────────────────
+            "browser_blocked" -> {
+                val url    = msg.optString("url")
+                val domain = msg.optString("domain")
+                val pkg    = msg.optString("package")
+                handler.post {
+                    browserSafetyFragment?.onBrowserBlocked(url, domain, pkg)
+                    reportsFragment?.addAlert("🌐 Browser Blocked", "$domain\n${url.take(50)}")
+                    dashboardFragment?.addLog("🌐 Blocked browser: $domain")
+                }
+            }
+            "blocked_domains" -> {
+                val arr = msg.optJSONArray("domains")
+                if (arr != null) {
+                    val list = (0 until arr.length()).map { arr.getString(it) }
+                    handler.post { browserSafetyFragment?.onBlockedDomains(list) }
+                }
+            }
+            "video_history" -> {
+                handler.post { videoHistoryFragment?.onVideoHistory(msg) }
+            }
+            "video_watched" -> {
+                handler.post {
+                    val title    = msg.optString("title", "")
+                    val platform = msg.optString("package", "").let {
+                        if (it.contains("youtube")) "YouTube" else "TikTok"
+                    }
+                    val secs     = msg.optLong("watched_seconds", 0)
+                    reportsFragment?.addAlert("$platform watched", "${secs}s — $title")
+                    videoHistoryFragment?.onVideoHistory(msg)
+                }
+            }
+            "permission_revoked" -> {
+                val perm = msg.optString("permission")
+                handler.post {
+                    reportsFragment?.addAlert("⚠️ Permission OFF!", perm)
+                    dashboardFragment?.addLog("⚠️ Permission revoked: $perm")
+                }
+            }
+            "permission_status" -> {
+                handler.post { dashboardFragment?.addLog("🔐 Perms: ${msg.toString().take(80)}") }
+            }
+            "recording_started" -> {
+                val type = msg.optString("type")
+                handler.post { dashboardFragment?.addLog("🎙 Recording started: $type") }
+            }
+            "recording_ready" -> {
+                handler.post { recordingsFragment?.onRecordingReady(msg) }
+            }
+            "recording_chunk" -> {
+                handler.post { recordingsFragment?.onRecordingChunk(msg) }
+            }
+            "recording_list" -> {
+                val arr = msg.optJSONArray("files")
+                if (arr != null) handler.post { recordingsFragment?.onRecordingList(arr) }
+            }
+            "back_online" -> {
+                val mins = msg.optLong("offline_minutes", 0)
+                handler.post {
+                    dashboardFragment?.addLog("📶 Child back online (was offline ${mins}min)")
+                    reportsFragment?.addAlert("📶 Back Online", "Was offline for ${mins} minutes")
                 }
             }
         }
