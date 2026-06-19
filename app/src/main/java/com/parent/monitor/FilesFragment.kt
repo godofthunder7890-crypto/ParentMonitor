@@ -128,7 +128,12 @@ class FilesFragment : Fragment() {
                 try {
                     val bytes = Base64.decode(b64, Base64.DEFAULT)
                     val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    if (bmp != null) { iv.setImageBitmap(bmp); return iv }
+                    if (bmp != null) {
+                        val oldBmp = (iv.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
+                        iv.setImageBitmap(bmp)
+                        if (oldBmp !== bmp) oldBmp?.recycle()
+                        return iv
+                    }
                 } catch (_: Exception) {}
             }
             iv.setImageDrawable(null)
