@@ -225,9 +225,12 @@ class LiveFragment : Fragment() {
                 }
                 mainHandler.post {
                     try {
+                        if (!isAdded || view == null) { bmp.recycle(); return@post }
+                        val oldBmp = (imgScreen.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
                         imgScreen.setImageBitmap(bmp)
+                        if (oldBmp !== bmp) oldBmp?.recycle()
                         tvScreenFps.text = "${fps}fps"
-                    } catch (_: Exception) {}
+                    } catch (_: Exception) { try { bmp.recycle() } catch (_: Exception) {} }
                 }
             } catch (_: Exception) {}
         }
@@ -251,9 +254,12 @@ class LiveFragment : Fragment() {
                 }
                 mainHandler.post {
                     try {
+                        if (!isAdded || view == null) { bmp.recycle(); return@post }
+                        val oldBmp = (imgCamera.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
                         imgCamera.setImageBitmap(bmp)
+                        if (oldBmp !== bmp) oldBmp?.recycle()
                         tvCameraFps.text = "${fps}fps"
-                    } catch (_: Exception) {}
+                    } catch (_: Exception) { try { bmp.recycle() } catch (_: Exception) {} }
                 }
             } catch (_: Exception) {}
         }
