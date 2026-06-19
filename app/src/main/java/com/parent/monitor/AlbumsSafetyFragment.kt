@@ -123,7 +123,11 @@ class AlbumsSafetyFragment : Fragment() {
         if (thumbB64.isNotEmpty()) {
             try {
                 val bytes = Base64.decode(thumbB64, Base64.DEFAULT)
-                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                val _optsbmp = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, _optsbmp)
+                    val _scbmp = maxOf(1, maxOf(_optsbmp.outWidth, _optsbmp.outHeight) / 300)
+                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
+                        BitmapFactory.Options().apply { inSampleSize = _scbmp })
                 if (bmp != null) ivThumb.setImageBitmap(bmp)
             } catch (_: Exception) {}
         }
@@ -175,7 +179,11 @@ class AlbumsSafetyFragment : Fragment() {
         activity?.runOnUiThread {
             try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
-                val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@runOnUiThread
+                val _optsbmp = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, _optsbmp)
+                    val _scbmp = maxOf(1, maxOf(_optsbmp.outWidth, _optsbmp.outHeight) / 300)
+                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
+                        BitmapFactory.Options().apply { inSampleSize = _scbmp }) ?: return@runOnUiThread
                 val dlg   = android.app.AlertDialog.Builder(requireContext())
                 val iv    = ImageView(requireContext()).apply {
                     setImageBitmap(bmp); adjustViewBounds = true; setBackgroundColor(0xFF000000.toInt())
