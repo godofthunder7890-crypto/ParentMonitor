@@ -22,15 +22,12 @@
             app:cardElevation="12dp"
             android:layout_marginBottom="10dp"
             android:alpha="0">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="20dp"
                 android:gravity="center_vertical">
-
-                <!-- Pulse ring + dot -->
                 <FrameLayout
                     android:layout_width="72dp"
                     android:layout_height="72dp"
@@ -55,7 +52,6 @@
                         android:background="@drawable/circle_white_shine"
                         android:alpha="0.25"/>
                 </FrameLayout>
-
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -88,7 +84,6 @@
                         android:fontFamily="monospace"
                         android:layout_marginTop="3dp"/>
                 </LinearLayout>
-
                 <Button
                     android:id="@+id/btnDashLock"
                     android:layout_width="58dp"
@@ -109,7 +104,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardBattery"
                 android:layout_width="0dp"
@@ -157,7 +151,6 @@
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardPing"
                 android:layout_width="0dp"
@@ -209,7 +202,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp">
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardApp"
                 android:layout_width="0dp"
@@ -259,7 +251,6 @@
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLocation"
                 android:layout_width="0dp"
@@ -387,6 +378,418 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- ═══ SERVICE HEALTH CARD ═══ -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardHealth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#0A1520"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            android:layout_marginBottom="10dp"
+            android:alpha="0">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Header row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="SERVICE HEALTH"
+                        android:textColor="#0099FF"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.2"/>
+                    <View
+                        android:id="@+id/viewHeartbeatDot"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:background="@drawable/circle_red"
+                        android:layout_marginEnd="6dp"/>
+                    <TextView
+                        android:id="@+id/tvHeartbeatStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NO SIGNAL"
+                        android:textColor="#FF1744"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
+                </LinearLayout>
+
+                <!-- Heartbeat age -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="#060E18"
+                    android:padding="10dp"
+                    android:layout_marginBottom="10dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="❤ HEARTBEAT"
+                        android:textColor="#336699"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"/>
+                    <TextView
+                        android:id="@+id/tvHeartbeatAge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="— waiting —"
+                        android:textColor="#4488BB"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"/>
+                </LinearLayout>
+
+                <!-- Uptime + Connection Quality row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#060E18"
+                        android:padding="10dp"
+                        android:layout_marginEnd="5dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="UPTIME"
+                            android:textColor="#335577"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.1"/>
+                        <TextView
+                            android:id="@+id/tvHealthUptime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#00AAFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"
+                            android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#060E18"
+                        android:padding="10dp"
+                        android:layout_marginStart="5dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CONN QUALITY"
+                            android:textColor="#335577"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.1"/>
+                        <TextView
+                            android:id="@+id/tvConnQuality"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#00FF88"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"
+                            android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Crash + Restart counters -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#100A0A"
+                        android:padding="8dp"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CRASHES"
+                            android:textColor="#553333"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvHealthCrashes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#FF5252"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#0F0E08"
+                        android:padding="8dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RESTARTS"
+                            android:textColor="#555533"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvHealthRestarts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#FFD600"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="#060E18"
+                        android:padding="8dp"
+                        android:layout_marginStart="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ANDROID"
+                            android:textColor="#335577"
+                            android:textSize="8sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvHealthAndroid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="#00E5FF"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Status grid: 4 permission checks -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#060E18"
+                    android:padding="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="FOREGROUND SVC"
+                            android:textColor="#446688"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvStatusFgService"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⬤ --"
+                            android:textColor="#555577"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="ACCESSIBILITY"
+                            android:textColor="#446688"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvStatusAccessibility"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⬤ --"
+                            android:textColor="#555577"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="NOTIF ACCESS"
+                            android:textColor="#446688"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvStatusNotifAccess"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⬤ --"
+                            android:textColor="#555577"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="BATTERY OPT"
+                            android:textColor="#446688"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"/>
+                        <TextView
+                            android:id="@+id/tvStatusBatteryOpt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⬤ --"
+                            android:textColor="#555577"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Device manufacturer + model -->
+                <TextView
+                    android:id="@+id/tvHealthDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="— Device: waiting —"
+                    android:textColor="#336688"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="6dp"/>
+
+                <!-- Last crash reason -->
+                <TextView
+                    android:id="@+id/tvHealthLastCrash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Last crash: —"
+                    android:textColor="#664444"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:layout_marginBottom="4dp"/>
+
+                <!-- Last restart reason -->
+                <TextView
+                    android:id="@+id/tvHealthLastRestart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Last restart: —"
+                    android:textColor="#665533"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Health action buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/btnHealthRefresh"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:text="🔄 REFRESH"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#051525"
+                        app:strokeColor="#0066BB"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#0099FF"
+                        android:stateListAnimator="@null"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    <Button
+                        android:id="@+id/btnHealthExport"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:text="📤 EXPORT"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:backgroundTint="#051525"
+                        app:strokeColor="#00AAFF"
+                        app:strokeWidth="1.5dp"
+                        android:textColor="#00AAFF"
+                        android:stateListAnimator="@null"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- ═══ DIAGNOSTIC CARD ═══ -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardDiagnostic"
@@ -428,13 +831,11 @@
                         android:fontFamily="monospace"/>
                 </LinearLayout>
 
-                <!-- Crash + Restart counters row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="12dp">
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -461,13 +862,11 @@
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
                     </LinearLayout>
-
                     <View
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:background="#1A2A1A"
                         android:layout_marginHorizontal="6dp"/>
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -494,13 +893,11 @@
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
                     </LinearLayout>
-
                     <View
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:background="#1A2A1A"
                         android:layout_marginHorizontal="6dp"/>
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -529,7 +926,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Last event text -->
                 <TextView
                     android:id="@+id/tvDiagLastEvent"
                     android:layout_width="match_parent"
@@ -542,7 +938,6 @@
                     android:ellipsize="end"
                     android:layout_marginBottom="12dp"/>
 
-                <!-- Action buttons row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -582,7 +977,6 @@
                         android:layout_width="0dp"
                         android:layout_height="46dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="0dp"
                         android:text="🗑 CLEAR"
                         android:textSize="10sp"
                         android:fontFamily="monospace"
