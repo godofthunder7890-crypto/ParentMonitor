@@ -1,157 +1,164 @@
 package com.parent.monitor
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
+import android.webkit.*
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.*
 
-class LocationFragment : Fragment(), OnMapReadyCallback {
+class LocationFragment : Fragment() {
 
-    private var tvLat:  TextView? = null
-    private var tvLng:  TextView? = null
-    private var tvAcc:  TextView? = null
-    private var tvHist: TextView? = null
-
-    private var mapView:   MapView?    = null
-    private var googleMap: GoogleMap?  = null
-    private var marker:    Marker?     = null
-
-    private val histLog = mutableListOf<String>()
+    private var webView: WebView? = null
+    private var tvCoords: TextView? = null
+    private var tvAccuracy: TextView? = null
+    private var llHistory: LinearLayout? = null
+    private val locationHistory = mutableListOf<String>()
     private var lastLat = 0.0
     private var lastLng = 0.0
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?): View {
         val ctx = requireContext()
         val act = requireActivity() as MainActivity
 
-        val scroll = ScrollView(ctx)
-        val root   = LinearLayout(ctx).apply {
-            orientation = LinearLayout.VERTICAL; setPadding(24, 24, 24, 24)
-        }
-        scroll.addView(root)
-
-        fun label(t: String) = TextView(ctx).apply {
-            text = t; setTextColor(0xFF888888.toInt()); textSize = 11f; setPadding(0, 8, 0, 2)
-        }
-        fun value() = TextView(ctx).apply {
-            text = "--"; setTextColor(0xFF00E5FF.toInt()); textSize = 20f
-            typeface = android.graphics.Typeface.MONOSPACE
+        val root = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF060612.toInt())
         }
 
-        // ── Coordinate readouts ───────────────────────────────────────────────
-        root.addView(label("LATITUDE"));  tvLat = value(); root.addView(tvLat)
-        root.addView(label("LONGITUDE")); tvLng = value(); root.addView(tvLng)
-        root.addView(label("ACCURACY"));  tvAcc = value(); root.addView(tvAcc)
-
-        // ── Buttons ───────────────────────────────────────────────────────────
+        val header = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setBackgroundColor(0xFF0A0A1E.toInt())
+            setPadding(28, 20, 28, 20)
+        }
+        val tvTitle = TextView(ctx).apply {
+            text = "LIVE LOCATION (OpenStreetMap)"; textSize = 12f
+            setTextColor(0xFF00E5FF.toInt()); layoutParams = LinearLayout.LayoutParams(0, -2, 1f)
+        }
         val btnFetch = Button(ctx).apply {
-            text = "📍 FETCH LOCATION"
-            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF001A33.toInt())
-            setTextColor(0xFF00E5FF.toInt())
+            text = "📍"; textSize = 14f; setTextColor(0xFF000000.toInt())
+            setBackgroundColor(0xFF00E5FF.toInt()); setPadding(20, 8, 20, 8)
         }
-        btnFetch.setOnClickListener { act.wsManager.sendCommand("get_location") }
-        root.addView(btnFetch)
+        btnFetch.setOnClickListener { act.sendCommand("get_location") }
+        header.addView(tvTitle); header.addView(btnFetch)
+        root.addView(header)
 
-        val btnCenter = Button(ctx).apply {
-            text = "🗺 CENTER MAP"
-            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF001A33.toInt())
-            setTextColor(0xFF00E5FF.toInt())
+        tvCoords = TextView(ctx).apply {
+            text = "Waiting for location…"; textSize = 14f
+            setTextColor(0xFF00E5FF.toInt()); setPadding(28, 10, 28, 0)
         }
-        btnCenter.setOnClickListener { centerMap() }
-        root.addView(btnCenter)
+        root.addView(tvCoords)
 
-        // ── Google Map ────────────────────────────────────────────────────────
-        root.addView(label("LIVE MAP"))
-        mapView = MapView(ctx).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, 900
-            )
+        tvAccuracy = TextView(ctx).apply {
+            text = ""; textSize = 11f; setTextColor(0xFF555577.toInt()); setPadding(28, 2, 28, 6)
         }
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync(this)
-        root.addView(mapView)
+        root.addView(tvAccuracy)
 
-        // ── History log ───────────────────────────────────────────────────────
-        root.addView(label("LOCATION HISTORY"))
-        tvHist = TextView(ctx).apply {
-            text = "No history"
-            setTextColor(0xFF444466.toInt()); textSize = 11f; setPadding(0, 8, 0, 0)
+        webView = WebView(ctx).apply {
+            layoutParams = LinearLayout.LayoutParams(-1, 0).apply { weight = 1f }
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.loadsImagesAutomatically = true
+            settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            webChromeClient = WebChromeClient()
+            webViewClient = object : WebViewClient() {
+                override fun onReceivedError(view: WebView?, r: WebResourceRequest?, e: WebResourceError?) {}
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
+            }
+            loadData(buildMapHtml(20.5937, 78.9629, false), "text/html", "UTF-8")
         }
-        root.addView(tvHist)
+        root.addView(webView)
+
+        val histHeader = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setBackgroundColor(0xFF0A0A1E.toInt())
+            setPadding(28, 8, 28, 8)
+        }
+        histHeader.addView(TextView(ctx).apply {
+            text = "History"; textSize = 11f; setTextColor(0xFF888888.toInt())
+            layoutParams = LinearLayout.LayoutParams(0, -2, 1f)
+        })
+        val btnClear = Button(ctx).apply {
+            text = "Clear"; textSize = 10f; setTextColor(0xFF888888.toInt())
+            setBackgroundColor(0); setPadding(16, 4, 0, 4)
+        }
+        btnClear.setOnClickListener { locationHistory.clear(); llHistory?.removeAllViews() }
+        histHeader.addView(btnClear)
+        root.addView(histHeader)
+
+        val scrollHist = ScrollView(ctx).apply {
+            layoutParams = LinearLayout.LayoutParams(-1, 120.dp(ctx))
+        }
+        llHistory = LinearLayout(ctx).apply {
+            orientation = LinearLayout.VERTICAL; setPadding(28, 4, 28, 8)
+        }
+        scrollHist.addView(llHistory)
+        root.addView(scrollHist)
 
         (activity as? MainActivity)?.locationFragment = this
-        return scroll
+        return root
     }
 
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        map.mapType = GoogleMap.MAP_TYPE_NORMAL
-        map.uiSettings.isZoomControlsEnabled   = true
-        map.uiSettings.isCompassEnabled        = true
-        map.uiSettings.isMyLocationButtonEnabled = false
-
-        // Dark map style
-        try {
-            map.setMapStyle(
-                MapStyleOptions("""[{"featureType":"all","stylers":[{"invert_lightness":true},{"saturation":-30}]},
-                {"featureType":"water","stylers":[{"color":"#00111a"}]},
-                {"featureType":"road","stylers":[{"color":"#00e5ff","weight":0.5}]}]""")
-            )
-        } catch (_: Exception) {}
-
-        // If we already have a location, place the marker
-        if (lastLat != 0.0 || lastLng != 0.0) {
-            placeMarker(lastLat, lastLng)
-        }
-    }
-
-    fun onLocation(lat: Double, lng: Double, acc: Float = 0f) {
+    fun onLocation(lat: Double, lng: Double, acc: Float) {
         lastLat = lat; lastLng = lng
+        activity?.runOnUiThread {
+            val ls = "%.6f".format(lat)
+            val ln = "%.6f".format(lng)
+            tvCoords?.text = "📍 $ls, $ln"
+            tvAccuracy?.text = if (acc > 0) "Accuracy: ±${acc.toInt()}m" else ""
 
-        tvLat?.text = "%.6f".format(lat)
-        tvLng?.text = "%.6f".format(lng)
-        if (acc > 0) tvAcc?.text = "±${acc.toInt()}m"
+            val time = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                .format(java.util.Date())
+            val entry = "$time — $ls, $ln"
+            if (locationHistory.firstOrNull() != entry) {
+                locationHistory.add(0, entry)
+                if (locationHistory.size > 25) locationHistory.removeAt(locationHistory.size - 1)
+                val tv = TextView(requireContext()).apply {
+                    text = entry; textSize = 10f; setTextColor(0xFF555577.toInt())
+                    setPadding(0, 2, 0, 2)
+                }
+                llHistory?.addView(tv, 0)
+                if ((llHistory?.childCount ?: 0) > 25) llHistory?.removeViewAt(25)
+            }
 
-        histLog.add(0, "%.5f, %.5f".format(lat, lng))
-        if (histLog.size > 20) histLog.removeAt(histLog.size - 1)
-        tvHist?.text = histLog.joinToString("\n")
-
-        placeMarker(lat, lng)
-    }
-
-    private fun placeMarker(lat: Double, lng: Double) {
-        val map = googleMap ?: return
-        val pos = LatLng(lat, lng)
-        if (marker == null) {
-            marker = map.addMarker(
-                MarkerOptions()
-                    .position(pos)
-                    .title("Child")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-            )
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15f))
-        } else {
-            marker!!.position = pos
+            webView?.evaluateJavascript("updateLocation($lat, $lng);", null)
         }
     }
 
-    private fun centerMap() {
-        if (lastLat == 0.0 && lastLng == 0.0) return
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lastLat, lastLng), 15f))
+    private fun buildMapHtml(initLat: Double, initLng: Double, @Suppress("UNUSED_PARAMETER") hasLoc: Boolean): String {
+        return """<!DOCTYPE html><html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box}html,body,#map{width:100%;height:100%;background:#060612}</style>
+</head><body><div id="map"></div><script>
+var map=L.map('map',{zoomControl:true,attributionControl:true}).setView([$initLat,$initLng],4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+var marker=null,circle=null;
+function updateLocation(lat,lng){
+  if(marker===null){
+    marker=L.circleMarker([lat,lng],{color:'#00E5FF',fillColor:'#00E5FF',fillOpacity:0.9,radius:10,weight:3}).addTo(map);
+    marker.bindPopup('<b>Child</b><br>'+lat.toFixed(6)+', '+lng.toFixed(6));
+    circle=L.circle([lat,lng],{color:'#00E5FF44',fillColor:'#00E5FF22',radius:80}).addTo(map);
+    map.setView([lat,lng],16);
+  } else {
+    marker.setLatLng([lat,lng]);
+    marker.setPopupContent('<b>Child</b><br>'+lat.toFixed(6)+', '+lng.toFixed(6));
+    circle.setLatLng([lat,lng]);
+    map.panTo([lat,lng]);
+  }
+}
+</script></body></html>"""
     }
 
-    // ── MapView lifecycle forwarding ──────────────────────────────────────────
-    override fun onResume()  { super.onResume();  mapView?.onResume()  }
-    override fun onPause()   { super.onPause();   mapView?.onPause()   }
-    override fun onStart()   { super.onStart();   mapView?.onStart()   }
-    override fun onStop()    { super.onStop();    mapView?.onStop()    }
-    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
-    override fun onSaveInstanceState(out: Bundle) { super.onSaveInstanceState(out); mapView?.onSaveInstanceState(out) }
+    private fun Int.dp(ctx: android.content.Context) =
+        (this * ctx.resources.displayMetrics.density).toInt()
 
+    override fun onResume()  { super.onResume();  webView?.onResume()  }
+    override fun onPause()   { super.onPause();   webView?.onPause()   }
+    override fun onDestroy() { webView?.destroy(); webView = null; super.onDestroy() }
     override fun onDestroyView() {
-        mapView?.onDestroy()
         (activity as? MainActivity)?.locationFragment = null
         super.onDestroyView()
     }

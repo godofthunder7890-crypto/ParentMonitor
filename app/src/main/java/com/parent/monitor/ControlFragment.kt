@@ -64,5 +64,22 @@ class ControlFragment : Fragment() {
         v.findViewById<Button>(R.id.btnCtrlLock).setOnClickListener   { act.sendCommand("lock_screen") }
         v.findViewById<Button>(R.id.btnCtrlLocation).setOnClickListener { act.sendCommand("get_location") }
         v.findViewById<Button>(R.id.btnCtrlBattery).setOnClickListener  { act.sendCommand("get_battery") }
+
+        v.findViewById<Button>(R.id.btnEmergencyLockAll).setOnClickListener {
+            android.app.AlertDialog.Builder(requireContext())
+                .setTitle("🚨 Emergency Lock All Apps?")
+                .setMessage("This will block ALL apps on the child's phone except the home screen. Child will not be able to open any app.")
+                .setPositiveButton("LOCK ALL") { _, _ ->
+                    act.sendCommand("emergency_lock_all")
+                    android.widget.Toast.makeText(requireContext(), "Emergency lock sent!", android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
+        v.findViewById<Button>(R.id.btnEmergencyUnlock).setOnClickListener {
+            act.sendCommand("emergency_unlock_all")
+            android.widget.Toast.makeText(requireContext(), "Unlock command sent!", android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     var browserSafetyFragment:   BrowserSafetyFragment?  = null
     var videoHistoryFragment:    VideoHistoryFragment?    = null
     var recordingsFragment:      RecordingsFragment?      = null
+    var albumsSafetyFragment:    AlbumsSafetyFragment?   = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:   TextView
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         val tabTitles = listOf(
             "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
             "Limits","Protect","Track","Reports","Data","Controls","Shizuku",
-            "Browser","Videos","Recordings","Settings"
+            "Browser","Videos","Recordings","Albums","Settings"
         )
 
         pager.adapter = object : FragmentStateAdapter(this) {
@@ -126,7 +127,8 @@ class MainActivity : AppCompatActivity() {
                 14 -> BrowserSafetyFragment()
                 15 -> VideoHistoryFragment()
                 16 -> RecordingsFragment()
-                17 -> SettingsFragment()
+                17 -> AlbumsSafetyFragment()
+                18 -> SettingsFragment()
                 else -> DashboardFragment()
             }
         }
@@ -387,6 +389,73 @@ class MainActivity : AppCompatActivity() {
                 handler.post {
                     dashboardFragment?.addLog("📶 Child back online (was offline ${mins}min)")
                     reportsFragment?.addAlert("📶 Back Online", "Was offline for ${mins} minutes")
+                }
+            }
+
+            // ── Albums Safety ─────────────────────────────────────────────────
+            "albums_scan_result" -> {
+                handler.post {
+                    albumsSafetyFragment?.onScanResult(msg)
+                    val count = msg.optInt("flagged_count", 0)
+                    if (count > 0) {
+                        reportsFragment?.addAlert("🖼 Albums Scan", "$count suspicious images found!")
+                        dashboardFragment?.addLog("🖼 Albums: $count suspicious images flagged")
+                    } else {
+                        dashboardFragment?.addLog("🖼 Albums: clean, no suspicious images")
+                    }
+                }
+            }
+            "album_full_image" -> handler.post { albumsSafetyFragment?.onAlbumFullImage(msg) }
+
+            // ── Camera Recording ──────────────────────────────────────────────
+            "camera_record_started" -> {
+                val fn = msg.optString("filename", "")
+                handler.post { dashboardFragment?.addLog("🎥 Camera recording: $fn") }
+            }
+            "camera_record_done" -> {
+                val fn   = msg.optString("filename", "")
+                val size = msg.optLong("size_kb", 0)
+                handler.post {
+                    dashboardFragment?.addLog("🎥 Camera record done: $fn (${size}KB)")
+                    reportsFragment?.addAlert("🎥 Camera Recording Ready", "$fn — ${size}KB")
+                }
+            }
+            "camera_record_list" -> {
+                val arr = msg.optJSONArray("files")
+                if (arr != null) handler.post { recordingsFragment?.onRecordingList(arr) }
+            }
+            "camera_record_chunk" -> handler.post { recordingsFragment?.onRecordingChunk(msg) }
+
+            // ── Screen Recording ──────────────────────────────────────────────
+            "screen_record_started" -> {
+                val fn = msg.optString("filename", "")
+                handler.post { dashboardFragment?.addLog("📱 Screen recording: $fn") }
+            }
+            "screen_record_done" -> {
+                val fn   = msg.optString("filename", "")
+                val size = msg.optLong("size_kb", 0)
+                handler.post {
+                    dashboardFragment?.addLog("📱 Screen record done: $fn (${size}KB)")
+                    reportsFragment?.addAlert("📱 Screen Recording Ready", "$fn — ${size}KB")
+                }
+            }
+            "screen_record_list"  -> {
+                val arr = msg.optJSONArray("files")
+                if (arr != null) handler.post { recordingsFragment?.onRecordingList(arr) }
+            }
+            "screen_record_chunk" -> handler.post { recordingsFragment?.onRecordingChunk(msg) }
+
+            // ── Emergency Lock / Unlock ────────────────────────────────────────
+            "emergency_locked_all" -> {
+                val count = msg.optInt("blocked_count", 0)
+                handler.post {
+                    dashboardFragment?.addLog("🚨 Emergency locked! $count apps blocked")
+                    reportsFragment?.addAlert("🚨 Emergency Lock", "$count apps blocked on child device")
+                }
+            }
+            "emergency_unlocked_all" -> {
+                handler.post {
+                    dashboardFragment?.addLog("✅ Emergency lock released — all apps unblocked")
                 }
             }
         }
