@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         const val KEY_SERVER_URL   = "server_url"
         const val KEY_PAIR_CODE    = "pair_code"
         const val KEY_GITHUB_REPO  = "github_repo"
-        const val DEFAULT_URL      = "wss://ws-relay-production-9ea0.up.railway.app/api/ws"
+        const val DEFAULT_URL      = "wss://ws-relay-production-efbb.up.railway.app/api/ws"
     }
 
     // ─── Fragment refs ────────────────────────────────────────────────────────
