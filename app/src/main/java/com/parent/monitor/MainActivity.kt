@@ -1,6 +1,8 @@
 package com.parent.monitor
 
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.Manifest
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -89,9 +91,31 @@ class MainActivity : AppCompatActivity() {
         setupViewPager()
         setupNetToggle()
         connect()
+        requestRuntimePermissions()
     }
 
-    private fun bindViews() {
+
+    // ── Runtime permission requests (alerts, camera for QR) ──────────────────
+    private fun requestRuntimePermissions() {
+        val needed = mutableListOf<String>()
+        // POST_NOTIFICATIONS — Android 13+ required for alerts to show
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+                needed.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        // CAMERA — for QR code scanning
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            needed.add(Manifest.permission.CAMERA)
+        if (needed.isNotEmpty())
+            requestPermissions(needed.toTypedArray(), 201)
+    }
+
+    override fun onRequestPermissionsResult(reqCode: Int, perms: Array<out String>, results: IntArray) {
+        super.onRequestPermissionsResult(reqCode, perms, results)
+        // Permissions granted — no special handling needed, system will allow notifications now
+    }
+
+        private fun bindViews() {
         tvStatus     = findViewById(R.id.tvStatus)
         tvBattery    = findViewById(R.id.tvBattery)
         tvPing       = findViewById(R.id.tvPing)
