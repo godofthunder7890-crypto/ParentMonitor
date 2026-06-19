@@ -44,7 +44,7 @@ class LiveFragment : Fragment() {
     private var cameraStreaming = false
     private var micStreaming    = false
     private var screenInterval = 1000L
-    private var cameraInterval = 1500L
+    private var cameraInterval = 33L  // 30fps default
 
     // FPS tracking
     private var screenFrameCount = 0L
@@ -118,12 +118,12 @@ class LiveFragment : Fragment() {
     }
 
     private fun setupControls() {
-        val intervals = listOf(300L, 500L, 750L, 1000L, 2000L, 3000L, 5000L)
-        var idx = intervals.indexOf(screenInterval).coerceAtLeast(3)
+        val intervals = listOf(16L, 33L, 50L, 100L, 200L, 500L, 1000L)  // 60fps→30fps→20fps→10fps→5fps→2fps→1fps
+        var idx = 1  // default 30fps (33ms)
 
         fun updateIntervalLabel() {
             screenInterval = intervals[idx]
-            tvScreenInterval.text = if (screenInterval < 1000) "${screenInterval}ms" else "${screenInterval / 1000}s"
+            val fps = (1000.0 / screenInterval).toInt(); tvScreenInterval.text = "${fps}fps (${screenInterval}ms)"
         }
 
         btnScreenFaster.setOnClickListener {
@@ -139,11 +139,21 @@ class LiveFragment : Fragment() {
         btnToggleScreen.setOnClickListener {
             screenStreaming = !screenStreaming
             if (screenStreaming) {
-                sendCommand(JSONObject().apply { put("command", "start_screen_stream"); put("interval", screenInterval) })
-                btnToggleScreen.text = "STOP SCREEN"
-                btnToggleScreen.setBackgroundColor(0xFFFF1744.toInt())
-                tvScreenInfo.text = "Streaming..."
+                // Step 1: Request screen capture permission on child device
+                sendCommand(JSONObject().apply { put("command", "request_screen_permission") })
+                btnToggleScreen.text = "REQUESTING..."
+                btnToggleScreen.setBackgroundColor(0xFFFF9800.toInt())
+                tvScreenInfo.text = "Asking child for permission..."
                 setDotColor(dotScreen, true)
+                // Step 2: Start stream after 3s (user has time to allow dialog on child)
+                mainHandler.postDelayed({
+                    if (screenStreaming) {
+                        sendCommand(JSONObject().apply { put("command", "start_screen_stream"); put("interval", screenInterval) })
+                        btnToggleScreen.text = "STOP SCREEN"
+                        btnToggleScreen.setBackgroundColor(0xFFFF1744.toInt())
+                        tvScreenInfo.text = "Streaming..."
+                    }
+                }, 3000)
             } else {
                 sendCommand(JSONObject().apply { put("command", "stop_screen_stream") })
                 btnToggleScreen.text = "START SCREEN"
