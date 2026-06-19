@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         const val KEY_SERVER_URL   = "server_url"
         const val KEY_PAIR_CODE    = "pair_code"
         const val KEY_GITHUB_REPO  = "github_repo"
-        const val DEFAULT_URL      = "wss://ws-relay-production-efbb.up.railway.app/api/ws"
+        const val DEFAULT_URL      = "wss://ws-relay-production-9ea0.up.railway.app/api/ws"
     }
 
     // ─── Fragment refs ────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         val tabTitles = listOf(
             "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
             "Limits","Protect","Track","Reports","Data","Controls","Shizuku",
-            "Browser","Videos","Recordings","Albums","Settings"
+            "Browser","Videos","Recordings","Albums","Painting","Settings"
         )
 
         pager.adapter = object : FragmentStateAdapter(this) {
@@ -128,7 +128,8 @@ class MainActivity : AppCompatActivity() {
                 15 -> VideoHistoryFragment()
                 16 -> RecordingsFragment()
                 17 -> AlbumsSafetyFragment()
-                18 -> SettingsFragment()
+                18 -> PaintingFragment()
+                19 -> SettingsFragment()
                 else -> DashboardFragment()
             }
         }
@@ -452,6 +453,10 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.addLog("🚨 Emergency locked! $count apps blocked")
                     reportsFragment?.addAlert("🚨 Emergency Lock", "$count apps blocked on child device")
                 }
+            }
+            "paint_ack" -> {
+                val action = msg.optString("action")
+                // Parent gets confirmation child received the stroke - no UI update needed
             }
             "emergency_unlocked_all" -> {
                 handler.post {
