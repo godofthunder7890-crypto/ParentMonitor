@@ -487,6 +487,18 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.addLog("✅ Emergency lock released — all apps unblocked")
                 }
             }
+
+            // ── Diagnostic Report ─────────────────────────────────────────────
+            "diagnostic_report" -> {
+                handler.post {
+                    dashboardFragment?.onDiagnosticReport(msg)
+                }
+            }
+            "diagnostic_cleared" -> {
+                handler.post {
+                    dashboardFragment?.addLog("🗑 Diagnostic logs cleared on child device", 0xFFFF6D00.toInt())
+                }
+            }
         }
     }
 
