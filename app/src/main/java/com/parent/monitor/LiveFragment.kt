@@ -199,11 +199,19 @@ class LiveFragment : Fragment() {
             try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
                 val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@Thread
-                // Update FPS
+                // BUG FIX: screenLastFps kabhi reset nahi hota tha — FPS 0 dikha deta tha.
+                // Ab har second ke baad counter reset hota hai for accurate FPS.
                 screenFrameCount++
                 val now = System.currentTimeMillis()
                 val elapsed = now - screenLastFps
-                val fps = if (elapsed > 0) screenFrameCount * 1000 / elapsed else 0
+                val fps = if (elapsed >= 1000) {
+                    val f = screenFrameCount * 1000 / elapsed
+                    screenFrameCount = 0
+                    screenLastFps = now
+                    f
+                } else {
+                    screenFrameCount * 1000 / (elapsed + 1)
+                }
                 mainHandler.post {
                     try {
                         imgScreen.setImageBitmap(bmp)
@@ -219,10 +227,18 @@ class LiveFragment : Fragment() {
             try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
                 val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return@Thread
+                // BUG FIX: Same fix — cameraLastFps reset hoga har second baad
                 cameraFrameCount++
                 val now = System.currentTimeMillis()
                 val elapsed = now - cameraLastFps
-                val fps = if (elapsed > 0) cameraFrameCount * 1000 / elapsed else 0
+                val fps = if (elapsed >= 1000) {
+                    val f = cameraFrameCount * 1000 / elapsed
+                    cameraFrameCount = 0
+                    cameraLastFps = now
+                    f
+                } else {
+                    cameraFrameCount * 1000 / (elapsed + 1)
+                }
                 mainHandler.post {
                     try {
                         imgCamera.setImageBitmap(bmp)
