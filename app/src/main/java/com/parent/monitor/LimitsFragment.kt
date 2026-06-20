@@ -89,7 +89,14 @@ class LimitsFragment : Fragment() {
             showStatus("🌙 Night mode: 10pm - 7am")
         }
 
+        (activity as? MainActivity)?.limitsFragment = this
         return v
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.limitsFragment = null
+        tvLimitsStatus = null
     }
 
     fun onScheduleEvent(action: String, hour: Int) {

@@ -5,19 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#070714">
+    android:background="#080B14">
 
     <!-- TOP STATUS BAR -->
     <LinearLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:background="#0D0D20"
+        android:layout_height="56dp"
+        android:background="#0D1117"
         android:paddingStart="16dp"
         android:paddingEnd="12dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:elevation="12dp">
+        android:elevation="8dp">
+
+        <!-- App icon dot -->
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/circle_green"
+            android:layout_marginEnd="10dp"/>
 
         <!-- App title -->
         <TextView
@@ -25,17 +32,39 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="GuardianEye"
-            android:textColor="#FFFFFF"
-            android:textSize="17sp"
+            android:textColor="#F1F5F9"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.05"/>
+            android:fontFamily="monospace"
+            android:letterSpacing="0.06"/>
+
+        <!-- Ping -->
+        <TextView
+            android:id="@+id/tvPing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--ms"
+            android:textColor="#64748B"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:layout_marginEnd="10dp"/>
+
+        <!-- Battery -->
+        <TextView
+            android:id="@+id/tvBattery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--"
+            android:textColor="#64748B"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:layout_marginEnd="10dp"/>
 
         <!-- Status pill -->
         <LinearLayout
             android:id="@+id/statusPill"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
+            android:layout_height="26dp"
             android:background="@drawable/pill_offline"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
@@ -44,8 +73,8 @@
             android:layout_marginEnd="8dp">
             <View
                 android:id="@+id/statusDot"
-                android:layout_width="7dp"
-                android:layout_height="7dp"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
                 android:background="@drawable/circle_red"
                 android:layout_marginEnd="5dp"/>
             <TextView
@@ -53,61 +82,42 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Offline"
-                android:textColor="#F44336"
+                android:textColor="#F87171"
                 android:textSize="11sp"
+                android:fontFamily="monospace"
                 android:textStyle="bold"/>
         </LinearLayout>
-
-        <!-- Battery -->
-        <TextView
-            android:id="@+id/tvBattery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="--"
-            android:textColor="#888"
-            android:textSize="12sp"
-            android:layout_marginEnd="8dp"/>
-
-        <!-- Ping -->
-        <TextView
-            android:id="@+id/tvPing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="--ms"
-            android:textColor="#888"
-            android:textSize="11sp"
-            android:layout_marginEnd="8dp"/>
 
         <!-- Net Toggle -->
         <Button
             android:id="@+id/btnNetToggle"
-            android:layout_width="68dp"
-            android:layout_height="30dp"
+            android:layout_width="56dp"
+            android:layout_height="28dp"
             android:text="NET"
-            android:textSize="10sp"
-            android:textColor="#000000"
-            android:fontFamily="sans-serif-bold"
-            android:backgroundTint="#00E5FF"
+            android:textSize="9sp"
+            android:textColor="#080B14"
+            android:fontFamily="monospace"
+            android:backgroundTint="#38BDF8"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:stateListAnimator="@null"/>
     </LinearLayout>
 
-    <!-- DIVIDER LINE (cyan glow) -->
+    <!-- DIVIDER (green glow) -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#1A00E5FF"/>
+        android:background="#1A10FF80"/>
 
     <!-- TAB BAR -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:background="#0D0D20"
-        app:tabTextColor="#4D4D6A"
-        app:tabSelectedTextColor="#00E5FF"
-        app:tabIndicatorColor="#00E5FF"
+        android:layout_height="44dp"
+        android:background="#0D1117"
+        app:tabTextColor="#64748B"
+        app:tabSelectedTextColor="#10FF80"
+        app:tabIndicatorColor="#10FF80"
         app:tabIndicatorHeight="2dp"
         app:tabTextAppearance="@android:style/TextAppearance.Small"
         app:tabMode="scrollable"
@@ -119,7 +129,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#15FFFFFF"/>
+        android:background="#1F2937"/>
 
     <!-- CONTENT -->
     <androidx.viewpager2.widget.ViewPager2

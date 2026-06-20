@@ -34,7 +34,14 @@ class ReportsFragment : Fragment() {
             alertsList.clear(); alertAdapter?.notifyDataSetChanged()
         }
 
+        (activity as? MainActivity)?.reportsFragment = this
         return v
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.reportsFragment = null
+        tvReportContent = null; tvReportStatus = null; lvAlerts = null
     }
 
     fun onDailyReport(data: JSONObject) {

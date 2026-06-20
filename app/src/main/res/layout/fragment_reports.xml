@@ -4,18 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#060612">
+    android:background="#080B14">
 
     <!-- Header -->
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:background="#0A0A1E"
+        android:background="#111827"
         android:paddingHorizontal="14dp"
         android:gravity="center_vertical">
         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="REPORTS &amp; ALERTS"
-            android:textColor="#00E5FF" android:textSize="13sp"
+            android:textColor="#38BDF8" android:textSize="13sp"
             android:fontFamily="sans-serif-medium" android:letterSpacing="0.12"/>
         <TextView android:id="@+id/tvReportStatus"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:text="📊 Fetch Daily Report"
         android:textSize="13sp" android:textColor="#000"
         android:fontFamily="sans-serif-bold"
-        android:backgroundTint="#00E5FF"
+        android:backgroundTint="#38BDF8"
         android:stateListAnimator="@null"/>
 
     <!-- Report content -->
@@ -36,7 +36,7 @@
         android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_margin="10dp"
-        app:cardBackgroundColor="#0A0A1E" app:cardCornerRadius="12dp">
+        app:cardBackgroundColor="#111827" app:cardCornerRadius="12dp">
 
         <ScrollView android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -54,7 +54,7 @@
     <!-- Alerts header -->
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="#0A0A1E"
+        android:background="#111827"
         android:paddingHorizontal="14dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -67,7 +67,7 @@
             android:layout_width="wrap_content" android:layout_height="28dp"
             android:text="Clear"
             android:textSize="10sp" android:textColor="#888"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:minWidth="0dp" android:minHeight="0dp"
             android:stateListAnimator="@null"/>
     </LinearLayout>
@@ -77,8 +77,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#09091A"
-        android:divider="#1A1A2E" android:dividerHeight="1dp"
+        android:background="#111827"
+        android:divider="#1F2937" android:dividerHeight="1dp"
         android:padding="4dp"/>
 
 </LinearLayout>

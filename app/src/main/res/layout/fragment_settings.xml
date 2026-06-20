@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#070714">
+    android:background="#080B14">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D21"
+            app:cardBackgroundColor="#0D1117"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             android:layout_marginBottom="10dp">
@@ -28,7 +28,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="SERVER CONFIG"
-                    android:textColor="#333355"
+                    android:textColor="#64748B"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     android:letterSpacing="0.15"
@@ -39,9 +39,9 @@
                     android:layout_height="wrap_content"
                     android:hint="wss://your-server.replit.app/api/ws"
                     android:inputType="textUri"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#333355"
-                    android:background="#0A0A1A"
+                    android:textColor="#F1F5F9"
+                    android:textColorHint="#64748B"
+                    android:background="#111827"
                     android:padding="12dp"
                     android:fontFamily="monospace"
                     android:textSize="12sp"
@@ -52,9 +52,9 @@
                     android:layout_height="wrap_content"
                     android:hint="6-digit pair code"
                     android:inputType="number"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#333355"
-                    android:background="#0A0A1A"
+                    android:textColor="#F1F5F9"
+                    android:textColorHint="#64748B"
+                    android:background="#111827"
                     android:padding="12dp"
                     android:fontFamily="monospace"
                     android:textSize="16sp"
@@ -71,7 +71,7 @@
                         android:layout_marginEnd="6dp"
                         android:text="SAVE"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#00E5FF"
+                        android:backgroundTint="#38BDF8"
                         android:textColor="#000000"
                         style="@style/Widget.MaterialComponents.Button"/>
                     <Button
@@ -83,7 +83,7 @@
                         android:text="SCAN QR"
                         android:fontFamily="monospace"
                         android:backgroundTint="#1A1A33"
-                        android:textColor="#888899"
+                        android:textColor="#94A3B8"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
                 <Button
@@ -94,7 +94,7 @@
                     android:text="📡  PUSH URL TO CHILD"
                     android:fontFamily="monospace"
                     android:backgroundTint="#1A0030"
-                    android:textColor="#AA00FF"
+                    android:textColor="#A78BFA"
                     style="@style/Widget.MaterialComponents.Button"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -103,7 +103,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D21"
+            app:cardBackgroundColor="#0D1117"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             android:layout_marginBottom="10dp">
@@ -117,7 +117,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="QR CODE"
-                    android:textColor="#333355"
+                    android:textColor="#64748B"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     android:letterSpacing="0.15"
@@ -131,7 +131,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Child app scans this to auto-connect"
-                    android:textColor="#333355"
+                    android:textColor="#64748B"
                     android:textSize="11sp"
                     android:fontFamily="monospace"
                     android:layout_marginTop="8dp"/>
@@ -140,7 +140,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="#00C853"
+                    android:textColor="#10FF80"
                     android:textSize="12sp"
                     android:fontFamily="monospace"
                     android:layout_marginTop="8dp"
@@ -152,7 +152,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D21"
+            app:cardBackgroundColor="#0D1117"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             android:layout_marginBottom="10dp">
@@ -171,14 +171,14 @@
                     <View
                         android:layout_width="4dp"
                         android:layout_height="18dp"
-                        android:background="#00C853"
+                        android:background="#10FF80"
                         android:layout_marginEnd="8dp"/>
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="OTA AUTO-UPDATE"
-                        android:textColor="#00C853"
+                        android:textColor="#10FF80"
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.1"/>
@@ -187,7 +187,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="v?"
-                        android:textColor="#333355"
+                        android:textColor="#64748B"
                         android:textSize="11sp"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -196,7 +196,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="GitHub Repo (ChildMonitor)"
-                    android:textColor="#555566"
+                    android:textColor="#64748B"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     android:layout_marginBottom="4dp"/>
@@ -206,9 +206,9 @@
                     android:layout_height="wrap_content"
                     android:hint="owner/ChildMonitor"
                     android:inputType="text"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#333355"
-                    android:background="#0A0A1A"
+                    android:textColor="#F1F5F9"
+                    android:textColorHint="#64748B"
+                    android:background="#111827"
                     android:padding="12dp"
                     android:fontFamily="monospace"
                     android:textSize="13sp"
@@ -221,7 +221,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="GitHub Token (private repo ke liye, optional)"
-                    android:textColor="#555566"
+                    android:textColor="#64748B"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     android:layout_marginBottom="4dp"/>
@@ -237,9 +237,9 @@
                         android:layout_weight="1"
                         android:hint="ghp_xxxxxxxxxxxx"
                         android:inputType="textPassword"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#333355"
-                        android:background="#0A0A1A"
+                        android:textColor="#F1F5F9"
+                        android:textColorHint="#64748B"
+                        android:background="#111827"
                         android:padding="12dp"
                         android:fontFamily="monospace"
                         android:textSize="13sp"
@@ -251,7 +251,7 @@
                         android:text="SAVE"
                         android:fontFamily="monospace"
                         android:backgroundTint="#1A1A33"
-                        android:textColor="#888899"
+                        android:textColor="#94A3B8"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
 
@@ -269,7 +269,7 @@
                         android:text="🔍 CHECK"
                         android:fontFamily="monospace"
                         android:backgroundTint="#001A33"
-                        android:textColor="#00E5FF"
+                        android:textColor="#38BDF8"
                         style="@style/Widget.MaterialComponents.Button"/>
                     <Button
                         android:id="@+id/btnPushUpdate"
@@ -280,7 +280,7 @@
                         android:text="🚀 PUSH APK"
                         android:fontFamily="monospace"
                         android:backgroundTint="#002200"
-                        android:textColor="#00C853"
+                        android:textColor="#10FF80"
                         android:enabled="false"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
@@ -290,7 +290,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Connect GitHub repo above → check for latest APK release → push update directly to child device via relay"
-                    android:textColor="#2A2A44"
+                    android:textColor="#64748B"
                     android:textSize="11sp"
                     android:fontFamily="monospace"
                     android:lineSpacingExtra="3dp"/>

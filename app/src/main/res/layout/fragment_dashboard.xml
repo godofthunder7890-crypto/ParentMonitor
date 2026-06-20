@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#070714"
+    android:background="#080B14"
     android:fillViewport="true">
 
     <LinearLayout
@@ -17,7 +17,7 @@
             android:id="@+id/cardStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D21"
+            app:cardBackgroundColor="#0D1117"
             app:cardCornerRadius="20dp"
             app:cardElevation="12dp"
             android:layout_marginBottom="10dp"
@@ -62,7 +62,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="OFFLINE"
-                        android:textColor="#FF1744"
+                        android:textColor="#F87171"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -71,7 +71,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Child Device"
-                        android:textColor="#6666AA"
+                        android:textColor="#64748B"
                         android:textSize="12sp"
                         android:layout_marginTop="1dp"/>
                     <TextView
@@ -79,7 +79,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Waiting for connection..."
-                        android:textColor="#555577"
+                        android:textColor="#64748B"
                         android:textSize="11sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="3dp"/>
@@ -89,8 +89,8 @@
                     android:layout_width="58dp"
                     android:layout_height="46dp"
                     android:text="LOCK"
-                    android:backgroundTint="#FF1744"
-                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#F87171"
+                    android:textColor="#F1F5F9"
                     android:textSize="9sp"
                     android:fontFamily="monospace"
                     android:stateListAnimator="@null"
@@ -110,7 +110,7 @@
                 android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
-                app:cardBackgroundColor="#0D0D21"
+                app:cardBackgroundColor="#0D1117"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
                 android:alpha="0">
@@ -124,7 +124,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BATTERY"
-                        android:textColor="#6677AA"
+                        android:textColor="#64748B"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.12"/>
@@ -133,7 +133,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textColor="#00C853"
+                        android:textColor="#10FF80"
                         android:textSize="28sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -145,8 +145,8 @@
                         android:text="REFRESH"
                         android:textSize="8sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1E1E3A"
-                        android:textColor="#6677AA"
+                        android:backgroundTint="#1F2937"
+                        android:textColor="#64748B"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
@@ -157,7 +157,7 @@
                 android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
-                app:cardBackgroundColor="#0D0D21"
+                app:cardBackgroundColor="#0D1117"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
                 android:alpha="0">
@@ -171,7 +171,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PING"
-                        android:textColor="#6677AA"
+                        android:textColor="#64748B"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.12"/>
@@ -180,7 +180,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textColor="#00E5FF"
+                        android:textColor="#38BDF8"
                         android:textSize="28sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -189,7 +189,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="latency"
-                        android:textColor="#444466"
+                        android:textColor="#64748B"
                         android:textSize="9sp"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -208,7 +208,7 @@
                 android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
-                app:cardBackgroundColor="#0D0D21"
+                app:cardBackgroundColor="#0D1117"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
                 android:alpha="0">
@@ -222,7 +222,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ACTIVE APP"
-                        android:textColor="#6677AA"
+                        android:textColor="#64748B"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.12"/>
@@ -231,7 +231,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textColor="#CC44FF"
+                        android:textColor="#A78BFA"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -245,8 +245,8 @@
                         android:text="CHECK"
                         android:textSize="8sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1E1E3A"
-                        android:textColor="#6677AA"
+                        android:backgroundTint="#1F2937"
+                        android:textColor="#64748B"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
@@ -257,7 +257,7 @@
                 android:layout_height="110dp"
                 android:layout_weight="1"
                 android:layout_marginStart="5dp"
-                app:cardBackgroundColor="#0D0D21"
+                app:cardBackgroundColor="#0D1117"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
                 android:alpha="0">
@@ -271,7 +271,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="LOCATION"
-                        android:textColor="#6677AA"
+                        android:textColor="#64748B"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.12"/>
@@ -280,7 +280,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="--"
-                        android:textColor="#FFD600"
+                        android:textColor="#FDE68A"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -294,8 +294,8 @@
                         android:text="TRACK"
                         android:textSize="8sp"
                         android:fontFamily="monospace"
-                        android:backgroundTint="#1E1E3A"
-                        android:textColor="#6677AA"
+                        android:backgroundTint="#1F2937"
+                        android:textColor="#64748B"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button"/>
                 </LinearLayout>
@@ -307,7 +307,7 @@
             android:id="@+id/cardActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0D0D21"
+            app:cardBackgroundColor="#0D1117"
             app:cardCornerRadius="20dp"
             app:cardElevation="10dp"
             android:layout_marginBottom="10dp"
@@ -341,9 +341,9 @@
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#1A0035"
-                        app:strokeColor="#AA00FF"
+                        app:strokeColor="#A78BFA"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#CC44FF"
+                        android:textColor="#A78BFA"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                     <Button
@@ -356,9 +356,9 @@
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#001A35"
-                        app:strokeColor="#00D4FF"
+                        app:strokeColor="#38BDF8"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#00D4FF"
+                        android:textColor="#38BDF8"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                 </LinearLayout>
@@ -371,7 +371,7 @@
                     android:textStyle="bold"
                     android:fontFamily="monospace"
                     android:backgroundTint="#CC0033"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#F1F5F9"
                     android:letterSpacing="0.05"
                     android:stateListAnimator="@null"
                     style="@style/Widget.MaterialComponents.Button"/>
@@ -383,7 +383,7 @@
             android:id="@+id/cardHealth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0A1520"
+            app:cardBackgroundColor="#111827"
             app:cardCornerRadius="20dp"
             app:cardElevation="10dp"
             android:layout_marginBottom="10dp"
@@ -406,7 +406,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="SERVICE HEALTH"
-                        android:textColor="#0099FF"
+                        android:textColor="#38BDF8"
                         android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.2"/>
@@ -421,7 +421,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="NO SIGNAL"
-                        android:textColor="#FF1744"
+                        android:textColor="#F87171"
                         android:textSize="9sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.1"/>
@@ -433,7 +433,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="#060E18"
+                    android:background="#111827"
                     android:padding="10dp"
                     android:layout_marginBottom="10dp">
                     <TextView
@@ -441,7 +441,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="❤ HEARTBEAT"
-                        android:textColor="#336699"
+                        android:textColor="#64748B"
                         android:textSize="10sp"
                         android:fontFamily="monospace"/>
                     <TextView
@@ -449,7 +449,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="— waiting —"
-                        android:textColor="#4488BB"
+                        android:textColor="#38BDF8"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:fontFamily="monospace"/>
@@ -468,14 +468,14 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="#060E18"
+                        android:background="#111827"
                         android:padding="10dp"
                         android:layout_marginEnd="5dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="UPTIME"
-                            android:textColor="#335577"
+                            android:textColor="#64748B"
                             android:textSize="8sp"
                             android:fontFamily="monospace"
                             android:letterSpacing="0.1"/>
@@ -484,7 +484,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textColor="#00AAFF"
+                            android:textColor="#38BDF8"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"
@@ -497,14 +497,14 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="#060E18"
+                        android:background="#111827"
                         android:padding="10dp"
                         android:layout_marginStart="5dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="CONN QUALITY"
-                            android:textColor="#335577"
+                            android:textColor="#64748B"
                             android:textSize="8sp"
                             android:fontFamily="monospace"
                             android:letterSpacing="0.1"/>
@@ -575,7 +575,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textColor="#FFD600"
+                            android:textColor="#FDE68A"
                             android:textSize="24sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -586,14 +586,14 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="#060E18"
+                        android:background="#111827"
                         android:padding="8dp"
                         android:layout_marginStart="4dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="ANDROID"
-                            android:textColor="#335577"
+                            android:textColor="#64748B"
                             android:textSize="8sp"
                             android:fontFamily="monospace"/>
                         <TextView
@@ -601,7 +601,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textColor="#00E5FF"
+                            android:textColor="#38BDF8"
                             android:textSize="24sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -613,7 +613,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="#060E18"
+                    android:background="#111827"
                     android:padding="10dp"
                     android:layout_marginBottom="10dp">
 
@@ -635,7 +635,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="⬤ --"
-                            android:textColor="#555577"
+                            android:textColor="#64748B"
                             android:textSize="10sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -659,7 +659,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="⬤ --"
-                            android:textColor="#555577"
+                            android:textColor="#64748B"
                             android:textSize="10sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -683,7 +683,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="⬤ --"
-                            android:textColor="#555577"
+                            android:textColor="#64748B"
                             android:textSize="10sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -706,7 +706,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="⬤ --"
-                            android:textColor="#555577"
+                            android:textColor="#64748B"
                             android:textSize="10sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -767,7 +767,7 @@
                         android:backgroundTint="#051525"
                         app:strokeColor="#0066BB"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#0099FF"
+                        android:textColor="#38BDF8"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                     <Button
@@ -780,9 +780,9 @@
                         android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#051525"
-                        app:strokeColor="#00AAFF"
+                        app:strokeColor="#38BDF8"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#00AAFF"
+                        android:textColor="#38BDF8"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                 </LinearLayout>
@@ -817,7 +817,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="DIAGNOSTICS"
-                        android:textColor="#00C853"
+                        android:textColor="#10FF80"
                         android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:letterSpacing="0.2"/>
@@ -826,7 +826,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="● HEALTHY"
-                        android:textColor="#00C853"
+                        android:textColor="#10FF80"
                         android:textSize="9sp"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -888,7 +888,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textColor="#FFD600"
+                            android:textColor="#FDE68A"
                             android:textSize="26sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -919,7 +919,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="--"
-                            android:textColor="#00E5FF"
+                            android:textColor="#38BDF8"
                             android:textSize="26sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -952,9 +952,9 @@
                         android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#001A00"
-                        app:strokeColor="#00C853"
+                        app:strokeColor="#10FF80"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#00C853"
+                        android:textColor="#10FF80"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                     <Button
@@ -967,9 +967,9 @@
                         android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#001A00"
-                        app:strokeColor="#4CAF50"
+                        app:strokeColor="#10FF80"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#4CAF50"
+                        android:textColor="#10FF80"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                     <Button
@@ -981,9 +981,9 @@
                         android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:backgroundTint="#1A0A00"
-                        app:strokeColor="#FF6D00"
+                        app:strokeColor="#FB923C"
                         app:strokeWidth="1.5dp"
-                        android:textColor="#FF6D00"
+                        android:textColor="#FB923C"
                         android:stateListAnimator="@null"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
                 </LinearLayout>
@@ -995,7 +995,7 @@
             android:id="@+id/cardLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0A0A1E"
+            app:cardBackgroundColor="#111827"
             app:cardCornerRadius="20dp"
             app:cardElevation="6dp"
             android:layout_marginBottom="6dp"

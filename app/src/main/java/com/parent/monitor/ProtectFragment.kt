@@ -75,7 +75,14 @@ class ProtectFragment : Fragment() {
             tvProtectStatus?.text = "✅ Unknown callers blocked"
         }
 
+        (activity as? MainActivity)?.protectFragment = this
         return v
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.protectFragment = null
+        etBlockApp = null; lvBlockedApps = null; tvProtectStatus = null
     }
 
     fun onDeviceInfo(data: JSONObject) {

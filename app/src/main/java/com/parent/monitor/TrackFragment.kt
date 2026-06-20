@@ -88,7 +88,16 @@ class TrackFragment : Fragment() {
             locationHistory.clear(); histAdapter?.notifyDataSetChanged()
         }
 
+        (activity as? MainActivity)?.trackFragment = this
         return v
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.trackFragment = null
+        tvTrackLat = null; tvTrackLng = null; tvTrackAccuracy = null
+        tvTrackStatus = null; tvGeofenceStatus = null; tvSosStatus = null
+        lvLocationHistory = null; sosIndicator = null
     }
 
     fun onLocationUpdate(lat: Double, lng: Double, accuracy: Float, geofenceInside: Boolean?) {

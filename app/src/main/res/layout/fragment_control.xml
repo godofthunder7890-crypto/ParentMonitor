@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#060612">
+    android:background="#080B14">
 
     <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#0A0A1E"
+        android:background="#111827"
         android:paddingHorizontal="14dp"
         android:gravity="center_vertical">
 
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="REMOTE CONTROL"
-            android:textColor="#00E5FF"
+            android:textColor="#38BDF8"
             android:textSize="13sp"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.1"/>
@@ -65,7 +65,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_margin="12dp"
-        app:cardBackgroundColor="#0A0A1E"
+        app:cardBackgroundColor="#111827"
         app:cardCornerRadius="18dp"
         app:cardElevation="4dp">
 
@@ -77,7 +77,7 @@
                 android:id="@+id/touchPad"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#0A0A1E"/>
+                android:background="#111827"/>
 
             <!-- Center crosshair hint -->
             <TextView
@@ -105,7 +105,7 @@
             android:layout_weight="1" android:layout_marginEnd="6dp"
             android:text="◀ Back"
             android:textSize="13sp" android:textColor="#CCC"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:stateListAnimator="@null"/>
 
         <Button android:id="@+id/btnNavHome"
@@ -113,7 +113,7 @@
             android:layout_weight="1" android:layout_marginEnd="6dp"
             android:text="⬤ Home"
             android:textSize="13sp" android:textColor="#CCC"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:stateListAnimator="@null"/>
 
         <Button android:id="@+id/btnNavRecents"
@@ -121,7 +121,7 @@
             android:layout_weight="1"
             android:text="▣ Recent"
             android:textSize="13sp" android:textColor="#CCC"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:stateListAnimator="@null"/>
 
     </LinearLayout>

@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#00E5FF</color>
-    <color name="colorPrimaryDark">#0D0D20</color>
-    <color name="colorAccent">#AA00FF</color>
-    <color name="colorBackground">#070714</color>
-    <color name="colorSurface">#0E0E22</color>
-    <color name="colorOnline">#00C853</color>
-    <color name="colorOffline">#FF1744</color>
-    <color name="colorWarning">#FFD600</color>
-    <color name="colorText">#FFFFFF</color>
-    <color name="colorTextSecondary">#888899</color>
-    <color name="colorTextMuted">#4D4D70</color>
-    <color name="colorCyan">#00E5FF</color>
-    <color name="colorPurple">#AA00FF</color>
-    <color name="colorGreen">#00C853</color>
-    <color name="colorRed">#FF1744</color>
-    <color name="colorYellow">#FFD600</color>
-    <color name="colorOrange">#FF6D00</color>
+    <!-- Design system: Dark Neon -->
+    <color name="colorPrimary">#10FF80</color>
+    <color name="colorPrimaryDark">#080B14</color>
+    <color name="colorAccent">#38BDF8</color>
+
+    <!-- Backgrounds -->
+    <color name="colorBg">#080B14</color>
+    <color name="colorCard">#0D1117</color>
+    <color name="colorCard2">#111827</color>
+    <color name="colorBorder">#1F2937</color>
+    <color name="colorBackground">#080B14</color>
+    <color name="colorSurface">#0D1117</color>
+
+    <!-- Neon accents -->
+    <color name="colorGreen">#10FF80</color>
+    <color name="colorBlue">#38BDF8</color>
+    <color name="colorPurple">#A78BFA</color>
+    <color name="colorOrange">#FB923C</color>
+    <color name="colorRed">#F87171</color>
+    <color name="colorYellow">#FDE68A</color>
+    <color name="colorPink">#F472B6</color>
+    <color name="colorCyan">#38BDF8</color>
+
+    <!-- Status -->
+    <color name="colorOnline">#10FF80</color>
+    <color name="colorOffline">#F87171</color>
+    <color name="colorWarning">#FDE68A</color>
+
+    <!-- Text -->
+    <color name="colorText">#F1F5F9</color>
+    <color name="colorTextSecondary">#94A3B8</color>
+    <color name="colorMuted">#64748B</color>
+    <color name="colorTextMuted">#64748B</color>
 </resources>

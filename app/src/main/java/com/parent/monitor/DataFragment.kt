@@ -66,7 +66,14 @@ class DataFragment : Fragment() {
                 "apps"    -> act.wsManager?.sendCommand("get_app_usage")
             }
         }
+        (activity as? MainActivity)?.dataFragment = this
         return v
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.dataFragment = null
+        tvDataStatus = null; rvGallery = null; rvList = null
     }
 
     fun onGallery(photos: JSONArray) {

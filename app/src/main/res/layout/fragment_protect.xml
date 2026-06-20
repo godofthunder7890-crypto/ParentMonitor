@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#060612">
+    android:background="#080B14">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="PROTECTION"
-                android:textColor="#00E5FF" android:textSize="13sp"
+                android:textColor="#38BDF8" android:textSize="13sp"
                 android:fontFamily="sans-serif-medium" android:letterSpacing="0.12"/>
             <TextView android:id="@+id/tvProtectStatus"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#0E0E24"
+            app:cardBackgroundColor="#0D1117"
             app:cardCornerRadius="16dp" app:cardElevation="4dp">
 
             <LinearLayout android:layout_width="match_parent"
@@ -89,7 +89,7 @@
                     <EditText android:id="@+id/etBlockApp"
                         android:layout_width="0dp" android:layout_height="44dp"
                         android:layout_weight="1" android:layout_marginEnd="8dp"
-                        android:background="#1A1A35"
+                        android:background="#1F2937"
                         android:textColor="#EEE" android:textColorHint="#333"
                         android:hint="com.example.app"
                         android:padding="10dp" android:textSize="12sp" android:singleLine="true"/>
@@ -97,7 +97,7 @@
                         android:layout_width="80dp" android:layout_height="44dp"
                         android:text="+ Block"
                         android:textSize="11sp" android:textColor="#000"
-                        android:backgroundTint="#00E5FF"
+                        android:backgroundTint="#38BDF8"
                         android:stateListAnimator="@null"/>
                 </LinearLayout>
 
@@ -105,15 +105,15 @@
                 <ListView android:id="@+id/lvBlockedApps"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
-                    android:background="#0A0A1E"
-                    android:divider="#1A1A2E"
+                    android:background="#111827"
+                    android:divider="#1F2937"
                     android:dividerHeight="1dp"/>
 
                 <Button android:id="@+id/btnClearBlocks"
                     android:layout_width="match_parent" android:layout_height="36dp"
                     android:text="Clear All Blocks"
                     android:textSize="11sp" android:textColor="#888"
-                    android:backgroundTint="#1A1A2E"
+                    android:backgroundTint="#1F2937"
                     android:layout_marginTop="6dp"
                     android:stateListAnimator="@null"/>
             </LinearLayout>
@@ -122,7 +122,7 @@
         <!-- Contact Blocker Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            app:cardBackgroundColor="#0E0E24" app:cardCornerRadius="16dp" app:cardElevation="4dp">
+            app:cardBackgroundColor="#0D1117" app:cardCornerRadius="16dp" app:cardElevation="4dp">
 
             <LinearLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                     android:layout_width="match_parent" android:layout_height="44dp"
                     android:text="🚫 Block Unknown Callers"
                     android:textSize="13sp" android:textColor="#FFF"
-                    android:backgroundTint="#1A1A2E"
+                    android:backgroundTint="#1F2937"
                     android:stateListAnimator="@null"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>

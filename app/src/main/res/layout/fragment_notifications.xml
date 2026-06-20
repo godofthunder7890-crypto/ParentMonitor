@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#060612">
+    android:background="#080B14">
 
     <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:background="#0A0A1E"
+        android:background="#111827"
         android:padding="12dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="LIVE NOTIFICATIONS"
-            android:textColor="#00E5FF"
+            android:textColor="#38BDF8"
             android:textSize="13sp"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.1"/>
@@ -48,7 +48,7 @@
             android:text="Clear"
             android:textSize="11sp"
             android:textColor="#888"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:minWidth="0dp" android:minHeight="0dp"
             android:stateListAnimator="@null"/>
     </LinearLayout>

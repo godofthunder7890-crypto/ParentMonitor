@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#060612">
+    android:background="#080B14">
 
     <!-- Category tabs -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:background="#0A0A1E"
+        android:background="#111827"
         android:paddingStart="8dp" android:paddingEnd="8dp"
         android:paddingTop="8dp" android:paddingBottom="8dp"
         android:fillViewport="true">
@@ -23,28 +23,28 @@
             <Button android:id="@+id/btnDataGallery"
                 android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="🖼 Gallery" android:textSize="12sp" android:textColor="#000"
-                android:backgroundTint="#00E5FF"
+                android:backgroundTint="#38BDF8"
                 android:layout_marginEnd="6dp"
                 android:stateListAnimator="@null"/>
 
             <Button android:id="@+id/btnDataCalls"
                 android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="📞 Calls" android:textSize="12sp" android:textColor="#AAA"
-                android:backgroundTint="#1A1A2E"
+                android:backgroundTint="#1F2937"
                 android:layout_marginEnd="6dp"
                 android:stateListAnimator="@null"/>
 
             <Button android:id="@+id/btnDataSms"
                 android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="💬 SMS" android:textSize="12sp" android:textColor="#AAA"
-                android:backgroundTint="#1A1A2E"
+                android:backgroundTint="#1F2937"
                 android:layout_marginEnd="6dp"
                 android:stateListAnimator="@null"/>
 
             <Button android:id="@+id/btnDataApps"
                 android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="📱 Apps" android:textSize="12sp" android:textColor="#AAA"
-                android:backgroundTint="#1A1A2E"
+                android:backgroundTint="#1F2937"
                 android:stateListAnimator="@null"/>
 
         </LinearLayout>
@@ -56,7 +56,7 @@
         android:orientation="horizontal"
         android:padding="10dp"
         android:gravity="center_vertical"
-        android:background="#09091A">
+        android:background="#111827">
 
         <TextView android:id="@+id/tvDataStatus"
             android:layout_width="0dp" android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             android:layout_width="80dp" android:layout_height="34dp"
             android:text="⬇ Fetch"
             android:textSize="11sp"
-            android:backgroundTint="#00E5FF" android:textColor="#000"
+            android:backgroundTint="#38BDF8" android:textColor="#000"
             android:fontFamily="sans-serif-bold"
             android:minWidth="0dp"
             android:stateListAnimator="@null"/>

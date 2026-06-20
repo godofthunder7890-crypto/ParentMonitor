@@ -3,14 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#070714"
+    android:background="#080B14"
     android:orientation="vertical">
 
     <!-- TAB SELECTOR -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        android:background="#0D0D20"
+        android:background="#0D1117"
         android:orientation="horizontal"
         android:padding="6dp">
 
@@ -23,7 +23,7 @@
             android:textSize="11sp"
             android:textColor="#000"
             android:fontFamily="sans-serif-bold"
-            android:backgroundTint="#00E5FF"
+            android:backgroundTint="#38BDF8"
             android:stateListAnimator="@null"
             android:layout_marginEnd="4dp"/>
 
@@ -34,9 +34,9 @@
             android:layout_weight="1"
             android:text="CAMERA"
             android:textSize="11sp"
-            android:textColor="#AAAAAA"
+            android:textColor="#94A3B8"
             android:fontFamily="sans-serif-bold"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:stateListAnimator="@null"
             android:layout_marginEnd="4dp"/>
 
@@ -47,9 +47,9 @@
             android:layout_weight="1"
             android:text="MIC"
             android:textSize="11sp"
-            android:textColor="#AAAAAA"
+            android:textColor="#94A3B8"
             android:fontFamily="sans-serif-bold"
-            android:backgroundTint="#1A1A2E"
+            android:backgroundTint="#1F2937"
             android:stateListAnimator="@null"/>
     </LinearLayout>
 
@@ -60,7 +60,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:background="#070714">
+        android:background="#080B14">
 
         <!-- Frame display — fills most of the screen -->
         <FrameLayout
@@ -93,14 +93,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Stopped"
-                    android:textColor="#AAAAAA"
+                    android:textColor="#94A3B8"
                     android:textSize="10sp"/>
                 <TextView
                     android:id="@+id/tvScreenFps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="#00E5FF"
+                    android:textColor="#38BDF8"
                     android:textSize="10sp"
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
@@ -110,7 +110,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:background="#0D0D20"
+            android:background="#0D1117"
             android:orientation="horizontal"
             android:padding="8dp"
             android:gravity="center_vertical">
@@ -122,7 +122,7 @@
                 android:text="+"
                 android:textSize="16sp"
                 android:textColor="#000"
-                android:backgroundTint="#00E5FF"
+                android:backgroundTint="#38BDF8"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:stateListAnimator="@null"
@@ -132,7 +132,7 @@
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:text="1s"
-                android:textColor="#FFFFFF"
+                android:textColor="#F1F5F9"
                 android:textSize="13sp"
                 android:gravity="center"
                 android:textStyle="bold"/>
@@ -159,7 +159,7 @@
                 android:textSize="11sp"
                 android:textColor="#000"
                 android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#00E5FF"
+                android:backgroundTint="#38BDF8"
                 android:stateListAnimator="@null"/>
         </LinearLayout>
     </LinearLayout>
@@ -202,14 +202,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Stopped"
-                    android:textColor="#AAAAAA"
+                    android:textColor="#94A3B8"
                     android:textSize="10sp"/>
                 <TextView
                     android:id="@+id/tvCameraFps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="#AA00FF"
+                    android:textColor="#A78BFA"
                     android:textSize="10sp"
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
@@ -218,7 +218,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:background="#0D0D20"
+            android:background="#0D1117"
             android:padding="8dp">
             <Button
                 android:id="@+id/btnToggleCamera"
@@ -228,7 +228,7 @@
                 android:textSize="11sp"
                 android:textColor="#000"
                 android:fontFamily="sans-serif-bold"
-                android:backgroundTint="#AA00FF"
+                android:backgroundTint="#A78BFA"
                 android:stateListAnimator="@null"/>
         </LinearLayout>
     </LinearLayout>
@@ -256,7 +256,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mic Off"
-            android:textColor="#555566"
+            android:textColor="#64748B"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
@@ -269,7 +269,7 @@
             android:textSize="13sp"
             android:textColor="#000"
             android:fontFamily="sans-serif-bold"
-            android:backgroundTint="#00C853"
+            android:backgroundTint="#10FF80"
             android:stateListAnimator="@null"/>
     </LinearLayout>
 
