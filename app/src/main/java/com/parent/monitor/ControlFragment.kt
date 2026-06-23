@@ -13,8 +13,12 @@ class ControlFragment : Fragment() {
     private var tvTouchCoords: TextView? = null
     private var lastTouchX = 0f
     private var lastTouchY = 0f
-    private val targetW = 1080f
-    private val targetH = 1920f
+    private var targetW = 1080f  // Bug #22 fix: updated dynamically from child screen_width
+    private var targetH = 1920f
+
+    fun onDeviceInfo(screenWidth: Int, screenHeight: Int) {
+        if (screenWidth > 0 && screenHeight > 0) { targetW = screenWidth.toFloat(); targetH = screenHeight.toFloat() }
+    }
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?): View? {
         val v = i.inflate(R.layout.fragment_control, c, false)
