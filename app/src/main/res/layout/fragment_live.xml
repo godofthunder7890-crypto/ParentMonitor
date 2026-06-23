@@ -62,7 +62,6 @@
         android:orientation="vertical"
         android:background="#080B14">
 
-        <!-- Frame display — fills most of the screen -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -106,7 +105,7 @@
             </LinearLayout>
         </FrameLayout>
 
-        <!-- Controls bar -->
+        <!-- Screen controls bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
@@ -129,11 +128,11 @@
                 android:padding="0dp"/>
             <TextView
                 android:id="@+id/tvScreenInterval"
-                android:layout_width="50dp"
+                android:layout_width="56dp"
                 android:layout_height="wrap_content"
-                android:text="1s"
+                android:text="1fps"
                 android:textColor="#F1F5F9"
-                android:textSize="13sp"
+                android:textSize="11sp"
                 android:gravity="center"
                 android:textStyle="bold"/>
             <Button
@@ -215,21 +214,75 @@
             </LinearLayout>
         </FrameLayout>
 
+        <!-- Camera controls: fps +/- | FLIP | START/STOP -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:background="#0D1117"
-            android:padding="8dp">
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/btnCameraFaster"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="+"
+                android:textSize="16sp"
+                android:textColor="#000"
+                android:backgroundTint="#A78BFA"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:stateListAnimator="@null"
+                android:padding="0dp"/>
+            <TextView
+                android:id="@+id/tvCameraInterval"
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:text="30fps"
+                android:textColor="#F1F5F9"
+                android:textSize="11sp"
+                android:gravity="center"
+                android:textStyle="bold"/>
+            <Button
+                android:id="@+id/btnCameraSlower"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="-"
+                android:textSize="16sp"
+                android:textColor="#000"
+                android:backgroundTint="#444455"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:stateListAnimator="@null"
+                android:padding="0dp"/>
+
+            <Button
+                android:id="@+id/btnSwitchCamera"
+                android:layout_width="46dp"
+                android:layout_height="36dp"
+                android:text="FLIP"
+                android:textSize="9sp"
+                android:textColor="#A78BFA"
+                android:backgroundTint="#1A0030"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:stateListAnimator="@null"
+                android:padding="0dp"
+                android:layout_marginStart="4dp"/>
+
             <Button
                 android:id="@+id/btnToggleCamera"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:text="START CAMERA"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textColor="#000"
                 android:fontFamily="sans-serif-bold"
                 android:backgroundTint="#A78BFA"
-                android:stateListAnimator="@null"/>
+                android:stateListAnimator="@null"
+                android:layout_marginStart="4dp"/>
         </LinearLayout>
     </LinearLayout>
 
