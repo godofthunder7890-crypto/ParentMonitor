@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         const val KEY_SERVER_URL   = "server_url"
         const val KEY_PAIR_CODE    = "pair_code"
         const val KEY_GITHUB_REPO  = "github_repo"
-        const val DEFAULT_URL      = "wss://ws-relay-production-9ea0.up.railway.app/api/ws"
+        const val DEFAULT_URL      = "wss://bhai-secret--bs5129628.replit.app/api/ws"
     }
 
     // ─── Fragment refs ────────────────────────────────────────────────────────
@@ -504,7 +504,22 @@ class MainActivity : AppCompatActivity() {
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHeartbeat(payload) }
             }
-            "health_status" -> {
+            "update_status" -> {
+                val status  = msg.optString("status")
+                val version = msg.optString("version", "")
+                val error   = msg.optString("error", "")
+                val (emoji, text) = when (status) {
+                    "downloading"    -> "⬇️" to "Downloading update $version..."
+                    "installed"      -> "✅" to "Updated to $version — child will restart"
+                    "install_failed" -> "❌" to "Install failed for $version"
+                    "download_failed"-> "❌" to "Download failed: $error"
+                    else             -> "ℹ️" to "Update: $status"
+                }
+                handler.post {
+                    dashboardFragment?.addLog("$emoji $text", if (status == "installed") 0xFF00C853.toInt() else 0xFFFF5252.toInt())
+                }
+            }
+            "heartbeat" -> {
                 // Child sends every ~2.5 min — full 15-indicator health snapshot
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHealthStatus(payload) }
