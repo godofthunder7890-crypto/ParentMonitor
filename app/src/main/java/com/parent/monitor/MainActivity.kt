@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private var reconnectRunnable: Runnable? = null
     private var pingInterval:      Runnable? = null
     private var connected = false
+    private var reconnectDelay = 5_000L
     private var pingTs    = 0L
 
     // ─── Prefs ───────────────────────────────────────────────────────────────
@@ -85,7 +86,11 @@ class MainActivity : AppCompatActivity() {
 
         prefs     = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         serverUrl = prefs.getString(KEY_SERVER_URL, DEFAULT_URL) ?: DEFAULT_URL
-        pairCode  = prefs.getString(KEY_PAIR_CODE,  pairCode)    ?: pairCode
+        pairCode  = prefs.getString(KEY_PAIR_CODE, "") ?: ""
+        if (pairCode.isEmpty()) {
+            pairCode = (100000..999999).random().toString()
+            prefs.edit().putString(KEY_PAIR_CODE, pairCode).apply()
+        }
 
         bindViews()
         setupViewPager()
@@ -529,6 +534,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setConnected(on: Boolean) {
         connected = on
+        if (on) reconnectDelay = 5_000L
         handler.post {
             tvStatus.text = if (on) "Online" else "Offline"
             tvStatus.setTextColor(if (on) 0xFF00C853.toInt() else 0xFFF44336.toInt())
@@ -539,8 +545,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun scheduleReconnect() {
         reconnectRunnable?.let { handler.removeCallbacks(it) }
-        reconnectRunnable = Runnable { if (!connected) connect() }
-        handler.postDelayed(reconnectRunnable!!, 5000)
+        reconnectRunnable = Runnable { if (!connected) { connect(); reconnectDelay = minOf(reconnectDelay * 2, 60_000L) } }
+        handler.postDelayed(reconnectRunnable!!, reconnectDelay)
     }
 
     private fun startPinging() {
