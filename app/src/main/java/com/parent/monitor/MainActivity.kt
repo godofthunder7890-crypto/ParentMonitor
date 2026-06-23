@@ -514,10 +514,7 @@ class MainActivity : AppCompatActivity() {
                 val wstate = msg.optString("state"); val wok = msg.optBoolean("success", true)
                 val wtxt = if (wok) "WiFi $wstate" else "WiFi ${wstate} failed — Shizuku needed"
                 handler.post { dashboardFragment?.addLog(if (wok) "Wi-Fi $wstate" else "WiFi control failed — enable Shizuku", if (wok) 0xFF00C853.toInt() else 0xFFFF5252.toInt()) }
-            }
-                        "wifi_changed" -> {
-                val wstate = msg.optString("state"); val wok = msg.optBoolean("success", true)
-                val wtxt = if (wok) "WiFi $wstate" else "WiFi ${wstate} failed — Shizuku needed"
+            } failed — Shizuku needed"
                 handler.post { dashboardFragment?.addLog(if (wok) "Wi-Fi $wstate" else "WiFi control failed — enable Shizuku", if (wok) 0xFF00C853.toInt() else 0xFFFF5252.toInt()) }
             }
             "update_status" -> {
@@ -535,7 +532,7 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.addLog("$emoji $text", if (status == "installed") 0xFF00C853.toInt() else 0xFFFF5252.toInt())
                 }
             }
-            "heartbeat" -> {
+            "health_status" -> {
                 // Child sends every ~2.5 min — full 15-indicator health snapshot
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHealthStatus(payload) }
