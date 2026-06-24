@@ -1,4 +1,4 @@
-name: Build ParentMonitor APK
+name: Build ParentMonitor Debug APK
 
 on:
   push:
@@ -20,35 +20,39 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Install Android SDK 36 & Build Tools
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-36" "build-tools;35.0.0" "platform-tools"
+
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Make gradlew executable
-        run: chmod +x gradlew
+        run: sed -i 's/\r$//' ./gradlew && chmod +x ./gradlew
+
+      - name: Generate signing keystore
+        run: |
+          keytool -genkey -v -keystore release.jks \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass guardian_2024 -keypass guardian_2024 \
+            -alias guardian \
+            -dname "CN=GuardianEye,OU=Dev,O=Personal,L=IN,S=IN,C=IN"
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
+        env:
+          KEYSTORE_PATH: release.jks
+          STORE_PASS: guardian_2024
+          KEY_ALIAS: guardian
+          KEY_PASS: guardian_2024
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: ParentMonitor-debug-APK
+          name: ParentMonitor-debug-APK-${{ github.run_number }}
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-
-      - name: Build Release APK (unsigned)
-        run: ./gradlew assembleRelease --no-daemon
-        continue-on-error: true
-
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ParentMonitor-release-APK
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 30
-        continue-on-error: true

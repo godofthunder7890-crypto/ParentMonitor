@@ -15,16 +15,6 @@
         android:theme="@style/Theme.App"
         android:supportsRtl="true">
 
-        <!--
-            Google Maps SDK key.
-            Replace "YOUR_MAPS_API_KEY" with a real key from Google Cloud Console:
-            https://console.cloud.google.com/ → APIs & Services → Maps SDK for Android
-            Without a key, the map will show a grey watermark but the app will NOT crash.
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_MAPS_API_KEY"/>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
