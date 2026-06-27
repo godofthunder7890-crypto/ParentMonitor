@@ -19,14 +19,12 @@
         android:gravity="center_vertical"
         android:elevation="8dp">
 
-        <!-- App icon dot -->
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:background="@drawable/circle_green"
             android:layout_marginEnd="10dp"/>
 
-        <!-- App title -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -38,7 +36,6 @@
             android:fontFamily="monospace"
             android:letterSpacing="0.06"/>
 
-        <!-- Ping -->
         <TextView
             android:id="@+id/tvPing"
             android:layout_width="wrap_content"
@@ -49,7 +46,6 @@
             android:fontFamily="monospace"
             android:layout_marginEnd="10dp"/>
 
-        <!-- Battery -->
         <TextView
             android:id="@+id/tvBattery"
             android:layout_width="wrap_content"
@@ -60,7 +56,6 @@
             android:fontFamily="monospace"
             android:layout_marginEnd="10dp"/>
 
-        <!-- Status pill -->
         <LinearLayout
             android:id="@+id/statusPill"
             android:layout_width="wrap_content"
@@ -88,7 +83,6 @@
                 android:textStyle="bold"/>
         </LinearLayout>
 
-        <!-- Net Toggle -->
         <Button
             android:id="@+id/btnNetToggle"
             android:layout_width="56dp"
@@ -103,17 +97,17 @@
             android:stateListAnimator="@null"/>
     </LinearLayout>
 
-    <!-- DIVIDER (green glow) -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#1A10FF80"/>
 
-    <!-- TAB BAR -->
+    <!-- TAB BAR (scrollable, hidden by default — BottomNav is primary) -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
         android:background="#0D1117"
         app:tabTextColor="#64748B"
         app:tabSelectedTextColor="#10FF80"
@@ -125,17 +119,60 @@
         app:tabPaddingStart="2dp"
         app:tabPaddingEnd="2dp"/>
 
-    <!-- DIVIDER -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#1F2937"/>
 
-    <!-- CONTENT -->
+    <!-- Time Request badge banner (shown when pending requests exist) -->
+    <LinearLayout
+        android:id="@+id/bannerTimeRequest"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#1A00C853"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⏱ Child requesting extra screen time"
+            android:textColor="#00C853"
+            android:textSize="12sp"
+            android:fontFamily="monospace"/>
+        <Button
+            android:id="@+id/btnBannerView"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="VIEW"
+            android:textSize="10sp"
+            android:textColor="#080B14"
+            android:backgroundTint="#00C853"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <!-- CONTENT (full height minus top bar + bottom nav) -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
+
+    <!-- BOTTOM NAVIGATION -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#0D1117"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="#64748B"
+        app:itemTextColor="#64748B"
+        app:itemActiveIndicatorColor="#1A10FF80"
+        app:labelVisibilityMode="labeled"/>
 
 </LinearLayout>
