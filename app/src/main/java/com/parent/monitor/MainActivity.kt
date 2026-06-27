@@ -6,7 +6,9 @@ import android.Manifest
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -15,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import okhttp3.*
@@ -29,15 +32,22 @@ class MainActivity : AppCompatActivity() {
         const val KEY_PAIR_CODE    = "pair_code"
         const val KEY_GITHUB_REPO  = "github_repo"
         const val DEFAULT_URL      = "wss://bhai-secret--bs5129628.replit.app/api/ws"
+
+        // Bottom nav → ViewPager tab indices
+        private const val TAB_DASHBOARD    = 0
+        private const val TAB_LIVE         = 1
+        private const val TAB_LIMITS       = 7
+        private const val TAB_REPORTS      = 10
+        private const val TAB_SETTINGS     = 19
+        private const val TAB_TIME_REQUEST = 20
+        private const val TAB_CALL_SAFETY  = 21
     }
 
-    // FIX #18: Adapter lives at MainActivity level → survives fragment recreation on rotation
     val notificationAdapter = NotificationAdapter()
 
     // ─── Fragment refs ────────────────────────────────────────────────────────
     var dashboardFragment:       DashboardFragment?       = null
-    var controlFragment:        ControlFragment?         = null
-      // BUG #11 FIX: Store device dimensions so ControlFragment can apply them in onViewCreated
+    var controlFragment:         ControlFragment?         = null
       var lastDeviceW = 0
       var lastDeviceH = 0
     var liveFragment:            LiveFragment?            = null
@@ -51,17 +61,22 @@ class MainActivity : AppCompatActivity() {
     var trackFragment:           TrackFragment?           = null
     var reportsFragment:         ReportsFragment?         = null
     var dataFragment:            DataFragment?            = null
-    // ── New fragments (blueprint missing features) ────────────────────────────
     var browserSafetyFragment:   BrowserSafetyFragment?  = null
     var videoHistoryFragment:    VideoHistoryFragment?    = null
     var recordingsFragment:      RecordingsFragment?      = null
     var albumsSafetyFragment:    AlbumsSafetyFragment?   = null
+    // New fragments
+    var timeRequestFragment:     TimeRequestFragment?     = null
+    var callWhitelistFragment:   CallWhitelistFragment?   = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
-    private lateinit var tvStatus:   TextView
-    private lateinit var tvBattery:  TextView
-    private lateinit var tvPing:     TextView
-    private lateinit var btnNetToggle: Button
+    private lateinit var tvStatus:         TextView
+    private lateinit var tvBattery:        TextView
+    private lateinit var tvPing:           TextView
+    private lateinit var btnNetToggle:     Button
+    private lateinit var bottomNav:        BottomNavigationView
+    private lateinit var bannerTimeRequest: LinearLayout
+    private lateinit var viewPager:        ViewPager2
 
     // ─── WebSocket ───────────────────────────────────────────────────────────
     private var ws:     WebSocket?    = null
@@ -79,10 +94,9 @@ class MainActivity : AppCompatActivity() {
     private var pairCode  = "123456"
     private var netEnabled = true
 
-    // Backward-compat shim — fragments call act.wsManager?.sendCommand(...)
     inner class WsCompat {
         fun sendCommand(cmd: String) = this@MainActivity.sendCommand(cmd)
-        fun sendCommandObj(data: org.json.JSONObject) = this@MainActivity.sendCommandObj(data)
+        fun sendCommandObj(data: JSONObject) = this@MainActivity.sendCommandObj(data)
         fun isConnected() = connected
     }
     val wsManager = WsCompat()
@@ -101,49 +115,48 @@ class MainActivity : AppCompatActivity() {
 
         bindViews()
         setupViewPager()
+        setupBottomNav()
+        setupTimeRequestBanner()
         setupNetToggle()
         connect()
         requestRuntimePermissions()
     }
 
-
-    // ── Runtime permission requests (alerts, camera for QR) ──────────────────
     private fun requestRuntimePermissions() {
         val needed = mutableListOf<String>()
-        // POST_NOTIFICATIONS — Android 13+ required for alerts to show
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
                 needed.add(Manifest.permission.POST_NOTIFICATIONS)
         }
-        // CAMERA — for QR code scanning
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
             needed.add(Manifest.permission.CAMERA)
-        if (needed.isNotEmpty())
-            requestPermissions(needed.toTypedArray(), 201)
+        if (needed.isNotEmpty()) requestPermissions(needed.toTypedArray(), 201)
     }
 
     override fun onRequestPermissionsResult(reqCode: Int, perms: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(reqCode, perms, results)
-        // Permissions granted — no special handling needed, system will allow notifications now
     }
 
-        private fun bindViews() {
-        tvStatus     = findViewById(R.id.tvStatus)
-        tvBattery    = findViewById(R.id.tvBattery)
-        tvPing       = findViewById(R.id.tvPing)
-        btnNetToggle = findViewById(R.id.btnNetToggle)
+    private fun bindViews() {
+        tvStatus          = findViewById(R.id.tvStatus)
+        tvBattery         = findViewById(R.id.tvBattery)
+        tvPing            = findViewById(R.id.tvPing)
+        btnNetToggle      = findViewById(R.id.btnNetToggle)
+        bottomNav         = findViewById(R.id.bottomNav)
+        bannerTimeRequest = findViewById(R.id.bannerTimeRequest)
+        viewPager         = findViewById(R.id.viewPager)
     }
 
     private fun setupViewPager() {
-        val pager = findViewById<ViewPager2>(R.id.viewPager)
         val tabs  = findViewById<TabLayout>(R.id.tabLayout)
         val tabTitles = listOf(
             "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
             "Limits","Protect","Track","Reports","Data","Controls","Shizuku",
-            "Browser","Videos","Recordings","Albums","Painting","Settings"
+            "Browser","Videos","Recordings","Albums","Painting","Settings",
+            "TimeReq","CallSafety"
         )
 
-        pager.adapter = object : FragmentStateAdapter(this) {
+        viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = tabTitles.size
             override fun createFragment(pos: Int): Fragment = when (pos) {
                 0  -> DashboardFragment()
@@ -166,11 +179,57 @@ class MainActivity : AppCompatActivity() {
                 17 -> AlbumsSafetyFragment()
                 18 -> PaintingFragment()
                 19 -> SettingsFragment()
+                20 -> TimeRequestFragment()
+                21 -> CallWhitelistFragment()
                 else -> DashboardFragment()
             }
         }
-        pager.offscreenPageLimit = 2
-        TabLayoutMediator(tabs, pager) { tab, pos -> tab.text = tabTitles[pos] }.attach()
+        viewPager.offscreenPageLimit = 2
+        // Tab strip is hidden (bottom nav is primary) — attach for keyboard navigation
+        TabLayoutMediator(tabs, viewPager) { tab, pos -> tab.text = tabTitles[pos] }.attach()
+    }
+
+    private fun setupBottomNav() {
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home     -> { viewPager.currentItem = TAB_DASHBOARD;    true }
+                R.id.nav_live     -> { viewPager.currentItem = TAB_LIVE;         true }
+                R.id.nav_protect  -> { viewPager.currentItem = TAB_LIMITS;       true }
+                R.id.nav_requests -> { viewPager.currentItem = TAB_TIME_REQUEST; true }
+                R.id.nav_settings -> { viewPager.currentItem = TAB_SETTINGS;     true }
+                else -> false
+            }
+        }
+        // Sync bottom nav when user swipes pager
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val itemId = when (position) {
+                    TAB_DASHBOARD                         -> R.id.nav_home
+                    TAB_LIVE                              -> R.id.nav_live
+                    TAB_LIMITS, 8, 14, 17, TAB_CALL_SAFETY -> R.id.nav_protect
+                    TAB_TIME_REQUEST                      -> R.id.nav_requests
+                    TAB_SETTINGS                          -> R.id.nav_settings
+                    else                                  -> R.id.nav_home
+                }
+                if (bottomNav.selectedItemId != itemId)
+                    bottomNav.selectedItemId = itemId
+            }
+        })
+    }
+
+    private fun setupTimeRequestBanner() {
+        val btnView = findViewById<Button>(R.id.btnBannerView)
+        btnView.setOnClickListener {
+            viewPager.currentItem = TAB_TIME_REQUEST
+            bottomNav.selectedItemId = R.id.nav_requests
+        }
+    }
+
+    fun hideBannerIfNoPending() {
+        handler.post {
+            val hasPending = timeRequestFragment?.hasPendingRequests() == true
+            bannerTimeRequest.visibility = if (hasPending) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setupNetToggle() {
@@ -307,7 +366,6 @@ class MainActivity : AppCompatActivity() {
                     time  = timeStr,
                     timestamp = ts
                 )
-                // FIX #18: Add to activity-level adapter directly — fragment doesn't need to be alive
                 handler.post { notificationAdapter.addNotification(item) }
             }
             "update_result" -> {
@@ -321,7 +379,60 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
             }
-            // ── New fragment routing ──────────────────────────────────────────
+
+            // ── Screen Time Request (child → parent) ──────────────────────────
+            "time_request" -> {
+                val requestId = msg.optString("request_id", "req_${System.currentTimeMillis()}")
+                val minutes   = msg.optInt("minutes", 30)
+                val reason    = msg.optString("reason", "")
+                val ts        = msg.optLong("ts", System.currentTimeMillis())
+                val req = TimeRequest(
+                    requestId = requestId,
+                    minutes   = minutes,
+                    reason    = reason,
+                    timestamp = ts
+                )
+                handler.post {
+                    // Show banner
+                    bannerTimeRequest.visibility = View.VISIBLE
+                    timeRequestFragment?.onTimeRequest(req)
+                    dashboardFragment?.addLog("⏱ Child requests $minutes min extra screen time", 0xFFFFB300.toInt())
+                    reportsFragment?.addAlert("⏱ Time Request", "$minutes min requested — reason: $reason")
+                    showUrgentNotification("Screen Time Request", "Child wants $minutes min extra. Open app to approve.")
+                }
+            }
+
+            // ── Call list sync (child → parent) ───────────────────────────────
+            "call_lists" -> {
+                val whiteArr = msg.optJSONArray("whitelist")
+                val blackArr = msg.optJSONArray("blacklist")
+                handler.post { callWhitelistFragment?.onCallLists(whiteArr, blackArr) }
+            }
+
+            // ── Browser list sync ─────────────────────────────────────────────
+            "browser_lists" -> {
+                val blockedArr = msg.optJSONArray("blocked")
+                val allowedArr = msg.optJSONArray("allowed")
+                if (blockedArr != null) {
+                    val list = (0 until blockedArr.length()).map { blockedArr.getString(it) }
+                    handler.post { browserSafetyFragment?.onBlockedDomains(list) }
+                }
+                if (allowedArr != null) {
+                    val list = (0 until allowedArr.length()).map { allowedArr.getString(it) }
+                    handler.post { browserSafetyFragment?.onAllowedDomains(list) }
+                }
+            }
+
+            // ── Legacy blocked_domains (backward compat) ──────────────────────
+            "blocked_domains" -> {
+                val arr = msg.optJSONArray("domains")
+                if (arr != null) {
+                    val list = (0 until arr.length()).map { arr.getString(it) }
+                    handler.post { browserSafetyFragment?.onBlockedDomains(list) }
+                }
+            }
+
+            // ── Existing fragment routing ─────────────────────────────────────
             "daily_report" -> handler.post { reportsFragment?.onDailyReport(msg) }
             "app_blocked" -> {
                 val pkg    = msg.optString("package")
@@ -352,7 +463,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "device_info" -> handler.post {
-                // FIX #9 step 2: Route screen_width/height to ControlFragment too
                 protectFragment?.onDeviceInfo(msg)
                 val w = msg.optInt("screen_width", 0)
                 val h = msg.optInt("screen_height", 0)
@@ -360,19 +470,13 @@ class MainActivity : AppCompatActivity() {
             }
             "app_open" -> {
                 val pkg = msg.optString("package")
-                handler.post {
-                    reportsFragment?.addAlert("App Opened", pkg.substringAfterLast('.'))
-                }
+                handler.post { reportsFragment?.addAlert("App Opened", pkg.substringAfterLast('.')) }
             }
             "chat_content" -> {
                 val pkg     = msg.optString("package")
                 val content = msg.optString("content").take(80)
-                handler.post {
-                    reportsFragment?.addAlert("Chat [${pkg.substringAfterLast('.')}]", content)
-                }
+                handler.post { reportsFragment?.addAlert("Chat [${pkg.substringAfterLast('.')}]", content) }
             }
-
-            // ── New events from blueprint features ────────────────────────────
             "browser_blocked" -> {
                 val url    = msg.optString("url")
                 val domain = msg.optString("domain")
@@ -383,16 +487,7 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.addLog("🌐 Blocked browser: $domain")
                 }
             }
-            "blocked_domains" -> {
-                val arr = msg.optJSONArray("domains")
-                if (arr != null) {
-                    val list = (0 until arr.length()).map { arr.getString(it) }
-                    handler.post { browserSafetyFragment?.onBlockedDomains(list) }
-                }
-            }
-            "video_history" -> {
-                handler.post { videoHistoryFragment?.onVideoHistory(msg) }
-            }
+            "video_history" -> handler.post { videoHistoryFragment?.onVideoHistory(msg) }
             "video_watched" -> {
                 handler.post {
                     val title    = msg.optString("title", "")
@@ -418,13 +513,9 @@ class MainActivity : AppCompatActivity() {
                 val type = msg.optString("type")
                 handler.post { dashboardFragment?.addLog("🎙 Recording started: $type") }
             }
-            "recording_ready" -> {
-                handler.post { recordingsFragment?.onRecordingReady(msg) }
-            }
-            "recording_chunk" -> {
-                handler.post { recordingsFragment?.onRecordingChunk(msg) }
-            }
-            "recording_list" -> {
+            "recording_ready"  -> handler.post { recordingsFragment?.onRecordingReady(msg) }
+            "recording_chunk"  -> handler.post { recordingsFragment?.onRecordingChunk(msg) }
+            "recording_list"   -> {
                 val arr = msg.optJSONArray("files")
                 if (arr != null) handler.post { recordingsFragment?.onRecordingList(arr) }
             }
@@ -435,8 +526,6 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("📶 Back Online", "Was offline for ${mins} minutes")
                 }
             }
-
-            // ── Albums Safety ─────────────────────────────────────────────────
             "albums_scan_result" -> {
                 handler.post {
                     albumsSafetyFragment?.onScanResult(msg)
@@ -450,8 +539,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "album_full_image" -> handler.post { albumsSafetyFragment?.onAlbumFullImage(msg) }
-
-            // ── Camera Recording ──────────────────────────────────────────────
             "camera_record_started" -> {
                 val fn = msg.optString("filename", "")
                 handler.post { dashboardFragment?.addLog("🎥 Camera recording: $fn") }
@@ -464,13 +551,11 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("🎥 Camera Recording Ready", "$fn — ${size}KB")
                 }
             }
-            "camera_record_list" -> {
+            "camera_record_list"  -> {
                 val arr = msg.optJSONArray("files")
                 if (arr != null) handler.post { recordingsFragment?.onRecordingList(arr) }
             }
             "camera_record_chunk" -> handler.post { recordingsFragment?.onRecordingChunk(msg) }
-
-            // ── Screen Recording ──────────────────────────────────────────────
             "screen_record_started" -> {
                 val fn = msg.optString("filename", "")
                 handler.post { dashboardFragment?.addLog("📱 Screen recording: $fn") }
@@ -488,8 +573,6 @@ class MainActivity : AppCompatActivity() {
                 if (arr != null) handler.post { recordingsFragment?.onRecordingList(arr) }
             }
             "screen_record_chunk" -> handler.post { recordingsFragment?.onRecordingChunk(msg) }
-
-            // ── Emergency Lock / Unlock ────────────────────────────────────────
             "emergency_locked_all" -> {
                 val count = msg.optInt("blocked_count", 0)
                 handler.post {
@@ -497,17 +580,11 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("🚨 Emergency Lock", "$count apps blocked on child device")
                 }
             }
-            "paint_ack" -> {
-                // Parent gets confirmation child received the stroke - no UI update needed
-            }
-
-            // UI #3 step 2: Child sends installed apps list
+            "paint_ack" -> { }
             "app_list" -> {
                 val arr = msg.optJSONArray("apps")
                 if (arr != null) handler.post { protectFragment?.onAppList(arr) }
             }
-
-            // Feature F2 / FIX #27: Alert parent about urgent events on child
             "sos_activated" -> handler.post {
                 dashboardFragment?.addLog("🚨 SOS ACTIVATED on child device!", 0xFFFF1744.toInt())
                 reportsFragment?.addAlert("🚨 EMERGENCY SOS", "Child activated SOS — check immediately!")
@@ -538,42 +615,27 @@ class MainActivity : AppCompatActivity() {
             "app_data_cleared" -> {
                 val pkg = msg.optString("package")
                 val ok  = msg.optBoolean("success")
-                handler.post {
-                    dashboardFragment?.addLog(if (ok) "✅ App data cleared: $pkg" else "❌ Clear failed: $pkg")
-                }
+                handler.post { dashboardFragment?.addLog(if (ok) "✅ App data cleared: $pkg" else "❌ Clear failed: $pkg") }
             }
             "token_granted" -> {
                 val pkg  = msg.optString("package")
                 val mins = msg.optInt("minutes")
-                handler.post {
-                    dashboardFragment?.addLog("🎮 Token granted: ${pkg.substringAfterLast('.')} for ${mins}min", 0xFF00C853.toInt())
-                }
+                handler.post { dashboardFragment?.addLog("🎮 Token granted: ${pkg.substringAfterLast('.')} for ${mins}min", 0xFF00C853.toInt()) }
             }
             "emergency_unlocked_all" -> {
-                handler.post {
-                    dashboardFragment?.addLog("✅ Emergency lock released — all apps unblocked")
-                }
+                handler.post { dashboardFragment?.addLog("✅ Emergency lock released — all apps unblocked") }
             }
-
-            // ── Diagnostic Report ─────────────────────────────────────────────
-            "diagnostic_report" -> {
-                handler.post { dashboardFragment?.onDiagnosticReport(msg) }
-            }
+            "diagnostic_report" -> handler.post { dashboardFragment?.onDiagnosticReport(msg) }
             "diagnostic_cleared" -> {
-                handler.post {
-                    dashboardFragment?.addLog("🗑 Diagnostic logs cleared on child device", 0xFFFF6D00.toInt())
-                }
+                handler.post { dashboardFragment?.addLog("🗑 Diagnostic logs cleared on child device", 0xFFFF6D00.toInt()) }
             }
-
-            // ── Service Health: real-time 15-indicator monitor ────────────────
             "heartbeat" -> {
-                // Child sends every 30s — payload: uptime, conn_quality, crash/restart counts
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHeartbeat(payload) }
             }
             "wifi_changed" -> {
-                val wstate = msg.optString("state"); val wok = msg.optBoolean("success", true)
-                val wtxt = if (wok) "WiFi $wstate" else "WiFi ${wstate} failed — Shizuku needed"
+                val wok = msg.optBoolean("success", true)
+                val wstate = msg.optString("state")
                 handler.post { dashboardFragment?.addLog(if (wok) "Wi-Fi $wstate" else "WiFi control failed — enable Shizuku", if (wok) 0xFF00C853.toInt() else 0xFFFF5252.toInt()) }
             }
             "update_status" -> {
@@ -587,12 +649,9 @@ class MainActivity : AppCompatActivity() {
                     "download_failed"-> "❌" to "Download failed: $error"
                     else             -> "ℹ️" to "Update: $status"
                 }
-                handler.post {
-                    dashboardFragment?.addLog("$emoji $text", if (status == "installed") 0xFF00C853.toInt() else 0xFFFF5252.toInt())
-                }
+                handler.post { dashboardFragment?.addLog("$emoji $text", if (status == "installed") 0xFF00C853.toInt() else 0xFFFF5252.toInt()) }
             }
             "health_status" -> {
-                // Child sends every ~2.5 min — full 15-indicator health snapshot
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHealthStatus(payload) }
             }
@@ -633,8 +692,6 @@ class MainActivity : AppCompatActivity() {
     private fun stopPinging() {
         pingInterval?.let { handler.removeCallbacks(it) }
     }
-
-    // ─── Public send helpers (used by all fragments) ──────────────────────────
 
     fun sendToChild(data: JSONObject) {
         try { ws?.send(data.toString()) } catch (_: Exception) {}
