@@ -128,7 +128,10 @@ class DataFragment : Fragment() {
                 try {
                     val bytes = Base64.decode(b64, Base64.NO_WRAP)
                     val bmp   = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    // FIX #17: Recycle old bitmap before replacing — prevents OOM on large galleries
+                    val oldBmp = (h.img.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
                     h.img.setImageBitmap(bmp)
+                    if (oldBmp != null && oldBmp !== bmp) oldBmp.recycle()
                 } catch (_: Exception) {
                     h.img.setImageResource(android.R.drawable.ic_menu_gallery)
                 }

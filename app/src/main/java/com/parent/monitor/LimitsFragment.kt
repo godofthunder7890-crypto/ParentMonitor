@@ -65,17 +65,39 @@ class LimitsFragment : Fragment() {
             showStatus("✅ Safety keywords loaded")
         }
 
-        // Internet Schedule
+        // Internet Schedule — UI #6: Use TimePickerDialog instead of plain EditText
         val etOffStart = v.findViewById<EditText>(R.id.etOffStart)
         val etOffEnd   = v.findViewById<EditText>(R.id.etOffEnd)
+        var scheduleStartHour = 23
+        var scheduleEndHour   = 6
+
+        // Override EditText to open TimePicker on click
+        etOffStart.isFocusable = false
+        etOffStart.isClickable = true
+        etOffStart.setText("23:00")
+        etOffStart.setOnClickListener {
+            android.app.TimePickerDialog(requireContext(), { _, hr, _ ->
+                scheduleStartHour = hr
+                etOffStart.setText(String.format("%02d:00", hr))
+            }, scheduleStartHour, 0, true).show()
+        }
+        etOffEnd.isFocusable = false
+        etOffEnd.isClickable = true
+        etOffEnd.setText("06:00")
+        etOffEnd.setOnClickListener {
+            android.app.TimePickerDialog(requireContext(), { _, hr, _ ->
+                scheduleEndHour = hr
+                etOffEnd.setText(String.format("%02d:00", hr))
+            }, scheduleEndHour, 0, true).show()
+        }
+
         v.findViewById<Button>(R.id.btnSetSchedule).setOnClickListener {
-            val start = etOffStart.text.toString().toIntOrNull() ?: 23
-            val end   = etOffEnd.text.toString().toIntOrNull() ?: 6
             act.wsManager?.sendCommandObj(JSONObject().apply {
                 put("command", "set_schedule")
-                put("off_hour_start", start); put("off_hour_end", end)
+                put("off_hour_start", scheduleStartHour)
+                put("off_hour_end", scheduleEndHour)
             })
-            showStatus("🌙 Internet off $start:00 - $end:00")
+            showStatus("🌙 Internet off ${String.format("%02d", scheduleStartHour)}:00 - ${String.format("%02d", scheduleEndHour)}:00")
         }
         v.findViewById<Button>(R.id.btnDisableSchedule).setOnClickListener {
             act.wsManager?.sendCommand("disable_schedule")

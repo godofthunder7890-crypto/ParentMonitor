@@ -116,6 +116,15 @@
                     android:backgroundTint="#1F2937"
                     android:layout_marginTop="6dp"
                     android:stateListAnimator="@null"/>
+
+                <!-- UI #3: Fetch installed app list from child device for quick blocking -->
+                <Button android:id="@+id/btnFetchApps"
+                    android:layout_width="match_parent" android:layout_height="44dp"
+                    android:text="📱 Fetch Child App List"
+                    android:textSize="12sp" android:textColor="#00E5FF"
+                    android:backgroundTint="#001A33"
+                    android:layout_marginTop="8dp"
+                    android:stateListAnimator="@null"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

@@ -31,6 +31,9 @@ class MainActivity : AppCompatActivity() {
         const val DEFAULT_URL      = "wss://bhai-secret--bs5129628.replit.app/api/ws"
     }
 
+    // FIX #18: Adapter lives at MainActivity level → survives fragment recreation on rotation
+    val notificationAdapter = NotificationAdapter()
+
     // ─── Fragment refs ────────────────────────────────────────────────────────
     var dashboardFragment:       DashboardFragment?       = null
     var controlFragment:        ControlFragment?         = null
@@ -301,7 +304,8 @@ class MainActivity : AppCompatActivity() {
                     time  = timeStr,
                     timestamp = ts
                 )
-                handler.post { notificationsFragment?.addNotification(item) }
+                // FIX #18: Add to activity-level adapter directly — fragment doesn't need to be alive
+                handler.post { notificationAdapter.addNotification(item) }
             }
             "update_result" -> {
                 val ok  = msg.optBoolean("success")
@@ -344,7 +348,13 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.addLog("🔍 Keyword \"$keyword\" detected in ${pkg.substringAfterLast('.')}")
                 }
             }
-            "device_info" -> handler.post { protectFragment?.onDeviceInfo(msg) }
+            "device_info" -> handler.post {
+                // FIX #9 step 2: Route screen_width/height to ControlFragment too
+                protectFragment?.onDeviceInfo(msg)
+                val w = msg.optInt("screen_width", 0)
+                val h = msg.optInt("screen_height", 0)
+                if (w > 0 && h > 0) controlFragment?.onDeviceInfo(w, h)
+            }
             "app_open" -> {
                 val pkg = msg.optString("package")
                 handler.post {
@@ -485,8 +495,56 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "paint_ack" -> {
-                val action = msg.optString("action")
                 // Parent gets confirmation child received the stroke - no UI update needed
+            }
+
+            // UI #3 step 2: Child sends installed apps list
+            "app_list" -> {
+                val arr = msg.optJSONArray("apps")
+                if (arr != null) handler.post { protectFragment?.onAppList(arr) }
+            }
+
+            // Feature F2 / FIX #27: Alert parent about urgent events on child
+            "sos_activated" -> handler.post {
+                dashboardFragment?.addLog("🚨 SOS ACTIVATED on child device!", 0xFFFF1744.toInt())
+                reportsFragment?.addAlert("🚨 EMERGENCY SOS", "Child activated SOS — check immediately!")
+                showUrgentNotification("SOS Activated", "Child activated emergency SOS")
+            }
+            "uninstall_attempt" -> handler.post {
+                dashboardFragment?.addLog("⚠️ Uninstall attempt blocked!", 0xFFFF6D00.toInt())
+                reportsFragment?.addAlert("⚠️ Uninstall Attempt", "Someone tried to uninstall child monitor")
+                showUrgentNotification("Uninstall Attempt!", "Someone tried to remove the child monitor app")
+            }
+            "grooming_alert" -> {
+                val keyword = msg.optString("keyword")
+                val pkg     = msg.optString("package")
+                val preview = msg.optString("message_preview")
+                handler.post {
+                    reportsFragment?.addAlert("🚨 Grooming Keyword", "\"$keyword\" in ${pkg.substringAfterLast('.')}\n$preview")
+                    dashboardFragment?.addLog("🚨 GROOMING: \"$keyword\" detected in ${pkg.substringAfterLast('.')}", 0xFFFF1744.toInt())
+                    showUrgentNotification("Grooming Alert!", "\"$keyword\" detected in ${pkg.substringAfterLast('.')}")
+                }
+            }
+            "call_blocked" -> {
+                val num = msg.optString("number", "Unknown")
+                handler.post {
+                    dashboardFragment?.addLog("📵 Call blocked: $num")
+                    reportsFragment?.addAlert("📵 Call Blocked", num)
+                }
+            }
+            "app_data_cleared" -> {
+                val pkg = msg.optString("package")
+                val ok  = msg.optBoolean("success")
+                handler.post {
+                    dashboardFragment?.addLog(if (ok) "✅ App data cleared: $pkg" else "❌ Clear failed: $pkg")
+                }
+            }
+            "token_granted" -> {
+                val pkg  = msg.optString("package")
+                val mins = msg.optInt("minutes")
+                handler.post {
+                    dashboardFragment?.addLog("🎮 Token granted: ${pkg.substringAfterLast('.')} for ${mins}min", 0xFF00C853.toInt())
+                }
             }
             "emergency_unlocked_all" -> {
                 handler.post {
@@ -585,6 +643,26 @@ class MainActivity : AppCompatActivity() {
 
     fun sendCommandObj(data: JSONObject) {
         sendToChild(data)
+    }
+
+    private fun showUrgentNotification(title: String, body: String) {
+        try {
+            val mgr = getSystemService(android.app.NotificationManager::class.java)
+            val channelId = "urgent"
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                val ch = android.app.NotificationChannel(channelId, "Urgent Alerts",
+                    android.app.NotificationManager.IMPORTANCE_HIGH)
+                ch.enableVibration(true)
+                mgr.createNotificationChannel(ch)
+            }
+            val notif = android.app.Notification.Builder(this, channelId)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .build()
+            mgr.notify(System.currentTimeMillis().toInt(), notif)
+        } catch (_: Exception) {}
     }
 
     override fun onDestroy() {

@@ -75,6 +75,13 @@ class ProtectFragment : Fragment() {
             tvProtectStatus?.text = "✅ Unknown callers blocked"
         }
 
+        // UI #3 step 3: Fetch Apps button — request installed app list from child
+        val btnFetchApps = v.findViewById<Button?>(R.id.btnFetchApps)
+        btnFetchApps?.setOnClickListener {
+            act.wsManager?.sendCommand("get_app_list")
+            tvProtectStatus?.text = "⏳ Fetching app list from child..."
+        }
+
         (activity as? MainActivity)?.protectFragment = this
         return v
     }
@@ -90,6 +97,31 @@ class ProtectFragment : Fragment() {
         blockedList.clear()
         for (i in 0 until arr.length()) blockedList.add(arr.getString(i))
         listAdapter?.notifyDataSetChanged()
+    }
+
+    // UI #3 step 3: Show received app list in an AlertDialog for quick blocking
+    fun onAppList(apps: JSONArray) {
+        val act = activity as? MainActivity ?: return
+        val names = ArrayList<String>()
+        val pkgs  = ArrayList<String>()
+        for (i in 0 until apps.length()) {
+            val obj = apps.optJSONObject(i) ?: continue
+            pkgs.add(obj.optString("package"))
+            names.add("${obj.optString("name")} (${obj.optString("package").substringAfterLast('.')})")
+        }
+        if (names.isEmpty()) { tvProtectStatus?.text = "No user apps found"; return }
+        android.app.AlertDialog.Builder(act)
+            .setTitle("Installed Apps — Tap to Block")
+            .setItems(names.toTypedArray()) { _, which ->
+                val pkg = pkgs[which]
+                if (!blockedList.contains(pkg)) {
+                    blockedList.add(pkg)
+                    listAdapter?.notifyDataSetChanged()
+                    pushBlockedList()
+                }
+            }
+            .setNegativeButton("Close", null)
+            .show()
     }
 
     fun onAppBlocked(pkg: String, reason: String) {

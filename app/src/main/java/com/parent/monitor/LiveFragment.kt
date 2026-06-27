@@ -48,6 +48,8 @@ class LiveFragment : Fragment() {
     private var micStreaming    = false
     private var screenInterval = 1000L
     private var cameraInterval = 33L  // 30fps default
+    // UI #5: Front/back camera toggle state
+    private var useFrontCamera = true
 
     // FPS tracking
     private var screenFrameCount = 0L
@@ -171,10 +173,14 @@ class LiveFragment : Fragment() {
         btnToggleCamera.setOnClickListener {
             cameraStreaming = !cameraStreaming
             if (cameraStreaming) {
-                sendCommand(JSONObject().apply { put("command", "start_camera_stream"); put("interval", cameraInterval) })
+                sendCommand(JSONObject().apply {
+                    put("command", "start_camera_stream")
+                    put("interval", cameraInterval)
+                    put("front_camera", useFrontCamera)  // UI #5
+                })
                 btnToggleCamera.text = "STOP CAMERA"
                 btnToggleCamera.setBackgroundColor(0xFFFF1744.toInt())
-                tvCameraInfo.text = "Streaming..."
+                tvCameraInfo.text = if (useFrontCamera) "Streaming (Front)..." else "Streaming (Back)..."
                 setDotColor(dotCamera, true)
             } else {
                 sendCommand(JSONObject().apply { put("command", "stop_camera_stream") })
@@ -184,6 +190,53 @@ class LiveFragment : Fragment() {
                 tvCameraFps.text = ""
                 setDotColor(dotCamera, false)
             }
+        }
+
+        // UI #5: Front/back camera flip button — dynamically added to panelCamera
+        panelCamera.post {
+            val ctx = context ?: return@post
+            // Flip button
+            val btnFlip = Button(ctx).apply {
+                text = "🔄 Flip Camera (Front/Back)"
+                setBackgroundColor(0xFF333355.toInt())
+                setTextColor(0xFFFFFFFF.toInt())
+            }
+            btnFlip.setOnClickListener {
+                useFrontCamera = !useFrontCamera
+                btnFlip.text = if (useFrontCamera) "🔄 Flip → Back Camera" else "🔄 Flip → Front Camera"
+                if (cameraStreaming) {
+                    sendCommand(JSONObject().apply {
+                        put("command", "start_camera_stream")
+                        put("interval", cameraInterval)
+                        put("front_camera", useFrontCamera)
+                    })
+                    tvCameraInfo.text = if (useFrontCamera) "Streaming (Front)..." else "Streaming (Back)..."
+                }
+            }
+            panelCamera.addView(btnFlip)
+
+            // UI #5: Screenshot save button — added to panelScreen
+            val btnSaveScreenshot = Button(ctx).apply {
+                text = "📷 Save Screenshot"
+                setBackgroundColor(0xFF003355.toInt())
+                setTextColor(0xFF00E5FF.toInt())
+            }
+            btnSaveScreenshot.setOnClickListener {
+                val bmp = (imgScreen.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
+                    ?: return@setOnClickListener
+                try {
+                    val dir = requireContext().getExternalFilesDir("screenshots")
+                        ?: requireContext().filesDir
+                    dir.mkdirs()
+                    val name = "screenshot_${System.currentTimeMillis()}.jpg"
+                    val f = java.io.File(dir, name)
+                    java.io.FileOutputStream(f).use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, it) }
+                    android.widget.Toast.makeText(ctx, "Saved: $name", android.widget.Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(ctx, "Save failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            panelScreen.addView(btnSaveScreenshot)
         }
 
         btnToggleMic.setOnClickListener {

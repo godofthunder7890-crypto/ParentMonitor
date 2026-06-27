@@ -58,6 +58,40 @@ class BrowserSafetyFragment : Fragment() {
         row.addView(btnAdd)
         root.addView(row)
 
+        // Feature F4: DNS Filter buttons (Cloudflare Family DNS)
+        root.addView(label("DNS SAFETY FILTER"))
+        val dnsRow = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            (layoutParams as? LinearLayout.LayoutParams)?.width = ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        val btnDnsOn = Button(ctx).apply {
+            text = "🛡 Enable Family DNS"
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFF00C853.toInt())
+            setTextColor(0xFFFFFFFF.toInt())
+        }
+        btnDnsOn.setOnClickListener {
+            act.sendCommandObj(JSONObject().apply {
+                put("command", "set_dns")
+                put("primary", "1.1.1.3"); put("secondary", "1.0.0.3")
+            })
+            android.widget.Toast.makeText(ctx, "Family DNS enabled (Cloudflare 1.1.1.3)", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        val btnDnsOff = Button(ctx).apply {
+            text = "✕ Disable DNS"
+            backgroundTintList = android.content.res.ColorStateList.valueOf(0xFFFF1744.toInt())
+            setTextColor(0xFFFFFFFF.toInt())
+        }
+        btnDnsOff.setOnClickListener {
+            act.sendCommandObj(JSONObject().apply {
+                put("command", "set_dns")
+                put("primary", ""); put("secondary", "")
+            })
+            android.widget.Toast.makeText(ctx, "DNS filter disabled", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        dnsRow.addView(btnDnsOn, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        dnsRow.addView(btnDnsOff, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        root.addView(dnsRow)
+
         // ── Fetch from child ──────────────────────────────────────────────────
         val btnFetch = Button(ctx).apply {
             text = "📋 FETCH FROM CHILD"; setTextColor(0xFF00E5FF.toInt())
@@ -110,20 +144,28 @@ class BrowserSafetyFragment : Fragment() {
     private fun refreshList() {
         if (blockedDomains.isEmpty()) {
             tvList?.text = "No blocked domains yet"
+            tvList?.setOnClickListener(null)
             return
         }
         val sb = StringBuilder()
         blockedDomains.forEachIndexed { idx, d ->
-            sb.append("${idx + 1}. $d   [tap to remove]\n")
+            sb.append("${idx + 1}. $d\n")
         }
         tvList?.text = sb.toString().trimEnd()
+
+        // FIX #14: Show AlertDialog listing all domains so user can pick which one to remove
         tvList?.setOnClickListener {
-            // Simple: show a dialog to remove all or tap specific
-            if (blockedDomains.isNotEmpty()) {
-                blockedDomains.removeAt(blockedDomains.size - 1)
-                syncDomains(requireActivity() as MainActivity)
-                refreshList()
-            }
+            val act = activity as? MainActivity ?: return@setOnClickListener
+            val items = blockedDomains.toTypedArray()
+            android.app.AlertDialog.Builder(act)
+                .setTitle("Remove Blocked Domain")
+                .setItems(items) { _, which ->
+                    blockedDomains.removeAt(which)
+                    syncDomains(act)
+                    refreshList()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 

@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 
 class NotificationsFragment : Fragment() {
 
-    val adapter = NotificationAdapter()
+    // FIX #18: Use adapter from MainActivity so data survives fragment recreation on rotation
+    private val adapter get() = (activity as? MainActivity)?.notificationAdapter
+
     private var tvCount: TextView? = null
     private var tvEmpty: TextView? = null
     private var rv: RecyclerView? = null
@@ -29,15 +31,16 @@ class NotificationsFragment : Fragment() {
         rv?.adapter = adapter
 
         // Register a data observer to update count + empty state
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(pos: Int, count: Int) { updateUi(); scrollTop() }
             override fun onChanged() { updateUi() }
         })
 
         view.findViewById<Button>(R.id.btnClear).setOnClickListener {
-            adapter.clear(); updateUi()
+            adapter?.clear(); updateUi()
         }
         (activity as? MainActivity)?.notificationsFragment = this
+        updateUi()  // Restore count display on re-creation
         return view
     }
 
@@ -47,12 +50,12 @@ class NotificationsFragment : Fragment() {
     }
 
     fun addNotification(item: NotificationItem) {
-        adapter.addNotification(item)
+        adapter?.addNotification(item)
         // updateUi() called via observer
     }
 
     private fun updateUi() {
-        val count = adapter.itemCount
+        val count = adapter?.itemCount ?: 0
         tvCount?.text = count.toString()
         tvEmpty?.visibility = if (count == 0) View.VISIBLE else View.GONE
         rv?.visibility = if (count > 0) View.VISIBLE else View.INVISIBLE

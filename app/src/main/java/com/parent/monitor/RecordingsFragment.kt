@@ -184,14 +184,23 @@ class RecordingsFragment : Fragment() {
             sb.append("   [Tap to download]\n\n")
         }
         tvList?.text = sb.toString().trimEnd()
+
+        // FIX #16: Show AlertDialog so user can pick which recording to download (not always first)
         tvList?.setOnClickListener {
-            // Download first recording
-            val first = recordings.firstOrNull() ?: return@setOnClickListener
-            (activity as? MainActivity)?.sendCommandObj(JSONObject().apply {
-                put("command", "get_recording")
-                put("path", first.path)
-            })
-            appendLog("Requesting download: ${first.filename}")
+            val act = activity as? MainActivity ?: return@setOnClickListener
+            val names = recordings.map { it.filename }.toTypedArray()
+            android.app.AlertDialog.Builder(act)
+                .setTitle("Download Recording")
+                .setItems(names) { _, which ->
+                    val chosen = recordings[which]
+                    act.sendCommandObj(JSONObject().apply {
+                        put("command", "get_recording")
+                        put("path", chosen.path)
+                    })
+                    appendLog("Requesting download: ${chosen.filename}")
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 

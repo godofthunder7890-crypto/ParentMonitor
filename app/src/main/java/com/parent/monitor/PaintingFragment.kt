@@ -159,7 +159,7 @@ class PaintingFragment : Fragment() {
     private fun sendStroke(xRatio: Float, yRatio: Float, action: String) {
         val size = (seekSize.progress + 4).toFloat()
         (activity as? MainActivity)?.sendToChild(JSONObject().apply {
-            put("command", "paint_stroke")
+            put("command", "live_painting_draw")  // FIX #13: child CoreService expects "live_painting_draw"
             put("x",      xRatio.toDouble())
             put("y",      yRatio.toDouble())
             put("color",  currentColor)
