@@ -172,7 +172,6 @@
         app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="#64748B"
         app:itemTextColor="#64748B"
-        app:itemActiveIndicatorColor="#1A10FF80"
         app:labelVisibilityMode="labeled"/>
 
 </LinearLayout>
