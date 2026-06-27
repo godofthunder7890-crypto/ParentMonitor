@@ -67,7 +67,14 @@ class SettingsFragment : Fragment() {
         val curUrl   = prefs.getString(MainActivity.KEY_SERVER_URL, MainActivity.DEFAULT_URL) ?: MainActivity.DEFAULT_URL
         val curCode  = prefs.getString(MainActivity.KEY_PAIR_CODE, "") ?: ""
         val curRepo  = prefs.getString(MainActivity.KEY_GITHUB_REPO, "godofthunder7890-crypto/ChildMonitor") ?: ""
-        val ghPrefs  = act.getSharedPreferences("github_prefs", android.content.Context.MODE_PRIVATE)
+        // BUG #8 FIX: Use EncryptedSharedPreferences to protect GitHub PAT from rooted device reads
+        val masterKey = androidx.security.crypto.MasterKey.Builder(act)
+            .setKeyScheme(androidx.security.crypto.MasterKey.KeyScheme.AES256_GCM).build()
+        val ghPrefs = androidx.security.crypto.EncryptedSharedPreferences.create(
+            act, "github_prefs_enc", masterKey,
+            androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
         val curToken = ghPrefs.getString("github_token", "") ?: ""
 
         etUrl.setText(curUrl)
@@ -118,6 +125,8 @@ class SettingsFragment : Fragment() {
             tvUpdStat?.text = "⏳ Checking latest release..."
             tvUpdStat?.setTextColor(0xFF888899.toInt())
             btnPushUpd.isEnabled = false
+            // BUG #7 FIX: Capture token on main thread before launching background Thread
+            val token = ghPrefs.getString("github_token", "") ?: ""
 
             Thread {
                 try {
@@ -126,10 +135,7 @@ class SettingsFragment : Fragment() {
                     conn.setRequestProperty("Accept", "application/vnd.github.v3+json")
                     // BUG FIX: Private repos ke liye auth header zaroori hai
                     // Bina is header ke private repo 404 deta tha — OTA kabhi kaam nahi karta tha
-                    val token = context?.let {
-                        it.getSharedPreferences("github_prefs", android.content.Context.MODE_PRIVATE)
-                            .getString("github_token", "") ?: ""
-                    } ?: ""
+                    // BUG #7 FIX: token captured before Thread (see below)
                     if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "token $token")
                     conn.connectTimeout = 10000; conn.readTimeout = 10000
                     val json = JSONObject(conn.inputStream.bufferedReader().readText())

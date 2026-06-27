@@ -11,8 +11,9 @@ import org.json.JSONObject
 class ControlFragment : Fragment() {
 
     private var tvTouchCoords: TextView? = null
-    private var lastTouchX = 0f
-    private var lastTouchY = 0f
+    private var lastTouchX    = 0f
+    private var lastTouchY    = 0f
+    private var lastSwipeSent = 0L  // BUG #10 FIX: throttle swipe flood
     private var targetW = 1080f  // Bug #22 fix: updated dynamically from child screen_width
     private var targetH = 1920f
 
@@ -25,6 +26,10 @@ class ControlFragment : Fragment() {
         tvTouchCoords = v.findViewById(R.id.tvTouchCoords)
         setupTouchpad(v)
         setupButtons(v)
+        // BUG #11 FIX: Apply stored device dims if Controls tab opened after device_info arrived
+        (activity as? MainActivity)?.let { act ->
+            if (act.lastDeviceW > 0 && act.lastDeviceH > 0) onDeviceInfo(act.lastDeviceW, act.lastDeviceH)
+        }
         return v
     }
 

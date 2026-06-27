@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity() {
     // ─── Fragment refs ────────────────────────────────────────────────────────
     var dashboardFragment:       DashboardFragment?       = null
     var controlFragment:        ControlFragment?         = null
+      // BUG #11 FIX: Store device dimensions so ControlFragment can apply them in onViewCreated
+      var lastDeviceW = 0
+      var lastDeviceH = 0
     var liveFragment:            LiveFragment?            = null
     var appsFragment:            AppsFragment?            = null
     var callSmsFragment:         CallSmsFragment?         = null
