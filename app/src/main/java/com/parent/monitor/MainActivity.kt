@@ -656,7 +656,7 @@ class MainActivity : AppCompatActivity() {
                 mgr.createNotificationChannel(ch)
             }
             val notif = android.app.Notification.Builder(this, channelId)
-                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setSmallIcon(R.drawable.ic_logo)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)
