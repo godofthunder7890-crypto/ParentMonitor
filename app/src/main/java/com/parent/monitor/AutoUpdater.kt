@@ -1,0 +1,138 @@
+package com.parent.monitor
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInstaller
+import android.os.Build
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.io.File
+import java.io.FileInputStream
+import java.net.HttpURLConnection
+import java.net.URL
+
+object AutoUpdater {
+
+    private const val TAG        = "AutoUpdater"
+    private const val GITHUB_REPO = "godofthunder7890-crypto/ParentMonitor"
+    private const val CHANNEL_ID  = "auto_update"
+    private const val NOTIF_ID    = 9901
+
+    suspend fun checkAndUpdate(ctx: Context) = withContext(Dispatchers.IO) {
+        try {
+            val latest = fetchLatestRelease() ?: return@withContext
+            val latestCode = latest.optInt("version_code", -1)
+            val apkUrl     = latest.optString("apk_url", "")
+            if (latestCode <= 0 || apkUrl.isEmpty()) return@withContext
+
+            val myCode = ctx.packageManager
+                .getPackageInfo(ctx.packageName, 0)
+                .let { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode.toInt() else @Suppress("DEPRECATION") it.versionCode }
+
+            Log.d(TAG, "Local: $myCode  Remote: $latestCode")
+            if (latestCode <= myCode) return@withContext
+
+            showNotification(ctx, "Update downloading…")
+            val apkFile = downloadApk(ctx, apkUrl) ?: return@withContext
+            showNotification(ctx, "Installing update…")
+            installApk(ctx, apkFile)
+        } catch (e: Exception) {
+            Log.e(TAG, "AutoUpdater error", e)
+        }
+    }
+
+    private fun fetchLatestRelease(): JSONObject? {
+        val url  = URL("https://api.github.com/repos/$GITHUB_REPO/releases/latest")
+        val conn = url.openConnection() as HttpURLConnection
+        conn.setRequestProperty("Accept", "application/vnd.github+json")
+        conn.setRequestProperty("User-Agent", "ParentMonitor-Updater")
+        conn.connectTimeout = 15_000
+        conn.readTimeout    = 15_000
+        return try {
+            if (conn.responseCode != 200) return null
+            val body = conn.inputStream.bufferedReader().readText()
+            val rel  = JSONObject(body)
+            val tag  = rel.optString("tag_name", "")
+            val code = tag.replace(Regex("[^0-9]"), "").toIntOrNull() ?: return null
+            val assets = rel.optJSONArray("assets") ?: return null
+            var apkUrl = ""
+            for (i in 0 until assets.length()) {
+                val a = assets.getJSONObject(i)
+                if (a.optString("name").endsWith(".apk")) {
+                    apkUrl = a.optString("browser_download_url")
+                    break
+                }
+            }
+            if (apkUrl.isEmpty()) return null
+            JSONObject().apply {
+                put("version_code", code)
+                put("apk_url", apkUrl)
+            }
+        } finally {
+            conn.disconnect()
+        }
+    }
+
+    private fun downloadApk(ctx: Context, urlStr: String): File? {
+        val file = File(ctx.cacheDir, "update_parent.apk")
+        val conn = (URL(urlStr).openConnection() as HttpURLConnection)
+            .apply { connectTimeout = 30_000; readTimeout = 120_000 }
+        return try {
+            if (conn.responseCode != 200) return null
+            conn.inputStream.use { i -> file.outputStream().use { o -> i.copyTo(o) } }
+            file
+        } finally {
+            conn.disconnect()
+        }
+    }
+
+    private fun installApk(ctx: Context, apk: File) {
+        val installer = ctx.packageManager.packageInstaller
+        val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        params.setAppPackageName(ctx.packageName)
+        val sessionId = installer.createSession(params)
+        val session   = installer.openSession(sessionId)
+        FileInputStream(apk).use { input ->
+            session.openWrite("update", 0, apk.length()).use { out ->
+                input.copyTo(out)
+                session.fsync(out)
+            }
+        }
+        val intent = Intent("com.parent.monitor.UPDATE_DONE").setPackage(ctx.packageName)
+        val pi = PendingIntent.getBroadcast(
+            ctx, sessionId, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+        session.commit(pi.intentSender)
+        session.close()
+    }
+
+    private fun showNotification(ctx: Context, msg: String) {
+        val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            nm.createNotificationChannel(
+                NotificationChannel(CHANNEL_ID, "App Updates", NotificationManager.IMPORTANCE_LOW)
+            )
+        }
+        val n = NotificationCompat.Builder(ctx, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setContentTitle("ParentMonitor Update")
+            .setContentText(msg)
+            .build()
+        nm.notify(NOTIF_ID, n)
+    }
+}
+
+class UpdateInstallReceiver : BroadcastReceiver() {
+    override fun onReceive(ctx: Context, intent: Intent) {
+        val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -1)
+        Log.d("AutoUpdater", "Install result: $status")
+    }
+}
