@@ -47,6 +47,8 @@ class DashboardFragment : Fragment() {
     private var btnDashCurrentApp: Button? = null
     private var btnDashGrantPerms: Button? = null
     private var btnDashEmergencyLock: Button? = null
+    private var btnSOS: Button? = null
+    private var sosActive = false
 
     // ── Service Health card views (15 indicators) ──────────────────────────────
     private var viewHeartbeatDot: View?       = null
@@ -168,17 +170,31 @@ class DashboardFragment : Fragment() {
             shakeView(btnDashEmergencyLock!!)
         }
 
-        val btnSOS = view?.findViewById<Button>(R.id.btnDashSOS)
+        btnSOS = view?.findViewById<Button>(R.id.btnDashSOS)
         btnSOS?.setOnClickListener {
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Send Emergency SOS?")
-                .setMessage("Turns on front camera, mic, location and alarm on child phone.")
-                .setPositiveButton("SEND SOS") { _, _ ->
-                    sendCmd("emergency_sos")
-                    addLog("SOS sent!", 0xFFFF1744.toInt())
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
+            if (!sosActive) {
+                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Send Emergency SOS?")
+                    .setMessage("Turns on front camera, mic, location and alarm on child phone.")
+                    .setPositiveButton("SEND SOS") { _, _ ->
+                        sendCmd("emergency_sos")
+                        addLog("🚨 SOS sent to child device!", 0xFFFF1744.toInt())
+                        setSosActive(true)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            } else {
+                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Stop Emergency SOS?")
+                    .setMessage("This will stop the camera, mic and alarm on the child phone.")
+                    .setPositiveButton("STOP SOS") { _, _ ->
+                        sendCmd("stop_sos")
+                        addLog("🛑 SOS stop command sent", 0xFFFF6D00.toInt())
+                        setSosActive(false)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
         }
 
         // Health card buttons
@@ -224,6 +240,7 @@ class DashboardFragment : Fragment() {
         stopPulse()
         stopHeartbeatPulse()
         handler.removeCallbacks(heartbeatTickerRunnable)
+        btnSOS = null
         super.onDestroyView()
     }
 
@@ -665,6 +682,18 @@ class DashboardFragment : Fragment() {
         activityLog.add(0, Pair("[${timeFmt.format(Date())}] $msg", color))
         if (activityLog.size > 12) activityLog.removeAt(activityLog.lastIndex)
         renderLog()
+    }
+
+    fun setSosActive(active: Boolean) {
+        sosActive = active
+        if (!isAdded) return
+        if (active) {
+            btnSOS?.text = "🛑 STOP SOS"
+            btnSOS?.setBackgroundColor(0xFFFF6D00.toInt())
+        } else {
+            btnSOS?.text = "🚨 EMERGENCY SOS"
+            btnSOS?.setBackgroundColor(0xFFFF1744.toInt())
+        }
     }
 
     private fun renderLog() {
