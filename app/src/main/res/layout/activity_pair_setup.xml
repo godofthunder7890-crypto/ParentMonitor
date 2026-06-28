@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#060612"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="28dp"
+        android:paddingTop="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GUARDIAN EYE"
+            android:textSize="20sp"
+            android:textColor="#00E5FF"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.15"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pair Child Device"
+            android:textSize="14sp"
+            android:textColor="#555577"
+            android:layout_marginBottom="32dp"/>
+
+        <!-- QR Code -->
+        <ImageView
+            android:id="@+id/ivQrCode"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:visibility="gone"
+            android:background="#0D0D21"
+            android:padding="8dp"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- 6-digit code display -->
+        <TextView
+            android:id="@+id/tvPairCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="38sp"
+            android:textColor="#00E5FF"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.3"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp"
+            android:textColor="#888899"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="28dp"/>
+
+        <ProgressBar
+            android:id="@+id/pairProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:indeterminateTint="#00E5FF"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Generate button -->
+        <Button
+            android:id="@+id/btnGenerate"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="GENERATE PAIR CODE"
+            android:textColor="#000000"
+            android:backgroundTint="#00E5FF"
+            android:textSize="14sp"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Share button -->
+        <Button
+            android:id="@+id/btnShare"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="SHARE CODE"
+            android:textColor="#00E5FF"
+            android:backgroundTint="#0D0D21"
+            android:textSize="13sp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ChildMonitor app mein yeh code enter karo ya QR scan karo."
+            android:textSize="11sp"
+            android:textColor="#333355"
+            android:gravity="center"
+            android:layout_marginTop="24dp"/>
+
+    </LinearLayout>
+</ScrollView>

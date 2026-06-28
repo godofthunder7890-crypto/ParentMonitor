@@ -7,6 +7,10 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
@@ -25,9 +29,9 @@ class LoginActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        // If already logged in → skip to MainActivity
+        // Already logged in → check pair code
         if (auth.currentUser != null) {
-            goToMain()
+            routeAfterLogin()
             return
         }
 
@@ -36,13 +40,13 @@ class LoginActivity : AppCompatActivity() {
         window.statusBarColor = 0xFF060612.toInt()
         window.navigationBarColor = 0xFF060612.toInt()
 
-        etEmail    = findViewById(R.id.etLoginEmail)
-        etPassword = findViewById(R.id.etLoginPassword)
-        btnLogin   = findViewById(R.id.btnLogin)
-        btnCreate  = findViewById(R.id.btnCreateAccount)
-        btnForgot  = findViewById(R.id.tvForgotPassword)
+        etEmail     = findViewById(R.id.etLoginEmail)
+        etPassword  = findViewById(R.id.etLoginPassword)
+        btnLogin    = findViewById(R.id.btnLogin)
+        btnCreate   = findViewById(R.id.btnCreateAccount)
+        btnForgot   = findViewById(R.id.tvForgotPassword)
         progressBar = findViewById(R.id.loginProgress)
-        tvStatus   = findViewById(R.id.tvLoginStatus)
+        tvStatus    = findViewById(R.id.tvLoginStatus)
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -52,7 +56,7 @@ class LoginActivity : AppCompatActivity() {
             }
             setLoading(true)
             auth.signInWithEmailAndPassword(email, pass)
-                .addOnSuccessListener { goToMain() }
+                .addOnSuccessListener { routeAfterLogin() }
                 .addOnFailureListener { e -> setLoading(false); showStatus(e.message ?: "Login failed", error = true) }
         }
 
@@ -67,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
             }
             setLoading(true)
             auth.createUserWithEmailAndPassword(email, pass)
-                .addOnSuccessListener { goToMain() }
+                .addOnSuccessListener { routeAfterLogin() }
                 .addOnFailureListener { e -> setLoading(false); showStatus(e.message ?: "Account create failed", error = true) }
         }
 
@@ -82,8 +86,27 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    // ── Route: check Firebase for existing pair code ───────────────────────
+    private fun routeAfterLogin() {
+        val uid = auth.currentUser?.uid ?: run { goToPairSetup(); return }
+        Firebase.database.reference
+            .child("users").child(uid).child("pairCode")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snap: DataSnapshot) {
+                    val code = snap.getValue(String::class.java)
+                    if (!code.isNullOrEmpty()) goToMain() else goToPairSetup()
+                }
+                override fun onCancelled(error: DatabaseError) { goToPairSetup() }
+            })
+    }
+
     private fun goToMain() {
         startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
+    private fun goToPairSetup() {
+        startActivity(Intent(this, PairSetupActivity::class.java))
         finish()
     }
 
