@@ -168,6 +168,19 @@ class DashboardFragment : Fragment() {
             shakeView(btnDashEmergencyLock!!)
         }
 
+        val btnSOS = view?.findViewById<Button>(R.id.btnDashSOS)
+        btnSOS?.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Send Emergency SOS?")
+                .setMessage("Turns on front camera, mic, location and alarm on child phone.")
+                .setPositiveButton("SEND SOS") { _, _ ->
+                    sendCmd("emergency_sos")
+                    addLog("SOS sent!", 0xFFFF1744.toInt())
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         // Health card buttons
         btnHealthRefresh?.setOnClickListener {
             sendCmd("get_health_status")
