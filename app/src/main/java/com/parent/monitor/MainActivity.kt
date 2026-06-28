@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var reconnectRunnable: Runnable? = null
     private var pingInterval:      Runnable? = null
+    private var keepaliveRunnable: Runnable? = null
     private var connected = false
     private var reconnectDelay = 5_000L
     private var pingTs    = 0L
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     // ─── Prefs ───────────────────────────────────────────────────────────────
     private lateinit var prefs: SharedPreferences
     private var serverUrl = DEFAULT_URL
-    private var pairCode  = "123456"
+    private var pairCode  = ""
     private var netEnabled = true
 
     inner class WsCompat {
@@ -687,10 +688,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
         handler.postDelayed(pingInterval!!, 5000)
+
+        // Keep Replit server awake — fires every 4 minutes
+        keepaliveRunnable = object : Runnable {
+            override fun run() {
+                Thread {
+                    try {
+                        val url = java.net.URL(
+                            "https://bhai-secret--bs5129628.replit.app")
+                        val conn = url.openConnection()
+                            as java.net.HttpURLConnection
+                        conn.connectTimeout = 5000
+                        conn.readTimeout = 5000
+                        conn.responseCode
+                        conn.disconnect()
+                    } catch (_: Exception) {}
+                }.start()
+                handler.postDelayed(this, 240_000)
+            }
+        }
+        handler.postDelayed(keepaliveRunnable!!, 240_000)
     }
 
     private fun stopPinging() {
         pingInterval?.let { handler.removeCallbacks(it) }
+        keepaliveRunnable?.let { handler.removeCallbacks(it) }
     }
 
     fun sendToChild(data: JSONObject) {
