@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         const val KEY_SERVER_URL   = "server_url"
         const val KEY_PAIR_CODE    = "pair_code"
         const val KEY_GITHUB_REPO  = "github_repo"
-        const val DEFAULT_URL      = "wss://bhai-secret--bs5129628.replit.app/api/ws"
+        const val DEFAULT_URL      = "wss://relay-server-production-bf46.up.railway.app/api/ws"
 
         // Bottom nav → ViewPager tab indices
         private const val TAB_DASHBOARD    = 0
@@ -117,6 +117,25 @@ class MainActivity : AppCompatActivity() {
             pairCode = (100000..999999).random().toString()
             prefs.edit().putString(KEY_PAIR_CODE, pairCode).apply()
         }
+        // Sync pair code from Firebase (PairSetupActivity saves it there)
+        try {
+            val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null && pairCode.isEmpty()) {
+                com.google.firebase.database.FirebaseDatabase.getInstance()
+                    .reference.child("users").child(uid).child("pairCode")
+                    .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                        override fun onDataChange(snap: com.google.firebase.database.DataSnapshot) {
+                            val fbCode = snap.getValue(String::class.java)
+                            if (!fbCode.isNullOrEmpty()) {
+                                pairCode = fbCode
+                                prefs.edit().putString(KEY_PAIR_CODE, fbCode).apply()
+                                reconnect(serverUrl, fbCode)
+                            }
+                        }
+                        override fun onCancelled(e: com.google.firebase.database.DatabaseError) {}
+                    })
+            }
+        } catch (_: Exception) {}
 
         bindViews()
         setupViewPager()
