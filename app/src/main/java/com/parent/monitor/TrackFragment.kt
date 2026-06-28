@@ -25,6 +25,11 @@ class TrackFragment : Fragment() {
         val v = i.inflate(R.layout.fragment_track, c, false)
         val act = requireActivity() as MainActivity
 
+        val mapFrag = MapFragment()
+        childFragmentManager.beginTransaction()
+            .replace(R.id.mapContainer, mapFrag)
+            .commit()
+
         tvTrackLat       = v.findViewById(R.id.tvTrackLat)
         tvTrackLng       = v.findViewById(R.id.tvTrackLng)
         tvTrackAccuracy  = v.findViewById(R.id.tvTrackAccuracy)
@@ -41,17 +46,6 @@ class TrackFragment : Fragment() {
         v.findViewById<Button>(R.id.btnGetLocation).setOnClickListener {
             act.wsManager?.sendCommand("get_location")
             tvTrackStatus?.text = "📡 Fetching location..."
-        }
-
-        // Open in Maps
-        v.findViewById<Button>(R.id.btnOpenMaps).setOnClickListener {
-            val lat = tvTrackLat?.text?.toString()?.toDoubleOrNull() ?: return@setOnClickListener
-            val lng = tvTrackLng?.text?.toString()?.toDoubleOrNull() ?: return@setOnClickListener
-            try {
-                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
-                    android.net.Uri.parse("geo:$lat,$lng?q=$lat,$lng(Child Location)"))
-                startActivity(intent)
-            } catch (_: Exception) {}
         }
 
         // Geofence setup
@@ -73,12 +67,14 @@ class TrackFragment : Fragment() {
                 put("command", "set_geofence"); put("lat", lat)
                 put("lng", lng); put("radius", radius)
             })
+            MapFragment.instance?.setGeofence(lat, lng, radius)
             tvGeofenceStatus?.text = "✅ Geofence set: ${radius}m radius"
             tvGeofenceStatus?.setTextColor(0xFF4CAF50.toInt())
         }
 
         v.findViewById<Button>(R.id.btnDisableGeofence).setOnClickListener {
             act.wsManager?.sendCommand("disable_geofence")
+            MapFragment.instance?.removeGeofence()
             tvGeofenceStatus?.text = "Geofence disabled"
             tvGeofenceStatus?.setTextColor(0xFF555555.toInt())
         }
@@ -101,6 +97,8 @@ class TrackFragment : Fragment() {
     }
 
     fun onLocationUpdate(lat: Double, lng: Double, accuracy: Float, geofenceInside: Boolean?) {
+        MapFragment.instance?.updateLocation(lat, lng, accuracy)
+
         tvTrackLat?.text  = "%.6f".format(lat)
         tvTrackLng?.text  = "%.6f".format(lng)
         tvTrackAccuracy?.text = "±${accuracy.toInt()}m"
@@ -131,7 +129,6 @@ class TrackFragment : Fragment() {
     fun onSosAlert() {
         tvSosStatus?.text = "🚨 SOS! CHILD TRIGGERED PANIC BUTTON!"
         tvSosStatus?.setTextColor(0xFFFF0000.toInt())
-        // Pulse the SOS indicator
         sosIndicator?.let { dot ->
             dot.setBackgroundResource(R.drawable.circle_red)
             ObjectAnimator.ofFloat(dot, "scaleX", 1f, 2f, 1f).apply {
