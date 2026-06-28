@@ -2,6 +2,7 @@ package com.parent.monitor
 
 import android.animation.*
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 
