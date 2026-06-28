@@ -1,5 +1,6 @@
 package com.parent.monitor
 
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
@@ -21,9 +22,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var pendingLng = 0.0
     private var pendingAcc = 0f
     private var hasPending = false
+    private var mapsEnabled = false
 
     companion object {
         var instance: MapFragment? = null
+
+        /** Returns true only when the build-time API key is a non-empty string. */
+        fun isMapsKeyPresent(ctx: android.content.Context): Boolean {
+            return try {
+                val ai = ctx.packageManager.getApplicationInfo(
+                    ctx.packageName, PackageManager.GET_META_DATA)
+                val key = ai.metaData?.getString("com.google.android.geo.API_KEY") ?: ""
+                key.isNotEmpty()
+            } catch (_: Exception) { false }
+        }
     }
 
     override fun onCreateView(
@@ -36,12 +48,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             layoutParams = ViewGroup.LayoutParams(-1, -1)
         }
 
-        val mapContainer = FrameLayout(ctx).apply {
-            id = View.generateViewId()
-            layoutParams = LinearLayout.LayoutParams(-1, 0, 1f)
-        }
-        root.addView(mapContainer)
-
+        // ── Info bar (coords + fetch button) — always shown ────────────────
         val infoBar = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             setBackgroundColor(Color.parseColor("#0A0A1E"))
@@ -67,13 +74,61 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
         infoBar.addView(tvCoords)
         infoBar.addView(btnFetch)
-        root.addView(infoBar)
 
-        val mapFrag = SupportMapFragment.newInstance()
-        childFragmentManager.beginTransaction()
-            .replace(mapContainer.id, mapFrag)
-            .commit()
-        mapFrag.getMapAsync(this)
+        mapsEnabled = isMapsKeyPresent(ctx)
+
+        if (mapsEnabled) {
+            // ── Normal map path ────────────────────────────────────────────
+            val mapContainer = FrameLayout(ctx).apply {
+                id = View.generateViewId()
+                layoutParams = LinearLayout.LayoutParams(-1, 0, 1f)
+            }
+            root.addView(mapContainer)
+            root.addView(infoBar)
+
+            val mapFrag = SupportMapFragment.newInstance()
+            childFragmentManager.beginTransaction()
+                .replace(mapContainer.id, mapFrag)
+                .commit()
+            mapFrag.getMapAsync(this)
+        } else {
+            // ── No-key placeholder — never crashes the app ─────────────────
+            val placeholder = LinearLayout(ctx).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = android.view.Gravity.CENTER
+                setBackgroundColor(Color.parseColor("#0D0D2B"))
+                layoutParams = LinearLayout.LayoutParams(-1, 0, 1f)
+                setPadding(48, 48, 48, 48)
+            }
+            placeholder.addView(TextView(ctx).apply {
+                text = "🗺️"
+                textSize = 56f
+                gravity = android.view.Gravity.CENTER
+            })
+            placeholder.addView(TextView(ctx).apply {
+                text = "Google Maps API Key Required"
+                textSize = 18f
+                setTextColor(Color.parseColor("#00E5FF"))
+                gravity = android.view.Gravity.CENTER
+                setPadding(0, 24, 0, 16)
+                setTypeface(null, android.graphics.Typeface.BOLD)
+            })
+            placeholder.addView(TextView(ctx).apply {
+                text = "To enable the map:\n\n" +
+                    "1. Go to console.cloud.google.com\n" +
+                    "2. Create a Maps SDK for Android API key\n" +
+                    "3. Add it as GOOGLE_MAPS_API_KEY\n" +
+                    "   in GitHub repo Settings → Secrets\n" +
+                    "4. Push any commit to rebuild the APK\n\n" +
+                    "📍 Location coordinates still work below."
+                textSize = 13f
+                setTextColor(Color.parseColor("#8899BB"))
+                gravity = android.view.Gravity.CENTER
+                lineSpacingMultiplier = 1.4f
+            })
+            root.addView(placeholder)
+            root.addView(infoBar)
+        }
 
         instance = this
         return root
