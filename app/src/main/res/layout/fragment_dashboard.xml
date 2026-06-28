@@ -375,6 +375,20 @@
                     android:letterSpacing="0.05"
                     android:stateListAnimator="@null"
                     style="@style/Widget.MaterialComponents.Button"/>
+                <Button
+                    android:id="@+id/btnDashSOS"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:text="🆘  SOS EMERGENCY"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:backgroundTint="#FF1744"
+                    android:textColor="#FFFFFF"
+                    android:letterSpacing="0.05"
+                    android:stateListAnimator="@null"
+                    style="@style/Widget.MaterialComponents.Button"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
