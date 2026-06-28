@@ -110,17 +110,24 @@ class ProtectFragment : Fragment() {
             names.add("${obj.optString("name")} (${obj.optString("package").substringAfterLast('.')})")
         }
         if (names.isEmpty()) { tvProtectStatus?.text = "No user apps found"; return }
+        tvProtectStatus?.text = "✅ ${names.size} apps received — tap to block"
+        tvProtectStatus?.setTextColor(0xFF00C853.toInt())
+        val checked = BooleanArray(names.size)
         android.app.AlertDialog.Builder(act)
-            .setTitle("Installed Apps — Tap to Block")
-            .setItems(names.toTypedArray()) { _, which ->
-                val pkg = pkgs[which]
-                if (!blockedList.contains(pkg)) {
-                    blockedList.add(pkg)
-                    listAdapter?.notifyDataSetChanged()
-                    pushBlockedList()
-                }
+            .setTitle("Installed Apps — Select to Block")
+            .setMultiChoiceItems(names.toTypedArray(), checked) { _, which, isChecked ->
+                checked[which] = isChecked
             }
-            .setNegativeButton("Close", null)
+            .setPositiveButton("Block Selected") { _, _ ->
+                var added = 0
+                for (i in checked.indices) {
+                    if (checked[i] && !blockedList.contains(pkgs[i])) {
+                        blockedList.add(pkgs[i]); added++
+                    }
+                }
+                if (added > 0) { listAdapter?.notifyDataSetChanged(); pushBlockedList() }
+            }
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
