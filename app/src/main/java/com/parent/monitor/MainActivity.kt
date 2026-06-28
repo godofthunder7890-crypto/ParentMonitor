@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAB_DASHBOARD    = 0
         private const val TAB_LIVE         = 1
         private const val TAB_LIMITS       = 7
+        private const val TAB_PROTECT      = 8
         private const val TAB_REPORTS      = 10
         private const val TAB_SETTINGS     = 19
         private const val TAB_TIME_REQUEST = 20
@@ -220,7 +221,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home     -> { viewPager.currentItem = TAB_DASHBOARD;    true }
                 R.id.nav_live     -> { viewPager.currentItem = TAB_LIVE;         true }
-                R.id.nav_protect  -> { viewPager.currentItem = TAB_LIMITS;       true }
+                R.id.nav_protect  -> { viewPager.currentItem = TAB_PROTECT;      true }
                 R.id.nav_requests -> { viewPager.currentItem = TAB_TIME_REQUEST; true }
                 R.id.nav_settings -> { viewPager.currentItem = TAB_SETTINGS;     true }
                 else -> false
@@ -613,8 +614,13 @@ class MainActivity : AppCompatActivity() {
             }
             "sos_activated" -> handler.post {
                 dashboardFragment?.addLog("🚨 SOS ACTIVATED on child device!", 0xFFFF1744.toInt())
+                dashboardFragment?.setSosActive(true)
                 reportsFragment?.addAlert("🚨 EMERGENCY SOS", "Child activated SOS — check immediately!")
                 showUrgentNotification("SOS Activated", "Child activated emergency SOS")
+            }
+            "sos_stopped" -> handler.post {
+                dashboardFragment?.addLog("✅ SOS stopped on child device", 0xFF00C853.toInt())
+                dashboardFragment?.setSosActive(false)
             }
             "uninstall_attempt" -> handler.post {
                 dashboardFragment?.addLog("⚠️ Uninstall attempt blocked!", 0xFFFF6D00.toInt())
