@@ -41,6 +41,8 @@ class MainActivity : AppCompatActivity() {
         private const val TAB_SETTINGS     = 19
         private const val TAB_TIME_REQUEST = 20
         private const val TAB_CALL_SAFETY  = 21
+        private const val TAB_AI_INSIGHTS = 22
+        private const val TAB_MESSAGES    = 23
     }
 
     val notificationAdapter = NotificationAdapter()
@@ -68,6 +70,8 @@ class MainActivity : AppCompatActivity() {
     // New fragments
     var timeRequestFragment:     TimeRequestFragment?     = null
     var callWhitelistFragment:   CallWhitelistFragment?   = null
+    var aiInsightsFragment:      AiInsightsFragment?      = null
+    var messagesFragment:        MessagesFragment?         = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:         TextView
@@ -154,7 +158,7 @@ class MainActivity : AppCompatActivity() {
             "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
             "Limits","Protect","Track","Reports","Data","Controls","Shizuku",
             "Browser","Videos","Recordings","Albums","Painting","Settings",
-            "TimeReq","CallSafety"
+            "TimeReq","CallSafety","AI","Messages"
         )
 
         viewPager.adapter = object : FragmentStateAdapter(this) {
@@ -182,6 +186,8 @@ class MainActivity : AppCompatActivity() {
                 19 -> SettingsFragment()
                 20 -> TimeRequestFragment()
                 21 -> CallWhitelistFragment()
+                22 -> AiInsightsFragment()
+                23 -> MessagesFragment()
                 else -> DashboardFragment()
             }
         }
@@ -652,6 +658,19 @@ class MainActivity : AppCompatActivity() {
                 }
                 handler.post { dashboardFragment?.addLog("$emoji $text", if (status == "installed") 0xFF00C853.toInt() else 0xFFFF5252.toInt()) }
             }
+            "child_message" -> {
+                val text = msg.optString("text","")
+                val isDistress = msg.optBoolean("isDistress",false)
+                val urgency = msg.optString("urgency","low")
+                val suggested = msg.optString("suggestedReply","")
+                handler.post {
+                    messagesFragment?.onChildMessage(msg)
+                    if (isDistress) {
+                        dashboardFragment?.addLog("⚠️ Child distress message: $text".take(80), 0xFFFF1744.toInt())
+                        showUrgentNotification("Child Message Alert!", text.take(60))
+                    }
+                }
+            }
             "health_status" -> {
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHealthStatus(payload) }
@@ -695,7 +714,7 @@ class MainActivity : AppCompatActivity() {
                 Thread {
                     try {
                         val url = java.net.URL(
-                            "https://bhai-secret--bs5129628.replit.app")
+                            "https://relay-server-production-bf46.up.railway.app")
                         val conn = url.openConnection()
                             as java.net.HttpURLConnection
                         conn.connectTimeout = 5000
