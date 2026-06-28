@@ -124,7 +124,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 textSize = 13f
                 setTextColor(Color.parseColor("#8899BB"))
                 gravity = android.view.Gravity.CENTER
-                lineSpacingMultiplier = 1.4f
+                setLineSpacing(0f, 1.4f)
             })
             root.addView(placeholder)
             root.addView(infoBar)
