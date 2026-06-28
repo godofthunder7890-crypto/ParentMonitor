@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.*
 import androidx.fragment.app.Fragment
 import okhttp3.*
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.IOException
 
@@ -124,7 +126,7 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
         btnAnalyze.text = "Analyzing..."
         progressBar.visibility = View.VISIBLE
         val req = Request.Builder().url("$RELAY/api/ai/analyze/$code")
-            .post(okhttp3.RequestBody.create(okhttp3.MediaType.parse(""), ByteArray(0))).build()
+            .post(ByteArray(0).toRequestBody(null)).build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 handler.post { reset() }
