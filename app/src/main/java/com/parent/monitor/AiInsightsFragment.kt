@@ -124,7 +124,7 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
         btnAnalyze.text = "Analyzing..."
         progressBar.visibility = View.VISIBLE
         val req = Request.Builder().url("$RELAY/api/ai/analyze/$code")
-            .post(okhttp3.RequestBody.create(ByteArray(0), null)).build()
+            .post(okhttp3.RequestBody.create(okhttp3.MediaType.parse(""), ByteArray(0))).build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 handler.post { reset() }
