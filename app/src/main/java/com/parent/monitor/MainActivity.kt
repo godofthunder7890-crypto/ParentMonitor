@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        UpdateWorker.schedule(this)
 
         prefs     = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         serverUrl = prefs.getString(KEY_SERVER_URL, DEFAULT_URL) ?: DEFAULT_URL
