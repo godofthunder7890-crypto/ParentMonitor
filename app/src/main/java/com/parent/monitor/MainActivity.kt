@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity() {
     private var keepaliveRunnable: Runnable? = null
     private var connected = false
     private var reconnectDelay = 5_000L
+    var reconnectCount = 0
     private var pingTs    = 0L
 
     // ─── Prefs ───────────────────────────────────────────────────────────────
@@ -738,6 +739,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun scheduleReconnect() {
         reconnectRunnable?.let { handler.removeCallbacks(it) }
+        reconnectCount++
+        handler.post { dashboardFragment?.updateReconnectCount(reconnectCount) }
         reconnectRunnable = Runnable { if (!connected) { connect(); reconnectDelay = minOf(reconnectDelay * 2, 60_000L) } }
         handler.postDelayed(reconnectRunnable!!, reconnectDelay)
     }
