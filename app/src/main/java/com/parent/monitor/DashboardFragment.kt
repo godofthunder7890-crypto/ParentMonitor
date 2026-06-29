@@ -289,12 +289,10 @@ class DashboardFragment : Fragment() {
             override fun run() { fetchServerHealth(); healthHandler.postDelayed(this, 60_000) }
         }, 60_000)
 
-        // Show pair code as child label
+        // Bug 13: show child pair code as log entry (tvChildLabel not in layout)
         val pairCode = (activity as? MainActivity)
             ?.getSharedPreferences("config", 0)?.getString("pair_code", "") ?: ""
-        if (pairCode.isNotEmpty()) {
-            view.findViewById<android.widget.TextView?>(R.id.tvChildLabel)?.text = "Child #$pairCode"
-        }
+        if (pairCode.isNotEmpty()) addLog("Child pair code: #$pairCode", 0xFF00AAFF.toInt())
     }
 
     override fun onDestroyView() {
