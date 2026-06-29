@@ -16,11 +16,19 @@ import java.io.IOException
 class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
 
     companion object {
-        private const val RELAY = "https://relay-server-production-bf46.up.railway.app"
+        private const val RELAY_DEFAULT = "https://relay-server-production-bf46.up.railway.app"
     }
 
     private val handler  = Handler(Looper.getMainLooper())
     private val http     = OkHttpClient()
+
+    private fun relayHttp(): String {
+        val prefs = (activity as? MainActivity)
+            ?.getSharedPreferences(MainActivity.PREFS_NAME, android.content.Context.MODE_PRIVATE)
+        val ws = prefs?.getString(MainActivity.KEY_SERVER_URL, RELAY_DEFAULT) ?: RELAY_DEFAULT
+        return if (ws.startsWith("ws://")) ws.replace("ws://", "http://").removeSuffix("/api/ws")
+               else ws.replace("wss://", "https://").removeSuffix("/api/ws")
+    }
 
     private lateinit var scoreCanvas:    ScoreCircleView
     private lateinit var tvGrade:        TextView
@@ -61,7 +69,7 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
     private fun loadInsights() {
         val code = pairCode(); if (code.isEmpty()) return
         progressBar.visibility = View.VISIBLE
-        val req = Request.Builder().url("$RELAY/api/ai/insights/$code").build()
+        val req = Request.Builder().url("\${relayHttp()}/api/ai/insights/$code").build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 handler.post { progressBar.visibility = View.GONE }
@@ -125,7 +133,7 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
         btnAnalyze.isEnabled = false
         btnAnalyze.text = "Analyzing..."
         progressBar.visibility = View.VISIBLE
-        val req = Request.Builder().url("$RELAY/api/ai/analyze/$code")
+        val req = Request.Builder().url("\${relayHttp()}/api/ai/analyze/$code")
             .post(ByteArray(0).toRequestBody(null)).build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
