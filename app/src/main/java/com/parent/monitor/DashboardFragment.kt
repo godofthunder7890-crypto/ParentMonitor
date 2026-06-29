@@ -88,7 +88,7 @@ class DashboardFragment : Fragment() {
     private fun relayHttp(): String {
         val prefs = (activity as? MainActivity)
             ?.getSharedPreferences(MainActivity.PREFS_NAME, android.content.Context.MODE_PRIVATE)
-        val ws = prefs?.getString(MainActivity.KEY_SERVER_URL, RELAY_DEFAULT) ?: RELAY_DEFAULT
+        val ws = prefs?.getString(MainActivity.KEY_SERVER_URL, "https://relay-server-production-bf46.up.railway.app") ?: "https://relay-server-production-bf46.up.railway.app"
         return if (ws.startsWith("ws://")) ws.replace("ws://", "http://").removeSuffix("/api/ws")
                else ws.replace("wss://", "https://").removeSuffix("/api/ws")
     }
@@ -282,10 +282,24 @@ class DashboardFragment : Fragment() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
+
+        // Health tile: poll server /health every 60s
+        fetchServerHealth()
+        healthHandler.postDelayed(object : Runnable {
+            override fun run() { fetchServerHealth(); healthHandler.postDelayed(this, 60_000) }
+        }, 60_000)
+
+        // Show pair code as child label
+        val pairCode = (activity as? MainActivity)
+            ?.getSharedPreferences("config", 0)?.getString("pair_code", "") ?: ""
+        if (pairCode.isNotEmpty()) {
+            view.findViewById<android.widget.TextView?>(R.id.tvChildLabel)?.text = "Child #$pairCode"
+        }
     }
 
     override fun onDestroyView() {
         (activity as? MainActivity)?.dashboardFragment = null
+        healthHandler.removeCallbacksAndMessages(null)
         stopPulse()
         stopHeartbeatPulse()
         handler.removeCallbacks(heartbeatTickerRunnable)
