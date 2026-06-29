@@ -122,13 +122,13 @@ class MainActivity : AppCompatActivity() {
         // Sync pair code from Firebase (PairSetupActivity saves it there)
         try {
             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-            if (uid != null && pairCode.isEmpty()) {
+            if (uid != null) {
                 com.google.firebase.database.FirebaseDatabase.getInstance()
                     .reference.child("users").child(uid).child("pairCode")
                     .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
                         override fun onDataChange(snap: com.google.firebase.database.DataSnapshot) {
                             val fbCode = snap.getValue(String::class.java)
-                            if (!fbCode.isNullOrEmpty()) {
+                            if (!fbCode.isNullOrEmpty() && fbCode != pairCode) {
                                 pairCode = fbCode
                                 prefs.edit().putString(KEY_PAIR_CODE, fbCode).apply()
                                 reconnect(serverUrl, fbCode)
@@ -688,13 +688,27 @@ class MainActivity : AppCompatActivity() {
                 val text = msg.optString("text","")
                 val isDistress = msg.optBoolean("isDistress",false)
                 val urgency = msg.optString("urgency","low")
-                val suggested = msg.optString("suggestedReply","")
                 handler.post {
                     messagesFragment?.onChildMessage(msg)
-                    if (isDistress) {
-                        dashboardFragment?.addLog("⚠️ Child distress message: $text".take(80), 0xFFFF1744.toInt())
-                        showUrgentNotification("Child Message Alert!", text.take(60))
+                    // Bug 15: Always notify parent, not only on distress
+                    if (isDistress || urgency == "high") {
+                        showUrgentNotification("Child Message - urgent!", text.take(60))
+                    } else {
+                        showUrgentNotification("Child says:", text.take(60))
                     }
+                    dashboardFragment?.addLog("Child msg: \"${text.take(40)}\"",
+                        if (isDistress) 0xFFFF1744.toInt() else 0xFF7C4DFF.toInt())
+                }
+            }
+            "danger_zone_alert" -> {
+                val zoneName = msg.optString("zone_name", "Geofence")
+                val inside   = msg.optBoolean("inside", false)
+                val lat      = msg.optDouble("lat", 0.0)
+                val lng      = msg.optDouble("lng", 0.0)
+                val verb     = if (inside) "entered" else "exited"
+                handler.post {
+                    showUrgentNotification("Danger Zone $verb!", "Child $verb $zoneName")
+                    dashboardFragment?.addLog("Geofence: $zoneName $verb (%.4f, %.4f)".format(lat, lng), 0xFFFF6D00.toInt())
                 }
             }
             "health_status" -> {
@@ -710,6 +724,13 @@ class MainActivity : AppCompatActivity() {
         handler.post {
             tvStatus.text = if (on) "Online" else "Offline"
             tvStatus.setTextColor(if (on) 0xFF00C853.toInt() else 0xFFF44336.toInt())
+            // Bug 6+17: Sync pill, dot, and topBarDot with connection state
+            findViewById<android.view.View>(R.id.statusDot)?.setBackgroundResource(
+                if (on) R.drawable.circle_green else R.drawable.circle_red)
+            findViewById<android.view.View>(R.id.statusPill)?.setBackgroundResource(
+                if (on) R.drawable.pill_online else R.drawable.pill_offline)
+            findViewById<android.view.View>(R.id.topBarDot)?.setBackgroundResource(
+                if (on) R.drawable.circle_green else R.drawable.circle_red)
             dashboardFragment?.updateOnline(on)
             if (on) startPinging() else stopPinging()
         }
