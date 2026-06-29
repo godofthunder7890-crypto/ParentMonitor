@@ -18,7 +18,7 @@ import java.io.IOException
 class MessagesFragment : Fragment(R.layout.fragment_messages) {
 
     companion object {
-        private const val RELAY = "https://relay-server-production-bf46.up.railway.app"
+        private const val RELAY_DEFAULT = "https://relay-server-production-bf46.up.railway.app"
         private val QUICK_REPLIES = listOf(
             "OK, be safe! 💙", "Coming to pick you up! 🚗",
             "Call me now 📞", "Don't worry, I'm here ❤️", "Stay where you are!"
@@ -27,6 +27,14 @@ class MessagesFragment : Fragment(R.layout.fragment_messages) {
 
     private val handler = Handler(Looper.getMainLooper())
     private val http    = OkHttpClient()
+
+    private fun relayHttp(): String {
+        val prefs = (activity as? MainActivity)
+            ?.getSharedPreferences(MainActivity.PREFS_NAME, android.content.Context.MODE_PRIVATE)
+        val ws = prefs?.getString(MainActivity.KEY_SERVER_URL, RELAY_DEFAULT) ?: RELAY_DEFAULT
+        return if (ws.startsWith("ws://")) ws.replace("ws://", "http://").removeSuffix("/api/ws")
+               else ws.replace("wss://", "https://").removeSuffix("/api/ws")
+    }
     private val adapter = MessageAdapter()
 
     private lateinit var recycler:     RecyclerView
@@ -71,7 +79,7 @@ class MessagesFragment : Fragment(R.layout.fragment_messages) {
     private fun loadMessages() {
         val code = pairCode(); if (code.isEmpty()) return
         progressBar.visibility = View.VISIBLE
-        val req = Request.Builder().url("$RELAY/api/messages/$code").build()
+        val req = Request.Builder().url("\${relayHttp()}/api/messages/$code").build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 handler.post { progressBar.visibility = View.GONE }
@@ -101,7 +109,7 @@ class MessagesFragment : Fragment(R.layout.fragment_messages) {
         val code = pairCode(); if (code.isEmpty()) return
         val body = JSONObject().apply { put("text", text) }.toString()
             .toRequestBody("application/json".toMediaType())
-        val req = Request.Builder().url("$RELAY/api/messages/$code").post(body).build()
+        val req = Request.Builder().url("\${relayHttp()}/api/messages/$code").post(body).build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {}
             override fun onResponse(call: Call, response: Response) {
