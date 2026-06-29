@@ -82,6 +82,55 @@ class DashboardFragment : Fragment() {
 
     // ── State ──────────────────────────────────────────────────────────────────
     private val handler = Handler(Looper.getMainLooper())
+    private val healthHandler = Handler(Looper.getMainLooper())
+    private var reconnectCount = 0
+
+    private fun relayHttp(): String {
+        val prefs = (activity as? MainActivity)
+            ?.getSharedPreferences(MainActivity.PREFS_NAME, android.content.Context.MODE_PRIVATE)
+        val ws = prefs?.getString(MainActivity.KEY_SERVER_URL, RELAY_DEFAULT) ?: RELAY_DEFAULT
+        return if (ws.startsWith("ws://")) ws.replace("ws://", "http://").removeSuffix("/api/ws")
+               else ws.replace("wss://", "https://").removeSuffix("/api/ws")
+    }
+
+    fun updateReconnectCount(count: Int) {
+        reconnectCount = count
+        tvConnQuality?.let { tv ->
+            val cur = tv.text.toString()
+            // Append reconnect count to existing quality label
+            val base = cur.substringBefore(" | WS:")
+            tv.text = "$base | WS reconnects: $count"
+        }
+    }
+
+    private fun fetchServerHealth() {
+        Thread {
+            try {
+                val conn = java.net.URL("${relayHttp()}/health").openConnection()
+                    as java.net.HttpURLConnection
+                conn.connectTimeout = 5000; conn.readTimeout = 5000
+                val body = conn.inputStream.bufferedReader().readText()
+                conn.disconnect()
+                val js = org.json.JSONObject(body)
+                val upSec = js.optLong("uptimeSeconds", js.optLong("uptime", 0L))
+                val uptimeStr = when {
+                    upSec > 86400 -> "${upSec / 86400}d ${(upSec % 86400) / 3600}h"
+                    upSec > 3600  -> "${upSec / 3600}h ${(upSec % 3600) / 60}m"
+                    else          -> "${upSec / 60}m ${upSec % 60}s"
+                }
+                val db     = js.optString("db", "ok")
+                val status = js.optString("status", "ok")
+                activity?.runOnUiThread {
+                    addLog("Server: up=$uptimeStr  db=$db  reconnects=$reconnectCount", 0xFF00BBFF.toInt())
+                    tvConnQuality?.text = "Server $status | up $uptimeStr | reconnects: $reconnectCount"
+                }
+            } catch (e: Exception) {
+                activity?.runOnUiThread {
+                    addLog("Server health check failed: ${e.message?.take(40)}", 0xFFFF5252.toInt())
+                }
+            }
+        }.start()
+    }
     private var pulseAnim: AnimatorSet? = null
     private var heartbeatPulse: AnimatorSet? = null
     private val activityLog = mutableListOf<Pair<String, Int>>()
