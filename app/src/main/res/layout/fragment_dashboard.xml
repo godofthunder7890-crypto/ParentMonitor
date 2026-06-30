@@ -12,6 +12,36 @@
         android:orientation="vertical"
         android:padding="12dp">
 
+        <!-- ═══ CRITICAL ACCESSIBILITY WARNING BANNER ═══
+             Shown when child device accessibility service is OFF.
+             Initially GONE — shown programmatically from DashboardFragment. -->
+        <LinearLayout
+            android:id="@+id/criticalWarningBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FF1744"
+            android:padding="16dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/tvWarningText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚠️ Accessibility is OFF on child device."
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"/>
+            <Button
+                android:id="@+id/btnFixNow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="FIX NOW"
+                android:textColor="#FF1744"
+                android:backgroundTint="#FFFFFF"/>
+        </LinearLayout>
+
         <!-- ═══ STATUS CARD ═══ -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardStatus"
