@@ -196,7 +196,11 @@ class PairSetupActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopPolling()
-        httpClient.dispatcher.executorService.shutdown()
+        // BUG FIX: dispatcher.executorService.shutdown() permanently kills OkHttp's shared
+        // thread pool — any subsequent OkHttp call in the process (e.g. in MainActivity)
+        // would throw a RejectedExecutionException. Use cancelAll() to abort in-flight
+        // requests without destroying the reusable executor.
+        httpClient.dispatcher.cancelAll()
     }
 
     override fun onBackPressed() {
