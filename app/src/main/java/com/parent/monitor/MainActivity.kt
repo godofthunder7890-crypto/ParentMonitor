@@ -226,6 +226,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_protect  -> { viewPager.currentItem = TAB_PROTECT;      true }
                 R.id.nav_requests -> { viewPager.currentItem = TAB_TIME_REQUEST; true }
                 R.id.nav_settings -> { viewPager.currentItem = TAB_SETTINGS;     true }
+                R.id.nav_ai       -> { viewPager.currentItem = TAB_AI_INSIGHTS;  true }
+                R.id.nav_messages -> { viewPager.currentItem = TAB_MESSAGES;     true }
                 else -> false
             }
         }
@@ -238,6 +240,8 @@ class MainActivity : AppCompatActivity() {
                     TAB_LIMITS, 8, 14, 17, TAB_CALL_SAFETY -> R.id.nav_protect
                     TAB_TIME_REQUEST                      -> R.id.nav_requests
                     TAB_SETTINGS                          -> R.id.nav_settings
+                    TAB_AI_INSIGHTS                       -> R.id.nav_ai
+                    TAB_MESSAGES                          -> R.id.nav_messages
                     else                                  -> R.id.nav_home
                 }
                 if (bottomNav.selectedItemId != itemId)
@@ -341,8 +345,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "current_app" -> {
-                val pkg = msg.optString("package")
-                handler.post { dashboardFragment?.updateCurrentApp(pkg) }
+                val pkg  = msg.optString("package")
+                val name = msg.optString("name", pkg.substringAfterLast('.'))
+                handler.post { dashboardFragment?.updateCurrentApp(pkg, name) }
             }
             "app_usage" -> {
                 val arr = msg.optJSONArray("stats")
@@ -612,7 +617,10 @@ class MainActivity : AppCompatActivity() {
             "paint_ack" -> { }
             "app_list" -> {
                 val arr = msg.optJSONArray("apps")
-                if (arr != null) handler.post { protectFragment?.onAppList(arr) }
+                if (arr != null) handler.post {
+                    protectFragment?.onAppList(arr)
+                    appsFragment?.onAppList(arr)
+                }
             }
             "sos_activated" -> handler.post {
                 dashboardFragment?.addLog("🚨 SOS ACTIVATED on child device!", 0xFFFF1744.toInt())
