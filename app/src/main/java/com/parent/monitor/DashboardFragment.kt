@@ -207,6 +207,12 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupButtons() {
+        // "Fix Now" inside accessibility warning banner — sends command to child to re-open setup
+        view?.findViewById<android.widget.Button>(R.id.btnFixNow)?.setOnClickListener {
+            sendCmd("request_accessibility_setup")
+            addLog("🔧 Accessibility setup request sent to child", 0xFFFF8800.toInt())
+        }
+
         btnDashLock?.setOnClickListener          { sendCmd("lock_screen"); popView(btnDashLock!!) }
         btnDashCamera?.setOnClickListener        { sendCmd("take_photo"); popView(btnDashCamera!!) }
         btnDashLocation?.setOnClickListener      { sendCmd("get_location"); popView(btnDashLocation!!) }
@@ -392,9 +398,13 @@ class DashboardFragment : Fragment() {
         val battExempt = data.optBoolean("battery_optimization_exempt", false)
         renderStatusRow(tvStatusBatteryOpt, "EXEMPT", battExempt)
 
-        // 7. Accessibility status
+        // 7. Accessibility status + critical warning banner
         val accessEnabled = data.optBoolean("accessibility_enabled", false)
         renderStatusRow(tvStatusAccessibility, "ENABLED", accessEnabled)
+        view?.findViewById<android.widget.LinearLayout>(R.id.criticalWarningBanner)?.visibility =
+            if (accessEnabled) android.view.View.GONE else android.view.View.VISIBLE
+        view?.findViewById<android.widget.TextView>(R.id.tvWarningText)?.text =
+            "⚠️ Accessibility is OFF on child device. App blocking, uninstall protection, and keyword detection are NOT working."
 
         // 8. Notification access
         val notifAccess = data.optBoolean("notification_access", false)
@@ -731,11 +741,12 @@ class DashboardFragment : Fragment() {
         addLog("📍 Location updated", 0xFFFFD600.toInt())
     }
 
-    fun updateCurrentApp(pkg: String) {
+    fun updateCurrentApp(pkg: String, name: String = pkg.substringAfterLast('.')) {
         if (!isAdded) return
-        val name = pkg.substringAfterLast('.')
-        tvDashCurrentApp?.text = name; popView(tvDashCurrentApp!!)
-        addLog("📱 App: $name", 0xFFAA00FF.toInt())
+        // Truncate friendly name to 20 chars with ellipsis if longer
+        val display = if (name.length > 20) name.take(17) + "…" else name
+        tvDashCurrentApp?.text = display; popView(tvDashCurrentApp!!)
+        addLog("📱 App: $display", 0xFFAA00FF.toInt())
     }
 
     fun addLog(msg: String, color: Int = 0xFF8888AA.toInt()) {
