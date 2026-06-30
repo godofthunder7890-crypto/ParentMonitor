@@ -20,4 +20,12 @@
         android:id="@+id/nav_settings"
         android:title="Settings"
         android:icon="@android:drawable/ic_menu_preferences"/>
+    <item
+        android:id="@+id/nav_ai"
+        android:title="AI"
+        android:icon="@android:drawable/ic_menu_info_details"/>
+    <item
+        android:id="@+id/nav_messages"
+        android:title="Chat"
+        android:icon="@android:drawable/ic_dialog_email"/>
 </menu>
