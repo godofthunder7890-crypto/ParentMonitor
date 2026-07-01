@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
+        android:name=".ParentMonitorApp"
         android:allowBackup="false"
         android:icon="@drawable/ic_logo"
         android:label="Parent Monitor"
@@ -60,5 +61,13 @@
         <receiver android:name=".UpdateInstallReceiver" android:exported="false">
             <intent-filter><action android:name="com.parent.monitor.UPDATE_DONE"/></intent-filter>
         </receiver>
+
+        <!-- Friendly crash screen — replaces "App has stopped" dialog -->
+        <activity
+            android:name=".CrashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.App"
+            android:excludeFromRecents="true"/>
+
     </application>
 </manifest>
