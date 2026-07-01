@@ -9,6 +9,7 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import org.json.JSONObject
+import android.widget.ImageView
 
 class DeviceTabFragment : Fragment() {
 
@@ -146,14 +147,20 @@ class DeviceTabFragment : Fragment() {
 
     private fun showHiddenAppDialog() {
         val ctx = context ?: return
-        AlertDialog.Builder(ctx)
-            .setTitle("How to open the hidden child's app?")
-            .setMessage(
-                "Method 1: Get the child's device, unlock the screen, and tap the button in GuardianEye parent app to open the child app.\n\n" +
-                "Method 2: Use the child's phone browser to access the app link and open it directly.\n\n" +
-                "Note: Do not open the child app when the child is present to avoid discovery."
-            )
-            .setPositiveButton("OK", null)
-            .show()
+        val dialogView = LayoutInflater.from(ctx).inflate(R.layout.dialog_find_child_app, null)
+        val dialog = AlertDialog.Builder(ctx)
+            .setTitle("Find Child's App")
+            .setView(dialogView)
+            .setPositiveButton("Close", null)
+            .create()
+        dialogView.findViewById<TextView>(R.id.btnOpenChildApp)?.setOnClickListener {
+            try {
+                val intent = ctx.packageManager.getLaunchIntentForPackage("com.system.service")
+                    ?: ctx.packageManager.getLaunchIntentForPackage("com.kids.installer")
+                intent?.let { ctx.startActivity(it) }
+            } catch (_: Exception) {}
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }
