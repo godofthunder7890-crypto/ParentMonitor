@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_home"
-        android:title="Home"
-        android:icon="@android:drawable/ic_menu_compass"/>
+        android:id="@+id/nav_notice"
+        android:title="Notice"
+        android:icon="@drawable/ic_nav_notice"/>
     <item
-        android:id="@+id/nav_live"
-        android:title="Live"
-        android:icon="@android:drawable/ic_menu_camera"/>
+        android:id="@+id/nav_device"
+        android:title="Device"
+        android:icon="@drawable/ic_nav_device"/>
     <item
-        android:id="@+id/nav_protect"
-        android:title="Protect"
-        android:icon="@android:drawable/ic_lock_lock"/>
-    <item
-        android:id="@+id/nav_requests"
-        android:title="Requests"
-        android:icon="@android:drawable/ic_dialog_alert"/>
-    <item
-        android:id="@+id/nav_settings"
-        android:title="Settings"
-        android:icon="@android:drawable/ic_menu_preferences"/>
-    <item
-        android:id="@+id/nav_ai"
-        android:title="AI"
-        android:icon="@android:drawable/ic_menu_info_details"/>
-    <item
-        android:id="@+id/nav_messages"
-        android:title="Chat"
-        android:icon="@android:drawable/ic_dialog_email"/>
+        android:id="@+id/nav_me"
+        android:title="Me"
+        android:icon="@drawable/ic_nav_me"/>
 </menu>

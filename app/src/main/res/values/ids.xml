@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="tvMapCoords" type="id"/>
+    <!-- Legacy view IDs no longer in layout but referenced in code -->
+    <item name="statusDot" type="id"/>
+    <item name="statusPill" type="id"/>
+    <item name="topBarDot" type="id"/>
+    <item name="statusBar" type="id"/>
+    <!-- Legacy bottom nav IDs no longer in menu but may be referenced -->
+    <item name="nav_home" type="id"/>
+    <item name="nav_live" type="id"/>
+    <item name="nav_protect" type="id"/>
+    <item name="nav_requests" type="id"/>
+    <item name="nav_settings" type="id"/>
+    <item name="nav_ai" type="id"/>
+    <item name="nav_messages" type="id"/>
 </resources>

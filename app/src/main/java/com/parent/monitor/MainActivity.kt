@@ -86,6 +86,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav:        BottomNavigationView
     private lateinit var bannerTimeRequest: LinearLayout
     private lateinit var viewPager:        ViewPager2
+    private var contentFrame:              android.widget.FrameLayout? = null
+    private var currentMainTab:            String = "device"
 
     // ─── WebSocket ───────────────────────────────────────────────────────────
     private var ws:     WebSocket?    = null
@@ -178,6 +180,7 @@ class MainActivity : AppCompatActivity() {
         bottomNav         = findViewById(R.id.bottomNav)
         bannerTimeRequest = findViewById(R.id.bannerTimeRequest)
         viewPager         = findViewById(R.id.viewPager)
+        contentFrame      = findViewById(R.id.contentFrame)
     }
 
     private fun setupViewPager() {
@@ -231,40 +234,58 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNav() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home     -> { viewPager.currentItem = TAB_DASHBOARD;    true }
-                R.id.nav_live     -> { viewPager.currentItem = TAB_LIVE;         true }
-                R.id.nav_protect  -> { viewPager.currentItem = TAB_PROTECT;      true }
-                R.id.nav_requests -> { viewPager.currentItem = TAB_TIME_REQUEST; true }
-                R.id.nav_settings -> { viewPager.currentItem = TAB_SETTINGS;     true }
-                R.id.nav_ai       -> { viewPager.currentItem = TAB_AI_INSIGHTS;  true }
-                R.id.nav_messages -> { viewPager.currentItem = TAB_MESSAGES;     true }
+                R.id.nav_notice -> { showMainTab("notice"); true }
+                R.id.nav_device -> { showMainTab("device"); true }
+                R.id.nav_me     -> { showMainTab("me");     true }
                 else -> false
             }
         }
-        // Sync bottom nav when user swipes pager
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                val itemId = when (position) {
-                    TAB_DASHBOARD                         -> R.id.nav_home
-                    TAB_LIVE                              -> R.id.nav_live
-                    TAB_LIMITS, 8, 14, 17, TAB_CALL_SAFETY -> R.id.nav_protect
-                    TAB_TIME_REQUEST                      -> R.id.nav_requests
-                    TAB_SETTINGS                          -> R.id.nav_settings
-                    TAB_AI_INSIGHTS                       -> R.id.nav_ai
-                    TAB_MESSAGES                          -> R.id.nav_messages
-                    else                                  -> R.id.nav_home
-                }
-                if (bottomNav.selectedItemId != itemId)
-                    bottomNav.selectedItemId = itemId
-            }
-        })
+        // Start on Device tab
+        showMainTab("device")
+        bottomNav.selectedItemId = R.id.nav_device
     }
+
+    fun showMainTab(tag: String) {
+        currentMainTab = tag
+        viewPager.visibility = android.view.View.GONE
+        contentFrame?.visibility = android.view.View.VISIBLE
+        val fragment: androidx.fragment.app.Fragment = when (tag) {
+            "notice" -> supportFragmentManager.findFragmentByTag("notice") as? NoticeTabFragment
+                ?: NoticeTabFragment()
+            "device" -> supportFragmentManager.findFragmentByTag("device") as? DeviceTabFragment
+                ?: DeviceTabFragment()
+            "me"     -> supportFragmentManager.findFragmentByTag("me") as? MeTabFragment
+                ?: MeTabFragment()
+            else -> return
+        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.contentFrame, fragment, tag)
+            .commitAllowingStateLoss()
+    }
+
+    fun openFragment(tabIndex: Int) {
+        contentFrame?.visibility = android.view.View.GONE
+        viewPager.visibility = android.view.View.VISIBLE
+        viewPager.currentItem = tabIndex
+    }
+
+    fun showNoticeBadge(show: Boolean) {
+        handler.post {
+            if (show) {
+                bottomNav.getOrCreateBadge(R.id.nav_notice).isVisible = true
+            } else {
+                bottomNav.removeBadge(R.id.nav_notice)
+            }
+        }
+    }
+
+    private val deviceTabFragment: DeviceTabFragment?
+        get() = supportFragmentManager.findFragmentByTag("device") as? DeviceTabFragment
 
     private fun setupTimeRequestBanner() {
         val btnView = findViewById<Button>(R.id.btnBannerView)
         btnView.setOnClickListener {
-            viewPager.currentItem = TAB_TIME_REQUEST
-            bottomNav.selectedItemId = R.id.nav_requests
+            openFragment(TAB_TIME_REQUEST)
         }
     }
 
@@ -355,6 +376,7 @@ class MainActivity : AppCompatActivity() {
                 handler.post {
                     tvBattery.text = "${pct}%${if (chg) "⚡" else ""}"
                     dashboardFragment?.updateBattery(pct, chg)
+                    deviceTabFragment?.updateBattery(pct, chg)
                 }
             }
             "location" -> {
@@ -366,6 +388,7 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.updateLocation(lat, lng)
                     locationFragment?.onLocation(lat, lng, acc)
                     trackFragment?.onLocationUpdate(lat, lng, acc, geoInside)
+                    deviceTabFragment?.updateLocation(lat, lng)
                 }
             }
             "current_app" -> {
@@ -525,6 +548,8 @@ class MainActivity : AppCompatActivity() {
                 val w = msg.optInt("screen_width", 0)
                 val h = msg.optInt("screen_height", 0)
                 if (w > 0 && h > 0) controlFragment?.onDeviceInfo(w, h)
+                val model = msg.optString("model", "")
+                if (model.isNotEmpty()) deviceTabFragment?.updateDeviceName(model)
             }
             "app_open" -> {
                 val pkg = msg.optString("package")
@@ -811,14 +836,8 @@ class MainActivity : AppCompatActivity() {
         handler.post {
             tvStatus.text = if (on) "Online" else "Offline"
             tvStatus.setTextColor(if (on) 0xFF00C853.toInt() else 0xFFF44336.toInt())
-            // Bug 6+17: Sync pill, dot, and topBarDot with connection state
-            findViewById<android.view.View>(R.id.statusDot)?.setBackgroundResource(
-                if (on) R.drawable.circle_green else R.drawable.circle_red)
-            findViewById<android.view.View>(R.id.statusPill)?.setBackgroundResource(
-                if (on) R.drawable.pill_online else R.drawable.pill_offline)
-            findViewById<android.view.View>(R.id.topBarDot)?.setBackgroundResource(
-                if (on) R.drawable.circle_green else R.drawable.circle_red)
             dashboardFragment?.updateOnline(on)
+            deviceTabFragment?.setOnlineStatus(on)
             if (on) startPinging() else stopPinging()
         }
     }
@@ -928,6 +947,21 @@ class MainActivity : AppCompatActivity() {
     fun stopWebRtcReceiver() {
         webrtcReceiver?.stop()
         webrtcReceiver = null
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION", "MissingSuperCall")
+    override fun onBackPressed() {
+        if (viewPager.visibility == android.view.View.VISIBLE) {
+            showMainTab(currentMainTab)
+            val itemId = when (currentMainTab) {
+                "notice" -> R.id.nav_notice
+                "me"     -> R.id.nav_me
+                else     -> R.id.nav_device
+            }
+            if (bottomNav.selectedItemId != itemId) bottomNav.selectedItemId = itemId
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onDestroy() {

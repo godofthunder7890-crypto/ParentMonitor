@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Design system: Dark Neon -->
-    <color name="colorPrimary">#10FF80</color>
-    <color name="colorPrimaryDark">#080B14</color>
+    <!-- Legacy dark theme colors (kept for existing fragments) -->
+    <color name="colorPrimary">#7C4DFF</color>
+    <color name="colorPrimaryDark">#9C27B0</color>
     <color name="colorAccent">#38BDF8</color>
-
-    <!-- Backgrounds -->
     <color name="colorBg">#080B14</color>
     <color name="colorCard">#0D1117</color>
     <color name="colorCard2">#111827</color>
     <color name="colorBorder">#1F2937</color>
     <color name="colorBackground">#080B14</color>
     <color name="colorSurface">#0D1117</color>
-
-    <!-- Neon accents -->
     <color name="colorGreen">#10FF80</color>
     <color name="colorBlue">#38BDF8</color>
     <color name="colorPurple">#A78BFA</color>
@@ -22,15 +18,26 @@
     <color name="colorYellow">#FDE68A</color>
     <color name="colorPink">#F472B6</color>
     <color name="colorCyan">#38BDF8</color>
-
-    <!-- Status -->
     <color name="colorOnline">#10FF80</color>
     <color name="colorOffline">#F87171</color>
     <color name="colorWarning">#FDE68A</color>
-
-    <!-- Text -->
     <color name="colorText">#F1F5F9</color>
     <color name="colorTextSecondary">#94A3B8</color>
     <color name="colorMuted">#64748B</color>
     <color name="colorTextMuted">#64748B</color>
+
+    <!-- NEW Light purple theme (FlashGet Kids style) -->
+    <color name="colorPurpleMain">#7C4DFF</color>
+    <color name="colorPurpleDark">#9C27B0</color>
+    <color name="colorPurpleLight">#EDE7F6</color>
+    <color name="colorBgLight">#F5F5F5</color>
+    <color name="colorCardWhite">#FFFFFF</color>
+    <color name="colorOrangeBadge">#FF9800</color>
+    <color name="colorProGold">#FFB300</color>
+    <color name="colorAlertRed">#F44336</color>
+    <color name="colorSuccessGreen">#4CAF50</color>
+    <color name="colorNavInactive">#9E9E9E</color>
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextGray">#757575</color>
+    <color name="colorDivider">#EEEEEE</color>
 </resources>

@@ -5,132 +5,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#080B14">
+    android:background="@color/colorBgLight">
 
-    <!-- TOP STATUS BAR -->
-    <LinearLayout
-        android:id="@+id/statusBar"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="#0D1117"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:elevation="8dp">
-
-        <View
-            android:id="@+id/topBarDot"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="@drawable/circle_green"
-            android:layout_marginEnd="10dp"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="GuardianEye"
-            android:textColor="#F1F5F9"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.06"/>
-
-        <TextView
-            android:id="@+id/tvPing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="--ms"
-            android:textColor="#64748B"
-            android:textSize="11sp"
-            android:fontFamily="monospace"
-            android:layout_marginEnd="10dp"/>
-
-        <TextView
-            android:id="@+id/tvBattery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="--"
-            android:textColor="#64748B"
-            android:textSize="12sp"
-            android:fontFamily="monospace"
-            android:layout_marginEnd="10dp"/>
-
-        <LinearLayout
-            android:id="@+id/statusPill"
-            android:layout_width="wrap_content"
-            android:layout_height="26dp"
-            android:background="@drawable/pill_offline"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_marginEnd="8dp">
-            <View
-                android:id="@+id/statusDot"
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:background="@drawable/circle_red"
-                android:layout_marginEnd="5dp"/>
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Offline"
-                android:textColor="#F87171"
-                android:textSize="11sp"
-                android:fontFamily="monospace"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnNetToggle"
-            android:layout_width="56dp"
-            android:layout_height="28dp"
-            android:text="NET"
-            android:textSize="9sp"
-            android:textColor="#080B14"
-            android:fontFamily="monospace"
-            android:backgroundTint="#38BDF8"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:stateListAnimator="@null"/>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#1A10FF80"/>
-
-    <!-- TAB BAR (scrollable, hidden by default — BottomNav is primary) -->
+    <!-- Hidden legacy compatibility views (MainActivity still references these) -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
+    <TextView
+        android:id="@+id/tvBattery"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
+    <TextView
+        android:id="@+id/tvPing"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
+    <Button
+        android:id="@+id/btnNetToggle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="gone"
-        android:background="#0D1117"
-        app:tabTextColor="#64748B"
-        app:tabSelectedTextColor="#10FF80"
-        app:tabIndicatorColor="#10FF80"
-        app:tabIndicatorHeight="2dp"
-        app:tabTextAppearance="@android:style/TextAppearance.Small"
-        app:tabMode="scrollable"
-        app:tabGravity="fill"
-        app:tabPaddingStart="2dp"
-        app:tabPaddingEnd="2dp"/>
+        android:visibility="gone"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#1F2937"/>
-
-    <!-- Time Request badge banner (shown when pending requests exist) -->
+    <!-- Time request banner (shown when child requests extra screen time) -->
     <LinearLayout
         android:id="@+id/bannerTimeRequest"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#1A00C853"
+        android:layout_height="48dp"
+        android:background="#7C4DFF"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
@@ -141,38 +50,52 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="⏱ Child requesting extra screen time"
-            android:textColor="#00C853"
-            android:textSize="12sp"
-            android:fontFamily="monospace"/>
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"/>
         <Button
             android:id="@+id/btnBannerView"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="32dp"
             android:text="VIEW"
-            android:textSize="10sp"
-            android:textColor="#080B14"
-            android:backgroundTint="#00C853"
+            android:textSize="11sp"
+            android:textColor="#7C4DFF"
+            android:backgroundTint="#FFFFFF"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:stateListAnimator="@null"/>
     </LinearLayout>
 
-    <!-- CONTENT (full height minus top bar + bottom nav) -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+    <!-- Main content area: shows either contentFrame (3 main tabs) or ViewPager (detail pages) -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1">
 
-    <!-- BOTTOM NAVIGATION -->
+        <!-- 3 main tab fragments live here -->
+        <FrameLayout
+            android:id="@+id/contentFrame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <!-- Existing 27-tab ViewPager (hidden by default; shown when navigating to detail fragments) -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+    <!-- New 3-tab bottom navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#0D1117"
+        android:layout_height="64dp"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
         app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="#64748B"
-        app:itemTextColor="#64748B"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
         app:labelVisibilityMode="labeled"/>
 
 </LinearLayout>
