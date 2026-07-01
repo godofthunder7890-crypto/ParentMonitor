@@ -153,6 +153,7 @@ class MainActivity : AppCompatActivity() {
         setupBottomNav()
         setupTimeRequestBanner()
         setupNetToggle()
+        restoreNotifications()
         connect()
         requestRuntimePermissions()
     }
@@ -392,9 +393,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             "current_app" -> {
-                val pkg  = msg.optString("package")
-                val name = msg.optString("name", pkg.substringAfterLast('.'))
-                handler.post { dashboardFragment?.updateCurrentApp(pkg, name) }
+                val pkg    = msg.optString("package")
+                val name   = msg.optString("name", pkg.substringAfterLast('.'))
+                val iconB64 = msg.optString("icon", "")
+                handler.post {
+                    dashboardFragment?.updateCurrentApp(pkg, name, iconB64)
+                    recentAppsFragment?.addEvent(name, "opened", 0L, iconB64, System.currentTimeMillis())
+                }
+                prefs.edit().putString("last_app_name", name).apply()
             }
             "app_usage" -> {
                 val arr = msg.optJSONArray("stats")
@@ -447,7 +453,20 @@ class MainActivity : AppCompatActivity() {
                     time  = timeStr,
                     timestamp = ts
                 )
-                handler.post { notificationAdapter.addNotification(item) }
+                handler.post {
+                    notificationAdapter.addNotification(item)
+                    saveNotifications()
+                }
+            }
+            "app_event" -> {
+                val name     = msg.optString("name")
+                val action   = msg.optString("action", "opened")
+                val duration = msg.optLong("duration_sec", 0L)
+                val iconB64  = msg.optString("icon", "")
+                val ts       = msg.optLong("timestamp", System.currentTimeMillis())
+                handler.post {
+                    recentAppsFragment?.addEvent(name, action, duration, iconB64, ts)
+                }
             }
             "update_result" -> {
                 val ok  = msg.optBoolean("success")
@@ -552,8 +571,15 @@ class MainActivity : AppCompatActivity() {
                 if (model.isNotEmpty()) deviceTabFragment?.updateDeviceName(model)
             }
             "app_open" -> {
-                val pkg = msg.optString("package")
-                handler.post { reportsFragment?.addAlert("App Opened", pkg.substringAfterLast('.')) }
+                val pkg    = msg.optString("package")
+                val name   = msg.optString("name", pkg.substringAfterLast('.'))
+                val iconB64 = msg.optString("icon", "")
+                val ts      = msg.optLong("timestamp", System.currentTimeMillis())
+                handler.post {
+                    recentAppsFragment?.addEvent(name, "opened", 0L, iconB64, ts)
+                    reportsFragment?.addAlert("📱 $name opened", "Package: $pkg")
+                    dashboardFragment?.addLog("📱 App: $name", 0xFFAA00FF.toInt())
+                }
             }
             "chat_content" -> {
                 val pkg     = msg.optString("package")
@@ -891,6 +917,39 @@ class MainActivity : AppCompatActivity() {
 
     fun sendToChild(data: JSONObject) {
         try { ws?.send(data.toString()) } catch (_: Exception) {}
+    }
+
+    fun saveNotifications() {
+        try {
+            val arr = org.json.JSONArray()
+            notificationAdapter.getAll().take(100).forEach { item ->
+                arr.put(org.json.JSONObject().apply {
+                    put("app",   item.app)
+                    put("title", item.title)
+                    put("text",  item.text)
+                    put("time",  item.time)
+                    put("ts",    item.timestamp)
+                })
+            }
+            prefs.edit().putString("saved_notifications", arr.toString()).apply()
+        } catch (_: Exception) {}
+    }
+
+    private fun restoreNotifications() {
+        try {
+            val saved = prefs.getString("saved_notifications", null) ?: return
+            val arr = org.json.JSONArray(saved)
+            for (i in 0 until minOf(arr.length(), 100)) {
+                val obj = arr.getJSONObject(i)
+                notificationAdapter.addNotification(NotificationItem(
+                    app   = obj.optString("app"),
+                    title = obj.optString("title"),
+                    text  = obj.optString("text"),
+                    time  = obj.optString("time"),
+                    timestamp = obj.optLong("ts", System.currentTimeMillis())
+                ))
+            }
+        } catch (_: Exception) {}
     }
 
     fun sendCommand(command: String) {
