@@ -132,7 +132,7 @@
         android:layout_height="52dp"
         android:orientation="horizontal"
         android:paddingHorizontal="12dp"
-        android:paddingBottom="10dp">
+        android:paddingBottom="6dp">
 
         <Button android:id="@+id/btnCtrlLock"
             android:layout_width="0dp" android:layout_height="match_parent"
@@ -156,6 +156,40 @@
             android:text="🔋 Batt"
             android:textSize="12sp" android:textColor="#FFF"
             android:backgroundTint="#1B5E20"
+            android:stateListAnimator="@null"/>
+
+    </LinearLayout>
+
+    <!-- FIND KID + SNAPSHOT ROW -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="10dp">
+
+        <Button android:id="@+id/btnFindKid"
+            android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_marginEnd="6dp"
+            android:text="🔔 Find Kid"
+            android:textSize="12sp" android:textColor="#FFF"
+            android:backgroundTint="#E65100"
+            android:stateListAnimator="@null"/>
+
+        <Button android:id="@+id/btnStopRing"
+            android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_marginEnd="6dp"
+            android:text="🔕 Stop Ring"
+            android:textSize="12sp" android:textColor="#FFF"
+            android:backgroundTint="#37474F"
+            android:stateListAnimator="@null"/>
+
+        <Button android:id="@+id/btnSnapNowCtrl"
+            android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="📸 Snap"
+            android:textSize="12sp" android:textColor="#FFF"
+            android:backgroundTint="#00695C"
             android:stateListAnimator="@null"/>
 
     </LinearLayout>
