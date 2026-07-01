@@ -62,6 +62,29 @@ class RecentAppsFragment : Fragment() {
         }
     }
 
+    fun addEvent(name: String, action: String, durationSec: Long, iconB64: String, ts: Long) {
+        val fmt = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val timeStr = fmt.format(Date(ts))
+        val durationText = when {
+            durationSec > 60 -> "Used for ${durationSec / 60}m ${durationSec % 60}s"
+            durationSec > 0  -> "Used for ${durationSec}s"
+            else             -> ""
+        }
+        val actionLabel = if (action == "closed") "Closed $durationText" else "Opened"
+        val displayName = if (name.length > 30) name.take(27) + "…" else name
+        apps.add(0, RecentApp(
+            pkg         = "",
+            name        = "$displayName — $actionLabel at $timeStr",
+            installedAt = timeStr,
+            ts          = ts
+        ))
+        if (apps.size > 100) apps.removeAt(apps.lastIndex)
+        activity?.runOnUiThread {
+            adapter?.notifyDataSetChanged()
+            tvStatus?.text = "Last: $displayName $actionLabel"
+        }
+    }
+
     fun onNewInstall(msg: JSONObject) {
         val pkg  = msg.optString("package")
         val name = msg.optString("name", pkg.substringAfterLast('.'))
