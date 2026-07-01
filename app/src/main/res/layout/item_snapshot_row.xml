@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:gravity="center_vertical"
+    android:background="#0D1117">
+
+    <ImageView android:id="@+id/ivSnapThumb"
+        android:layout_width="140dp" android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:background="#1F2937"
+        android:layout_marginEnd="12dp"/>
+
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/tvSnapTime"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="#CCC" android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"/>
+        <TextView android:id="@+id/tvSnapFile"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="#555" android:textSize="11sp"
+            android:layout_marginTop="4dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tap to view full size →"
+            android:textColor="#38BDF8" android:textSize="11sp"
+            android:layout_marginTop="6dp"/>
+    </LinearLayout>
+</LinearLayout>
