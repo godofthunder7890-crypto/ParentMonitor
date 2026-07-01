@@ -73,6 +73,10 @@ class MainActivity : AppCompatActivity() {
     var callWhitelistFragment:   CallWhitelistFragment?   = null
     var aiInsightsFragment:      AiInsightsFragment?      = null
     var messagesFragment:        MessagesFragment?         = null
+    // FlashGet features
+    var snapshotFragment:        SnapshotFragment?        = null
+    var socialDetectFragment:    SocialDetectFragment?    = null
+    var recentAppsFragment:      RecentAppsFragment?      = null
 
     // ─── Views ───────────────────────────────────────────────────────────────
     private lateinit var tvStatus:         TextView
@@ -180,7 +184,8 @@ class MainActivity : AppCompatActivity() {
             "Dashboard","Live","Apps","Calls","Location","Files","Notifs",
             "Limits","Protect","Track","Reports","Data","Controls","Shizuku",
             "Browser","Videos","Recordings","Albums","Painting","Settings",
-            "TimeReq","CallSafety","AI","Messages"
+            "TimeReq","CallSafety","AI","Messages",
+            "Snapshots","Social","NewApps"
         )
 
         viewPager.adapter = object : FragmentStateAdapter(this) {
@@ -210,6 +215,9 @@ class MainActivity : AppCompatActivity() {
                 21 -> CallWhitelistFragment()
                 22 -> AiInsightsFragment()
                 23 -> MessagesFragment()
+                24 -> SnapshotFragment().also    { snapshotFragment     = it }
+                25 -> SocialDetectFragment().also { socialDetectFragment = it }
+                26 -> RecentAppsFragment().also  { recentAppsFragment   = it }
                 else -> DashboardFragment()
             }
         }
@@ -723,6 +731,60 @@ class MainActivity : AppCompatActivity() {
             "health_status" -> {
                 val payload = msg.optJSONObject("payload") ?: msg
                 handler.post { dashboardFragment?.onHealthStatus(payload) }
+            }
+
+            // ── NEW: Scheduled Snapshots ──────────────────────────────────────
+            "snapshot" -> {
+                handler.post {
+                    snapshotFragment?.onSnapshot(msg)
+                    dashboardFragment?.addLog("📸 Snapshot received (${msg.optString("datetime","?")})")
+                }
+            }
+
+            // ── NEW: Social Media Detection Alerts ────────────────────────────
+            "social_detect" -> {
+                val severity = msg.optString("severity","MEDIUM")
+                val category = msg.optString("category","?")
+                val app      = msg.optString("app","?")
+                handler.post {
+                    socialDetectFragment?.onSocialAlert(msg)
+                    reportsFragment?.addAlert("[$severity] Social: $category", "$app — ${msg.optString("keyword","")}")
+                    dashboardFragment?.addLog("⚠️ Social[$severity] $category in $app", if (severity=="HIGH") 0xFFFF1744.toInt() else 0xFFFFB300.toInt())
+                    if (severity == "HIGH") showUrgentNotification("Social Alert: $category", "Detected in $app")
+                }
+            }
+
+            // ── NEW: Location History ─────────────────────────────────────────
+            "location_history" -> {
+                handler.post {
+                    trackFragment?.onLocationHistory(msg)
+                    dashboardFragment?.addLog("📍 Location history: ${msg.optJSONArray("points")?.length() ?: 0} points")
+                }
+            }
+
+            // ── NEW: Recently Installed Apps ──────────────────────────────────
+            "recent_installs" -> {
+                handler.post { recentAppsFragment?.onRecentInstalls(msg) }
+            }
+
+            // ── NEW: New App Installed alert (both naming variants) ──────────
+            "new_install", "new_app_installed" -> {
+                val pkg  = msg.optString("package")
+                val name = msg.optString("name", pkg.substringAfterLast('.'))
+                handler.post {
+                    recentAppsFragment?.onNewInstall(msg)
+                    dashboardFragment?.addLog("🆕 App installed: $name", 0xFFFFB300.toInt())
+                    reportsFragment?.addAlert("🆕 App Installed", name)
+                    showUrgentNotification("App Installed", "$name installed on child's phone")
+                }
+            }
+
+            // ── NEW: Find Kid feedback ────────────────────────────────────────
+            "find_kid_started" -> {
+                handler.post { dashboardFragment?.addLog("🔔 Ringing child's phone for ${msg.optInt("duration_seconds",30)}s") }
+            }
+            "find_kid_stopped" -> {
+                handler.post { dashboardFragment?.addLog("🔕 Ring stopped") }
             }
         }
     }
