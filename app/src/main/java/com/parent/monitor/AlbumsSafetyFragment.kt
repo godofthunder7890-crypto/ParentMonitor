@@ -78,12 +78,15 @@ class AlbumsSafetyFragment : Fragment() {
         val items = msg.optJSONArray("items") ?: JSONArray()
         flaggedItems = items
         activity?.runOnUiThread {
+            // FIX: use context (nullable) not requireContext() — fragment may be detached
+            // by the time the runOnUiThread block executes
+            val ctx = context ?: return@runOnUiThread
             val count = items.length()
             tvStatus?.text = "$count flagged"
             tvStatus?.setTextColor(if (count > 0) 0xFFFF5722.toInt() else 0xFF00C853.toInt())
             llItems?.removeAllViews()
             if (count == 0) {
-                val tv = TextView(requireContext()).apply {
+                val tv = TextView(ctx).apply {
                     text = "✅ No suspicious images found."; textSize = 14f
                     setTextColor(0xFF00C853.toInt()); gravity = android.view.Gravity.CENTER
                     setPadding(0, 60, 0, 0)
@@ -93,14 +96,13 @@ class AlbumsSafetyFragment : Fragment() {
             }
             for (k in 0 until items.length()) {
                 val item = items.optJSONObject(k) ?: continue
-                addItemCard(item)
+                addItemCard(ctx, item)
             }
         }
     }
 
-    private fun addItemCard(item: JSONObject) {
-        val ctx = requireContext()
-        val act = requireActivity() as MainActivity
+    private fun addItemCard(ctx: android.content.Context, item: JSONObject) {
+        val act = activity as? MainActivity ?: return
         val card = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(0xFF0D0D2B.toInt())
@@ -177,6 +179,8 @@ class AlbumsSafetyFragment : Fragment() {
         val b64 = msg.optString("data", "")
         if (b64.isEmpty()) return
         activity?.runOnUiThread {
+            // FIX: use context (nullable) — fragment may be detached when runOnUiThread fires
+            val ctx = context ?: return@runOnUiThread
             try {
                 val bytes = Base64.decode(b64, Base64.DEFAULT)
                 val _optsbmp = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -184,11 +188,11 @@ class AlbumsSafetyFragment : Fragment() {
                     val _scbmp = maxOf(1, maxOf(_optsbmp.outWidth, _optsbmp.outHeight) / 300)
                     val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
                         BitmapFactory.Options().apply { inSampleSize = _scbmp }) ?: return@runOnUiThread
-                val dlg   = android.app.AlertDialog.Builder(requireContext())
-                val iv    = ImageView(requireContext()).apply {
+                val iv = ImageView(ctx).apply {
                     setImageBitmap(bmp); adjustViewBounds = true; setBackgroundColor(0xFF000000.toInt())
                 }
-                dlg.setView(iv).setNegativeButton("Close", null).show()
+                android.app.AlertDialog.Builder(ctx)
+                    .setView(iv).setNegativeButton("Close", null).show()
             } catch (_: Exception) {}
         }
     }

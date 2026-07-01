@@ -109,7 +109,15 @@ class DashboardFragment : Fragment() {
                 val conn = java.net.URL("${relayHttp()}/health").openConnection()
                     as java.net.HttpURLConnection
                 conn.connectTimeout = 5000; conn.readTimeout = 5000
-                val body = conn.inputStream.bufferedReader().readText()
+                // FIX: conn.inputStream throws FileNotFoundException on non-2xx responses.
+                // Check responseCode first to avoid a silent crash masked by the catch block.
+                val httpCode = conn.responseCode
+                val body = if (httpCode in 200..299)
+                    conn.inputStream.bufferedReader().readText()
+                else {
+                    conn.disconnect()
+                    throw Exception("HTTP $httpCode")
+                }
                 conn.disconnect()
                 val js = org.json.JSONObject(body)
                 val upSec = js.optLong("uptimeSeconds", js.optLong("uptime", 0L))
@@ -120,12 +128,17 @@ class DashboardFragment : Fragment() {
                 }
                 val db     = js.optString("db", "ok")
                 val status = js.optString("status", "ok")
+                // FIX: guard against fragment detach between Thread start and runOnUiThread
+                if (!isAdded) return@Thread
                 activity?.runOnUiThread {
+                    if (!isAdded) return@runOnUiThread
                     addLog("Server: up=$uptimeStr  db=$db  reconnects=$reconnectCount", 0xFF00BBFF.toInt())
                     tvConnQuality?.text = "Server $status | up $uptimeStr | reconnects: $reconnectCount"
                 }
             } catch (e: Exception) {
+                if (!isAdded) return@Thread
                 activity?.runOnUiThread {
+                    if (!isAdded) return@runOnUiThread
                     addLog("Server health check failed: ${e.message?.take(40)}", 0xFFFF5252.toInt())
                 }
             }

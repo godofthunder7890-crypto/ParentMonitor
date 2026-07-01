@@ -101,12 +101,17 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
             tvGrade.text = grade
             tvGrade.setTextColor(ThemeColors.gradeColor(grade))
 
-            val highlights = (0 until (b.optJSONArray("highlights")?.length() ?: 0))
-                .map { "✅ " + b.optJSONArray("highlights")!!.optString(it) }.joinToString("\n")
-            val concerns = (0 until (b.optJSONArray("concerns")?.length() ?: 0))
-                .map { "⚠️ " + b.optJSONArray("concerns")!!.optString(it) }.joinToString("\n")
-            val suggestions = (0 until (b.optJSONArray("suggestions")?.length() ?: 0))
-                .map { "💡 " + b.optJSONArray("suggestions")!!.optString(it) }.joinToString("\n")
+            // FIX: cache optJSONArray() result locally — calling it twice with !! on the second
+            // call caused NPE if the server returned null for a field between the two calls
+            val highlightsArr = b.optJSONArray("highlights")
+            val highlights = (0 until (highlightsArr?.length() ?: 0))
+                .map { "✅ " + highlightsArr!!.optString(it) }.joinToString("\n")
+            val concernsArr = b.optJSONArray("concerns")
+            val concerns = (0 until (concernsArr?.length() ?: 0))
+                .map { "⚠️ " + concernsArr!!.optString(it) }.joinToString("\n")
+            val suggestionsArr = b.optJSONArray("suggestions")
+            val suggestions = (0 until (suggestionsArr?.length() ?: 0))
+                .map { "💡 " + suggestionsArr!!.optString(it) }.joinToString("\n")
 
             tvHighlights.text  = highlights.ifEmpty { "No highlights yet" }
             tvConcerns.text    = concerns.ifEmpty    { "No concerns" }
@@ -140,7 +145,10 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
                 handler.post { reset() }
             }
             override fun onResponse(call: Call, response: Response) {
+                // FIX: check isAdded before touching views — fragment may be detached
+                // during the 8-second delay (e.g. user navigated away)
                 handler.postDelayed({
+                    if (!isAdded) return@postDelayed
                     reset()
                     loadInsights()
                 }, 8000)
@@ -155,10 +163,10 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // FIX: Do not shut down the OkHttpClient dispatcher here — shutting it down
-        // on view destruction (e.g. during ViewPager swipe) permanently breaks future
-        // requests if the Fragment instance survives view recreation. Cancel in-flight
-        // calls by tag instead, and let the client live for the Fragment's lifetime.
+        // FIX: Cancel in-flight HTTP calls and pending handler callbacks so they
+        // don't touch destroyed views. Do NOT shutdown dispatcher — that permanently
+        // breaks the OkHttpClient for future use after view recreation.
         http.dispatcher.cancelAll()
+        handler.removeCallbacksAndMessages(null)
     }
 }

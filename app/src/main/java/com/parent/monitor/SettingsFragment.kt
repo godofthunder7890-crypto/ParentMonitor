@@ -138,8 +138,18 @@ class SettingsFragment : Fragment() {
                     // BUG #7 FIX: token captured before Thread (see below)
                     if (token.isNotEmpty()) conn.setRequestProperty("Authorization", "token $token")
                     conn.connectTimeout = 10000; conn.readTimeout = 10000
-                    val json = JSONObject(conn.inputStream.bufferedReader().readText())
+                    // FIX: conn.inputStream throws FileNotFoundException on non-2xx responses.
+                    // Check responseCode first; use errorStream for 4xx/5xx to get error body.
+                    val code = conn.responseCode
+                    val body = if (code in 200..299)
+                        conn.inputStream.bufferedReader().readText()
+                    else {
+                        val err = conn.errorStream?.bufferedReader()?.readText() ?: "HTTP $code"
+                        conn.disconnect()
+                        throw Exception(if (code == 401 || code == 403) "Auth failed — check GitHub token" else "HTTP $code: $err")
+                    }
                     conn.disconnect()
+                    val json = JSONObject(body)
 
                     val tag    = json.optString("tag_name", "unknown")
                     val assets = json.optJSONArray("assets")

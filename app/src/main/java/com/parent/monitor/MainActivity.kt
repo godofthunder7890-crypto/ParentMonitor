@@ -1047,6 +1047,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         stopPinging()
+        // FIX: Remove ALL pending handler callbacks to prevent stale runnables
+        // from firing after the Activity is destroyed (memory leak + potential NPE)
+        handler.removeCallbacksAndMessages(null)
         reconnectRunnable?.let { handler.removeCallbacks(it) }
         ws?.close(1000, null)
         // FIX: Shutdown OkHttpClient to release connection pool and thread resources

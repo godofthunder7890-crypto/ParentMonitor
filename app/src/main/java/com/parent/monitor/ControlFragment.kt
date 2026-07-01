@@ -13,7 +13,7 @@ class ControlFragment : Fragment() {
     private var tvTouchCoords: TextView? = null
     private var lastTouchX    = 0f
     private var lastTouchY    = 0f
-    private var lastSwipeSent = 0L  // BUG #10 FIX: throttle swipe flood
+    private var lastSwipeSent = 0L  // throttle: max one swipe command per 32ms (~30/s)
     private var targetW = 1080f  // Bug #22 fix: updated dynamically from child screen_width
     private var targetH = 1920f
 
@@ -45,12 +45,18 @@ class ControlFragment : Fragment() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> { lastTouchX = rx; lastTouchY = ry }
                 MotionEvent.ACTION_MOVE -> {
-                    if (Math.abs(rx - lastTouchX) > 5 || Math.abs(ry - lastTouchY) > 5) {
+                    val now = System.currentTimeMillis()
+                    // FIX: lastSwipeSent was declared but never checked — rapid finger movement
+                    // flooded the WebSocket with hundreds of swipe commands per second.
+                    // Now throttled to ~30 commands/sec (one per 32ms) with a 20px dead-zone.
+                    if ((Math.abs(rx - lastTouchX) > 20 || Math.abs(ry - lastTouchY) > 20)
+                        && (now - lastSwipeSent) >= 32L) {
                         act.sendCommandObj(JSONObject().apply {
                             put("command","swipe"); put("x1",lastTouchX); put("y1",lastTouchY)
                             put("x2",rx); put("y2",ry); put("duration",80)
                         })
                         lastTouchX = rx; lastTouchY = ry
+                        lastSwipeSent = now
                     }
                 }
                 MotionEvent.ACTION_UP -> {

@@ -193,13 +193,23 @@ class PairSetupActivity : AppCompatActivity() {
         tvStatus.visibility = View.VISIBLE
     }
 
+    override fun onStop() {
+        super.onStop()
+        // FIX: Stop polling when activity goes to background — pollRunnable was scheduling
+        // itself every 4s even while the app was backgrounded, wasting battery and network.
+        // Polling resumes in onStart() if pairing not yet complete.
+        if (!connected) stopPolling()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Resume polling if we still have a code and aren't connected yet
+        if (!connected && currentCode.isNotEmpty()) startPolling(currentCode)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         stopPolling()
-        // BUG FIX: dispatcher.executorService.shutdown() permanently kills OkHttp's shared
-        // thread pool — any subsequent OkHttp call in the process (e.g. in MainActivity)
-        // would throw a RejectedExecutionException. Use cancelAll() to abort in-flight
-        // requests without destroying the reusable executor.
         httpClient.dispatcher.cancelAll()
     }
 
