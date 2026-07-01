@@ -56,13 +56,33 @@ class LimitsFragment : Fragment() {
             }
         }
 
-        // Quick keywords
+        // Quick keywords — general presets
         v.findViewById<Button>(R.id.btnPresetKeywords).setOnClickListener {
             val presets = listOf("drugs", "fight", "hate", "kill", "bad", "sex", "porn", "dangerous")
             kwList.addAll(presets.filter { !kwList.contains(it) })
             kwAdapter.notifyDataSetChanged()
             pushKeywords(kwList, act)
             showStatus("✅ Safety keywords loaded")
+        }
+
+        // Keyword category presets — FlashGet feature
+        val CATEGORY_PRESETS = mapOf(
+            R.id.btnKwViolence  to listOf("kill","murder","hurt","beat","attack","stab","fight me","beat you up"),
+            R.id.btnKwDrugs     to listOf("weed","cocaine","heroin","meth","mdma","pills","drug deal","get high","dealer","bud"),
+            R.id.btnKwAdult     to listOf("sex","porn","nude","nudes","naked","xxx","onlyfans","send photos"),
+            R.id.btnKwBullying  to listOf("ugly","loser","nobody likes you","kill yourself","kys","worthless","hate you"),
+            R.id.btnKwGrooming  to listOf("meet alone","don't tell","send pic","video call alone","our secret","how old are you"),
+            R.id.btnKwSelfHarm  to listOf("cut myself","end it","want to die","don't want to live","suicide")
+        )
+        for ((btnId, keywords) in CATEGORY_PRESETS) {
+            try {
+                v.findViewById<Button?>(btnId)?.setOnClickListener {
+                    kwList.addAll(keywords.filter { !kwList.contains(it) })
+                    kwAdapter.notifyDataSetChanged()
+                    pushKeywords(kwList, act)
+                    showStatus("✅ ${keywords.size} category keywords added")
+                }
+            } catch (_: Exception) {}
         }
 
         // Internet Schedule — UI #6: Use TimePickerDialog instead of plain EditText
