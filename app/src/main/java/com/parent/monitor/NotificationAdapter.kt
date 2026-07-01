@@ -43,4 +43,6 @@ class NotificationAdapter(
         items.clear()
         notifyDataSetChanged()
     }
+
+    fun getAll(): List<NotificationItem> = items.toList()
 }
