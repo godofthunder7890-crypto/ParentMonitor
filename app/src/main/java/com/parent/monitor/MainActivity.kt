@@ -107,6 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     inner class WsCompat {
         fun sendCommand(cmd: String) = this@MainActivity.sendCommand(cmd)
+        fun sendCommand(cmd: String, data: JSONObject) = this@MainActivity.sendCommandObj(data.also { it.put("command", cmd) })
         fun sendCommandObj(data: JSONObject) = this@MainActivity.sendCommandObj(data)
         fun isConnected() = connected
     }
