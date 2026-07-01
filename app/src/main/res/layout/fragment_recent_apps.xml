@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#080B14">
+
+    <!-- Header -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp"
+        android:background="#111827" android:paddingHorizontal="14dp" android:gravity="center_vertical">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="🆕 RECENTLY INSTALLED APPS"
+            android:textColor="#38BDF8" android:textSize="13sp"
+            android:fontFamily="sans-serif-medium" android:letterSpacing="0.1"/>
+        <Button android:id="@+id/btnRefreshRecent"
+            android:layout_width="wrap_content" android:layout_height="32dp"
+            android:text="Refresh" android:textSize="11sp" android:textColor="#FFF"
+            android:backgroundTint="#1565C0" android:stateListAnimator="@null"
+            android:paddingHorizontal="12dp"/>
+    </LinearLayout>
+
+    <TextView android:id="@+id/tvRecentStatus"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Apps installed in last 30 days"
+        android:textColor="#555" android:textSize="12sp"
+        android:padding="12dp"/>
+
+    <ListView android:id="@+id/lvRecentApps"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:divider="#111827" android:dividerHeight="1dp"/>
+
+</LinearLayout>
