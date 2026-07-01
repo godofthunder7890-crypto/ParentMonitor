@@ -28,6 +28,20 @@
 -keep class com.google.zxing.** { *; }
 -keep class com.journeyapps.** { *; }
 
+# ── Material Components (BottomNavigationView, etc.) ──────────────────────
+-keep class com.google.android.material.** { *; }
+-dontwarn com.google.android.material.**
+-keepclassmembers class com.google.android.material.** { *; }
+
+# ── AndroidX ──────────────────────────────────────────────────────────────
+-keep class androidx.** { *; }
+-dontwarn androidx.**
+-keepclassmembers class androidx.** { *; }
+
+# ── Firebase Auth ─────────────────────────────────────────────────────────
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
 # ── View Binding / Fragments ───────────────────────────────────────────────
 -keepclassmembers class * extends androidx.fragment.app.Fragment { *; }
 
