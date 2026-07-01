@@ -212,6 +212,13 @@
                             android:stateListAnimator="@null"/>
                     </LinearLayout>
 
+                    <Button android:id="@+id/btnGetStayLocations"
+                        android:layout_width="match_parent" android:layout_height="38dp"
+                        android:text="📍 Get Stay Locations (24h)"
+                        android:textSize="12sp" android:textColor="#FFF"
+                        android:backgroundTint="#0D47A1" android:stateListAnimator="@null"
+                        android:layout_marginBottom="8dp"/>
+
                     <ListView android:id="@+id/lvLocationHistory"
                         android:layout_width="match_parent"
                         android:layout_height="180dp"
