@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#080B14">
+
+    <!-- Header -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp"
+        android:background="#111827" android:paddingHorizontal="14dp" android:gravity="center_vertical">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="📸 SCHEDULED SNAPSHOTS"
+            android:textColor="#38BDF8" android:textSize="13sp"
+            android:fontFamily="sans-serif-medium" android:letterSpacing="0.1"/>
+        <TextView android:id="@+id/tvSnapStatus"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Ready" android:textColor="#666" android:textSize="11sp"/>
+    </LinearLayout>
+
+    <!-- Config Card -->
+    <androidx.cardview.widget.CardView android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_margin="12dp"
+        app:cardBackgroundColor="#0D1117" app:cardCornerRadius="14dp" app:cardElevation="3dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="14dp">
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="⚙ SNAPSHOT CONFIG" android:textColor="#555"
+                android:textSize="10sp" android:letterSpacing="0.12" android:layout_marginBottom="10dp"/>
+
+            <TextView android:id="@+id/tvSnapConfig"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="📸 Snapshots: OFF" android:textColor="#CCC"
+                android:textSize="13sp" android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+                <Switch android:id="@+id/swSnapEnabled"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Enable" android:textColor="#CCC"
+                    android:layout_marginEnd="16dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Interval (min):" android:textColor="#999" android:textSize="13sp"
+                    android:layout_marginEnd="8dp"/>
+                <EditText android:id="@+id/etSnapInterval"
+                    android:layout_width="70dp" android:layout_height="38dp"
+                    android:text="5" android:inputType="number"
+                    android:textColor="#FFF" android:background="#1F2937"
+                    android:padding="8dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button android:id="@+id/btnSnapApply"
+                    android:layout_width="0dp" android:layout_height="38dp"
+                    android:layout_weight="1" android:layout_marginEnd="8dp"
+                    android:text="Apply Config" android:textSize="12sp" android:textColor="#FFF"
+                    android:backgroundTint="#1565C0" android:stateListAnimator="@null"/>
+                <Button android:id="@+id/btnSnapNow"
+                    android:layout_width="0dp" android:layout_height="38dp"
+                    android:layout_weight="1" android:layout_marginEnd="8dp"
+                    android:text="📸 Snap Now" android:textSize="12sp" android:textColor="#FFF"
+                    android:backgroundTint="#00695C" android:stateListAnimator="@null"/>
+                <Button android:id="@+id/btnSnapClear"
+                    android:layout_width="0dp" android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:text="Clear" android:textSize="12sp" android:textColor="#FFF"
+                    android:backgroundTint="#37474F" android:stateListAnimator="@null"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Snapshots List -->
+    <ListView android:id="@+id/lvSnapshots"
+        android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:divider="#111827" android:dividerHeight="1dp"/>
+
+</LinearLayout>
