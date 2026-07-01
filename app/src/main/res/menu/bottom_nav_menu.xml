@@ -3,13 +3,13 @@
     <item
         android:id="@+id/nav_notice"
         android:title="Notice"
-        android:icon="@drawable/ic_nav_notice"/>
+        android:icon="@drawable/ic_bottom_notice"/>
     <item
         android:id="@+id/nav_device"
         android:title="Device"
-        android:icon="@drawable/ic_nav_device"/>
+        android:icon="@drawable/ic_bottom_device"/>
     <item
         android:id="@+id/nav_me"
         android:title="Me"
-        android:icon="@drawable/ic_nav_me"/>
+        android:icon="@drawable/ic_bottom_me"/>
 </menu>
