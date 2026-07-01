@@ -69,7 +69,7 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
     private fun loadInsights() {
         val code = pairCode(); if (code.isEmpty()) return
         progressBar.visibility = View.VISIBLE
-        val req = Request.Builder().url("\${relayHttp()}/api/ai/insights/$code").build()
+        val req = Request.Builder().url("${relayHttp()}/api/ai/insights/$code").build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 handler.post { progressBar.visibility = View.GONE }
@@ -133,7 +133,7 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
         btnAnalyze.isEnabled = false
         btnAnalyze.text = "Analyzing..."
         progressBar.visibility = View.VISIBLE
-        val req = Request.Builder().url("\${relayHttp()}/api/ai/analyze/$code")
+        val req = Request.Builder().url("${relayHttp()}/api/ai/analyze/$code")
             .post(ByteArray(0).toRequestBody(null)).build()
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {

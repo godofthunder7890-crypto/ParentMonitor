@@ -1049,6 +1049,10 @@ class MainActivity : AppCompatActivity() {
         stopPinging()
         reconnectRunnable?.let { handler.removeCallbacks(it) }
         ws?.close(1000, null)
+        // FIX: Shutdown OkHttpClient to release connection pool and thread resources
+        try { client?.dispatcher?.cancelAll() } catch (_: Exception) {}
+        try { client?.dispatcher?.executorService?.shutdown() } catch (_: Exception) {}
+        try { client?.connectionPool?.evictAll() } catch (_: Exception) {}
         webrtcReceiver?.stop()
         super.onDestroy()
     }

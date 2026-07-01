@@ -99,19 +99,23 @@ object AutoUpdater {
         params.setAppPackageName(ctx.packageName)
         val sessionId = installer.createSession(params)
         val session   = installer.openSession(sessionId)
-        FileInputStream(apk).use { input ->
-            session.openWrite("update", 0, apk.length()).use { out ->
-                input.copyTo(out)
-                session.fsync(out)
+        // FIX: Always close session in finally to prevent PackageInstaller resource leak
+        try {
+            FileInputStream(apk).use { input ->
+                session.openWrite("update", 0, apk.length()).use { out ->
+                    input.copyTo(out)
+                    session.fsync(out)
+                }
             }
+            val intent = Intent("com.parent.monitor.UPDATE_DONE").setPackage(ctx.packageName)
+            val pi = PendingIntent.getBroadcast(
+                ctx, sessionId, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
+            session.commit(pi.intentSender)
+        } finally {
+            session.close()
         }
-        val intent = Intent("com.parent.monitor.UPDATE_DONE").setPackage(ctx.packageName)
-        val pi = PendingIntent.getBroadcast(
-            ctx, sessionId, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-        )
-        session.commit(pi.intentSender)
-        session.close()
     }
 
     private fun showNotification(ctx: Context, msg: String) {
