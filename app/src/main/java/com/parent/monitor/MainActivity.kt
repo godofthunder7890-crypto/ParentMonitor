@@ -154,6 +154,7 @@ class MainActivity : AppCompatActivity() {
         setupTimeRequestBanner()
         setupNetToggle()
         restoreNotifications()
+        startForegroundMonitor()
         connect()
         requestRuntimePermissions()
     }
@@ -379,6 +380,8 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.updateBattery(pct, chg)
                     deviceTabFragment?.updateBattery(pct, chg)
                 }
+                if (pct in 1..20 && !chg)
+                    showUrgentNotification("🔋 Low Battery Warning", "Child's phone battery at $pct% — please charge soon")
             }
             "location" -> {
                 val lat = msg.optDouble("lat")
@@ -446,10 +449,13 @@ class MainActivity : AppCompatActivity() {
             "notification" -> {
                 val ts = msg.optLong("ts", System.currentTimeMillis())
                 val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(ts))
+                val appName = msg.optString("app", "App")
+                val title   = msg.optString("title", "New Notification")
+                val text    = msg.optString("text", "")
                 val item = NotificationItem(
-                    app   = msg.optString("app"),
-                    title = msg.optString("title"),
-                    text  = msg.optString("text"),
+                    app   = appName,
+                    title = title,
+                    text  = text,
                     time  = timeStr,
                     timestamp = ts
                 )
@@ -457,6 +463,7 @@ class MainActivity : AppCompatActivity() {
                     notificationAdapter.addNotification(item)
                     saveNotifications()
                 }
+                showUrgentNotification("📱 $appName: $title", text.ifEmpty { "Tap to view" })
             }
             "app_event" -> {
                 val name     = msg.optString("name")
@@ -542,11 +549,14 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("App Blocked", "${pkg.substringAfterLast('.')} ($reason)")
                     dashboardFragment?.addLog("🚫 Blocked: ${pkg.substringAfterLast('.')} ($reason)")
                 }
+                showUrgentNotification("🚫 App Blocked", "Child tried to open ${pkg.substringAfterLast('.')} — blocked ($reason)")
             }
             "geofence_alert" -> {
                 val inside = msg.optBoolean("inside")
                 val distM  = msg.optInt("dist_m")
                 handler.post { trackFragment?.onGeofenceAlert(inside, distM) }
+                val verb = if (inside) "entered safe zone ✅" else "LEFT safe zone ⚠️"
+                showUrgentNotification("📍 Location Alert!", "Child has $verb (${distM}m from boundary)")
             }
             "schedule_event" -> {
                 val action = msg.optString("action")
@@ -561,6 +571,7 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("Keyword [$source]", "\"$keyword\" in ${pkg.substringAfterLast('.')}")
                     dashboardFragment?.addLog("🔍 Keyword \"$keyword\" detected in ${pkg.substringAfterLast('.')}")
                 }
+                showUrgentNotification("🔍 Keyword Detected!", "\"$keyword\" found in ${pkg.substringAfterLast('.')} — tap to review")
             }
             "device_info" -> handler.post {
                 protectFragment?.onDeviceInfo(msg)
@@ -595,6 +606,7 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("🌐 Browser Blocked", "$domain\n${url.take(50)}")
                     dashboardFragment?.addLog("🌐 Blocked browser: $domain")
                 }
+                showUrgentNotification("🌐 Website Blocked", "Child tried to visit: $domain")
             }
             "video_history" -> handler.post { videoHistoryFragment?.onVideoHistory(msg) }
             "video_watched" -> {
@@ -614,6 +626,7 @@ class MainActivity : AppCompatActivity() {
                     reportsFragment?.addAlert("⚠️ Permission OFF!", perm)
                     dashboardFragment?.addLog("⚠️ Permission revoked: $perm")
                 }
+                showUrgentNotification("⚠️ Permission Disabled!", "$perm has been turned off on child's device")
             }
             "permission_status" -> {
                 handler.post { dashboardFragment?.addLog("🔐 Perms: ${msg.toString().take(80)}") }
@@ -634,11 +647,12 @@ class MainActivity : AppCompatActivity() {
                     dashboardFragment?.addLog("📶 Child back online (was offline ${mins}min)")
                     reportsFragment?.addAlert("📶 Back Online", "Was offline for ${mins} minutes")
                 }
+                showUrgentNotification("📶 Child Device Back Online", "Device was offline for ${mins} minutes")
             }
             "albums_scan_result" -> {
+                val count = msg.optInt("flagged_count", 0)
                 handler.post {
                     albumsSafetyFragment?.onScanResult(msg)
-                    val count = msg.optInt("flagged_count", 0)
                     if (count > 0) {
                         reportsFragment?.addAlert("🖼 Albums Scan", "$count suspicious images found!")
                         dashboardFragment?.addLog("🖼 Albums: $count suspicious images flagged")
@@ -646,6 +660,8 @@ class MainActivity : AppCompatActivity() {
                         dashboardFragment?.addLog("🖼 Albums: clean, no suspicious images")
                     }
                 }
+                if (count > 0)
+                    showUrgentNotification("🖼 Suspicious Images Found!", "$count inappropriate images detected in child's gallery")
             }
             "album_full_image" -> handler.post { albumsSafetyFragment?.onAlbumFullImage(msg) }
             "camera_record_started" -> {
@@ -917,6 +933,12 @@ class MainActivity : AppCompatActivity() {
 
     fun sendToChild(data: JSONObject) {
         try { ws?.send(data.toString()) } catch (_: Exception) {}
+    }
+
+    private fun startForegroundMonitor() {
+        try {
+            startForegroundService(android.content.Intent(this, MonitorService::class.java))
+        } catch (_: Exception) {}
     }
 
     fun saveNotifications() {
