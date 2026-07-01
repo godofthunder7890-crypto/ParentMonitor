@@ -98,6 +98,7 @@ class MainActivity : AppCompatActivity() {
     private var reconnectDelay = 5_000L
     var reconnectCount = 0
     private var pingTs    = 0L
+    var webrtcReceiver: WebRTCReceiver? = null
 
     // ─── Prefs ───────────────────────────────────────────────────────────────
     private lateinit var prefs: SharedPreferences
@@ -334,6 +335,20 @@ class MainActivity : AppCompatActivity() {
             }
             "screen_frame" -> liveFragment?.onScreenFrame(msg.optString("frame"))
             "camera_frame" -> liveFragment?.onCameraFrame(msg.optString("frame"))
+            "webrtc_offer" -> {
+                val sdp = msg.optString("sdp")
+                if (sdp.isNotEmpty()) handler.post { handleWebRtcOffer(sdp) }
+            }
+            "ice_candidate" -> {
+                if (msg.optString("role") == "from_child") {
+                    val sdpMid      = msg.optString("sdp_mid", "0")
+                    val sdpMLineIdx = msg.optInt("sdp_mline_index", 0)
+                    val candidate   = msg.optString("candidate")
+                    if (candidate.isNotEmpty()) handler.post {
+                        webrtcReceiver?.addIceCandidate(sdpMid, sdpMLineIdx, candidate)
+                    }
+                }
+            }
             "battery" -> {
                 val pct = msg.optInt("battery", -1)
                 val chg = msg.optBoolean("charging", false)
@@ -887,10 +902,39 @@ class MainActivity : AppCompatActivity() {
         } catch (_: Exception) {}
     }
 
+    fun handleWebRtcOffer(sdp: String) {
+        if (webrtcReceiver == null) {
+            webrtcReceiver = WebRTCReceiver(this) { signalJson ->
+                when (signalJson.optString("type")) {
+                    "webrtc_answer" -> sendCommandObj(JSONObject().apply {
+                        put("command", "webrtc_answer")
+                        put("sdp", signalJson.optString("sdp"))
+                    })
+                    "ice_candidate" -> sendCommandObj(JSONObject().apply {
+                        put("command", "webrtc_ice_candidate")
+                        put("sdp_mid", signalJson.optString("sdp_mid"))
+                        put("sdp_mline_index", signalJson.optInt("sdp_mline_index"))
+                        put("candidate", signalJson.optString("candidate"))
+                    })
+                }
+            }.also { it.init() }
+        }
+        webrtcReceiver!!.onVideoTrack = { track ->
+            handler.post { liveFragment?.onWebRtcTrack(track) }
+        }
+        webrtcReceiver!!.onOffer(sdp)
+    }
+
+    fun stopWebRtcReceiver() {
+        webrtcReceiver?.stop()
+        webrtcReceiver = null
+    }
+
     override fun onDestroy() {
         stopPinging()
         reconnectRunnable?.let { handler.removeCallbacks(it) }
         ws?.close(1000, null)
+        webrtcReceiver?.stop()
         super.onDestroy()
     }
 }

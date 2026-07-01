@@ -12,6 +12,8 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import org.json.JSONObject
+import org.webrtc.SurfaceViewRenderer
+import org.webrtc.VideoTrack
 
 class LiveFragment : Fragment() {
 
@@ -37,15 +39,17 @@ class LiveFragment : Fragment() {
     private lateinit var btnToggleMic: Button
     private lateinit var btnScreenFaster: Button
     private lateinit var btnScreenSlower: Button
+    private lateinit var webrtcRenderer: SurfaceViewRenderer
 
     private val mainHandler = Handler(Looper.getMainLooper())
     // BUG FIX: Thread() per frame bad tha — 30fps pe 30 threads/sec ban-bigar rahe the.
     // Single thread executor se ek hi background thread reuse hota hai.
     private val decodeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
 
-    private var screenStreaming = false
-    private var cameraStreaming = false
-    private var micStreaming    = false
+    private var screenStreaming  = false
+    private var cameraStreaming  = false
+    private var micStreaming     = false
+    private var webrtcStreaming  = false
     private var screenInterval = 1000L
     private var cameraInterval = 33L  // 30fps default
     // UI #5: Front/back camera toggle state
@@ -72,6 +76,12 @@ class LiveFragment : Fragment() {
     override fun onDestroyView() {
         (activity as? MainActivity)?.liveFragment = null
         decodeExecutor.shutdown()
+        try {
+            if (webrtcStreaming) {
+                (activity as? MainActivity)?.stopWebRtcReceiver()
+                webrtcRenderer.release()
+            }
+        } catch (_: Exception) {}
         super.onDestroyView()
     }
 
@@ -98,6 +108,7 @@ class LiveFragment : Fragment() {
         btnToggleMic     = v.findViewById(R.id.btnToggleMic)
         btnScreenFaster  = v.findViewById(R.id.btnScreenFaster)
         btnScreenSlower  = v.findViewById(R.id.btnScreenSlower)
+        webrtcRenderer   = v.findViewById(R.id.webrtcRenderer)
     }
 
     private fun setupTabs() {
@@ -192,10 +203,70 @@ class LiveFragment : Fragment() {
             }
         }
 
-        // UI #5: Front/back camera flip button — dynamically added to panelCamera
+        // UI WebRTC: P2P real-time stream button — dynamically added to panelCamera
         panelCamera.post {
             val ctx = context ?: return@post
-            // Flip button
+
+            val btnWebRtc = Button(ctx).apply {
+                text = "▶ START WEBRTC (P2P)"
+                setBackgroundColor(0xFF00AA55.toInt())
+                setTextColor(0xFFFFFFFF.toInt())
+            }
+            btnWebRtc.setOnClickListener {
+                webrtcStreaming = !webrtcStreaming
+                if (webrtcStreaming) {
+                    val act = activity as? MainActivity ?: return@setOnClickListener
+                    val eglBase = act.webrtcReceiver?.getEglBase()
+                        ?: run {
+                            act.webrtcReceiver = WebRTCReceiver(act) { signalJson ->
+                                when (signalJson.optString("type")) {
+                                    "webrtc_answer" -> act.sendCommandObj(JSONObject().apply {
+                                        put("command", "webrtc_answer")
+                                        put("sdp", signalJson.optString("sdp"))
+                                    })
+                                    "ice_candidate" -> act.sendCommandObj(JSONObject().apply {
+                                        put("command", "webrtc_ice_candidate")
+                                        put("sdp_mid", signalJson.optString("sdp_mid"))
+                                        put("sdp_mline_index", signalJson.optInt("sdp_mline_index"))
+                                        put("candidate", signalJson.optString("candidate"))
+                                    })
+                                }
+                            }.also { it.init() }
+                            act.webrtcReceiver!!.onVideoTrack = { track ->
+                                mainHandler.post { onWebRtcTrack(track) }
+                            }
+                            act.webrtcReceiver!!.getEglBase()
+                        }
+                    try {
+                        webrtcRenderer.init(eglBase!!.eglBaseContext, null)
+                        webrtcRenderer.setMirror(false)
+                        webrtcRenderer.setEnableHardwareScaler(true)
+                        webrtcRenderer.visibility = View.VISIBLE
+                        imgCamera.visibility = View.GONE
+                    } catch (_: Exception) {}
+                    sendCommand(JSONObject().apply {
+                        put("command", "start_webrtc_stream")
+                        put("front_camera", useFrontCamera)
+                    })
+                    btnWebRtc.text = "⏹ STOP WEBRTC"
+                    btnWebRtc.setBackgroundColor(0xFFFF3333.toInt())
+                    tvCameraInfo.text = "WebRTC P2P..."
+                    setDotColor(dotCamera, true)
+                } else {
+                    sendCommand(JSONObject().apply { put("command", "stop_webrtc_stream") })
+                    try { webrtcRenderer.clearImage(); webrtcRenderer.release() } catch (_: Exception) {}
+                    webrtcRenderer.visibility = View.GONE
+                    imgCamera.visibility = View.VISIBLE
+                    (activity as? MainActivity)?.stopWebRtcReceiver()
+                    btnWebRtc.text = "▶ START WEBRTC (P2P)"
+                    btnWebRtc.setBackgroundColor(0xFF00AA55.toInt())
+                    tvCameraInfo.text = "Stopped"
+                    setDotColor(dotCamera, false)
+                }
+            }
+            panelCamera.addView(btnWebRtc)
+
+            // UI #5: Front/back camera flip button — dynamically added to panelCamera
             val btnFlip = Button(ctx).apply {
                 text = "🔄 Flip Camera (Front/Back)"
                 setBackgroundColor(0xFF333355.toInt())
@@ -315,6 +386,17 @@ class LiveFragment : Fragment() {
                     } catch (_: Exception) { try { bmp.recycle() } catch (_: Exception) {} }
                 }
             } catch (_: Exception) {}
+        }
+    }
+
+    fun onWebRtcTrack(track: VideoTrack) {
+        if (!isAdded || view == null) return
+        try { track.addSink(webrtcRenderer) } catch (_: Exception) {}
+        mainHandler.post {
+            if (!isAdded || view == null) return@post
+            webrtcRenderer.visibility = View.VISIBLE
+            imgCamera.visibility = View.GONE
+            tvCameraInfo.text = "WebRTC P2P Live ✓"
         }
     }
 
