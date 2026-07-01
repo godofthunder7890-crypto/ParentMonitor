@@ -107,6 +107,49 @@
                     android:layout_marginBottom="8dp"
                     android:stateListAnimator="@null"/>
 
+                <!-- Category Presets Row 1 -->
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+                    <Button android:id="@+id/btnKwViolence"
+                        android:layout_width="0dp" android:layout_height="34dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="⚔ Violence" android:textSize="10sp" android:textColor="#FFF"
+                        android:backgroundTint="#B71C1C" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnKwDrugs"
+                        android:layout_width="0dp" android:layout_height="34dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="💊 Drugs" android:textSize="10sp" android:textColor="#FFF"
+                        android:backgroundTint="#4A148C" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnKwAdult"
+                        android:layout_width="0dp" android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:text="🔞 Adult" android:textSize="10sp" android:textColor="#FFF"
+                        android:backgroundTint="#E65100" android:stateListAnimator="@null"/>
+                </LinearLayout>
+                <!-- Category Presets Row 2 -->
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <Button android:id="@+id/btnKwBullying"
+                        android:layout_width="0dp" android:layout_height="34dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="😡 Bullying" android:textSize="10sp" android:textColor="#FFF"
+                        android:backgroundTint="#F57F17" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnKwGrooming"
+                        android:layout_width="0dp" android:layout_height="34dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="⚠ Grooming" android:textSize="10sp" android:textColor="#FFF"
+                        android:backgroundTint="#880E4F" android:stateListAnimator="@null"/>
+                    <Button android:id="@+id/btnKwSelfHarm"
+                        android:layout_width="0dp" android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:text="🆘 Self Harm" android:textSize="10sp" android:textColor="#FFF"
+                        android:backgroundTint="#1A237E" android:stateListAnimator="@null"/>
+                </LinearLayout>
+
                 <LinearLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
