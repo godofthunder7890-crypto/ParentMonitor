@@ -74,6 +74,18 @@ class ControlFragment : Fragment() {
         v.findViewById<Button>(R.id.btnCtrlLocation).setOnClickListener { act.sendCommand("get_location") }
         v.findViewById<Button>(R.id.btnCtrlBattery).setOnClickListener  { act.sendCommand("get_battery") }
 
+        v.findViewById<Button>(R.id.btnFindKid).setOnClickListener {
+            act.sendCommandObj(JSONObject().apply { put("command","find_kid"); put("duration_seconds", 30) })
+            android.widget.Toast.makeText(requireContext(), "📳 Ringing child's phone for 30s...", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        v.findViewById<Button>(R.id.btnStopRing).setOnClickListener {
+            act.sendCommand("stop_find_kid")
+            android.widget.Toast.makeText(requireContext(), "🔕 Ring stopped", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        v.findViewById<Button>(R.id.btnSnapNowCtrl).setOnClickListener {
+            act.sendCommand("snapshot_now")
+            android.widget.Toast.makeText(requireContext(), "📸 Capturing screenshot...", android.widget.Toast.LENGTH_SHORT).show()
+        }
         v.findViewById<Button>(R.id.btnEmergencyLockAll).setOnClickListener {
             android.app.AlertDialog.Builder(requireContext())
                 .setTitle("🚨 Emergency Lock All Apps?")
