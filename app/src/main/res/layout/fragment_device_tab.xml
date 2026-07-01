@@ -31,7 +31,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_menu_my_calendar"
+                android:src="@drawable/ic_device_camera"
                 android:tint="#7C4DFF"/>
         </FrameLayout>
 
@@ -79,7 +79,7 @@
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@android:drawable/ic_lock_idle_charging"
+                    android:src="@drawable/ic_pro_badge"
                     android:tint="#4CAF50"
                     android:layout_marginEnd="4dp"/>
                 <TextView
@@ -96,7 +96,7 @@
         <ImageView
             android:layout_width="22dp"
             android:layout_height="22dp"
-            android:src="@android:drawable/arrow_down_float"
+            android:src="@drawable/ic_notice_usage"
             android:tint="#FFFFFF"
             android:layout_marginEnd="8dp"/>
 
@@ -215,7 +215,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@android:drawable/ic_menu_preferences"
+                            android:src="@drawable/ic_check_permissions"
                             android:tint="#9E9E9E"/>
                     </LinearLayout>
 
@@ -247,7 +247,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:layout_gravity="center"
-                                    android:src="@android:drawable/ic_menu_camera"
+                                    android:src="@drawable/ic_device_camera"
                                     android:tint="#7C4DFF"/>
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -291,7 +291,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:layout_gravity="center"
-                                    android:src="@android:drawable/ic_menu_send"
+                                    android:src="@drawable/ic_device_screen_mirror"
                                     android:tint="#7C4DFF"/>
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -335,7 +335,7 @@
                                     android:layout_width="28dp"
                                     android:layout_height="28dp"
                                     android:layout_gravity="center"
-                                    android:src="@android:drawable/ic_btn_speak_now"
+                                    android:src="@drawable/ic_device_audio"
                                     android:tint="#7C4DFF"/>
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -378,7 +378,7 @@
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@android:drawable/ic_lock_lock"
+                        android:src="@drawable/ic_block_apps"
                         android:tint="#7C4DFF"
                         android:background="@drawable/circle_purple"
                         android:padding="8dp"
@@ -515,7 +515,7 @@
                             android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_media_play" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_device_camera" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Camera\nRecording" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -527,7 +527,7 @@
                             android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_send" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_device_screen_mirror" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Screen\nRecording" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -539,7 +539,7 @@
                             android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_btn_speak_now" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_device_audio" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Ambient\nRecording" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -559,7 +559,7 @@
                             android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_camera" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_device_camera" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Camera\nSnapshot" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -571,7 +571,7 @@
                             android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_crop" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_notice_snapshot" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Screen\nSnapshot" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -615,7 +615,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_recent_history" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_screen_time" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Screen Time\nLimits" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -625,7 +625,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_agenda" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_app_time" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="App Time\nLimits" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -635,7 +635,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_lock_lock" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_block_apps" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="App\nRules" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -650,7 +650,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_info_details" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_usage_logs" android:tint="#7C4DFF"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|start" android:text=" PRO " android:textSize="7sp" android:textColor="#000000" android:background="@drawable/bg_pro_badge" android:padding="1dp"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Usage\nLogs" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
@@ -661,7 +661,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_edit" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_live_painting" android:tint="#7C4DFF"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|start" android:text=" Beta " android:textSize="7sp" android:textColor="#FFFFFF" android:background="#4CAF50" android:padding="1dp"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|start" android:text=" PRO " android:textSize="7sp" android:textColor="#000000" android:background="@drawable/bg_pro_badge" android:padding="1dp"/>
                             </FrameLayout>
@@ -673,7 +673,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_preferences" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_check_permissions" android:tint="#7C4DFF"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Check\nPermissions" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
                         </LinearLayout>
@@ -714,7 +714,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_dialog_dialer" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_social_detect" android:tint="#7C4DFF"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|start" android:text=" PRO " android:textSize="7sp" android:textColor="#000000" android:background="@drawable/bg_pro_badge" android:padding="1dp"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Social App\nDetection" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
@@ -725,7 +725,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_call_answer" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_call_sms" android:tint="#7C4DFF"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|start" android:text=" PRO " android:textSize="7sp" android:textColor="#000000" android:background="@drawable/bg_pro_badge" android:padding="1dp"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Call &amp; SMS\nSafety" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
@@ -736,7 +736,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_gallery" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_albums_safety" android:tint="#7C4DFF"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|start" android:text=" PRO " android:textSize="7sp" android:textColor="#000000" android:background="@drawable/bg_pro_badge" android:padding="1dp"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Albums\nSafety" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
@@ -752,7 +752,7 @@
                             android:orientation="vertical" android:gravity="center" android:padding="6dp" android:clickable="true" android:focusable="true">
                             <FrameLayout android:layout_width="52dp" android:layout_height="52dp">
                                 <View android:layout_width="52dp" android:layout_height="52dp" android:background="@drawable/circle_purple"/>
-                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_search" android:tint="#7C4DFF"/>
+                                <ImageView android:layout_width="26dp" android:layout_height="26dp" android:layout_gravity="center" android:src="@drawable/ic_browser_safety" android:tint="#7C4DFF"/>
                                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|start" android:text=" PRO " android:textSize="7sp" android:textColor="#000000" android:background="@drawable/bg_pro_badge" android:padding="1dp"/>
                             </FrameLayout>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Browser\nSafety" android:textSize="11sp" android:textColor="#424242" android:gravity="center"/>
@@ -787,7 +787,7 @@
                     <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@android:drawable/ic_dialog_alert"
+                        android:src="@drawable/ic_notice_alerts"
                         android:tint="#FFB300"
                         android:layout_marginEnd="12dp"/>
                     <TextView
