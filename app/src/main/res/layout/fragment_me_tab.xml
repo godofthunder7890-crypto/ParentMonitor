@@ -31,7 +31,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/circle_white_shine"
-                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:src="@drawable/ic_me_devices"
                     android:scaleType="centerInside"
                     android:tint="#7C4DFF"
                     android:padding="8dp"/>
@@ -64,7 +64,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@android:drawable/ic_media_next"
+                android:src="@drawable/ic_check_permissions"
                 android:tint="#FFFFFF"/>
         </LinearLayout>
 
@@ -83,7 +83,7 @@
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:src="@android:drawable/star_big_on"
+                android:src="@drawable/ic_me_rate"
                 android:tint="#FFB300"
                 android:layout_marginEnd="10dp"/>
             <TextView
@@ -145,7 +145,7 @@
                     <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_nav_device"
+                        android:src="@drawable/ic_me_devices"
                         android:tint="#7C4DFF"
                         android:layout_marginEnd="14dp"/>
                     <TextView
@@ -202,7 +202,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_dialog_info"
+                            android:src="@drawable/ic_me_help"
                             android:tint="#7C4DFF"
                             android:layout_marginEnd="14dp"/>
                         <TextView
@@ -235,7 +235,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_dialog_email"
+                            android:src="@drawable/ic_me_feedback"
                             android:tint="#7C4DFF"
                             android:layout_marginEnd="14dp"/>
                         <TextView
@@ -268,7 +268,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/btn_star_big_on"
+                            android:src="@drawable/ic_me_rate"
                             android:tint="#7C4DFF"
                             android:layout_marginEnd="14dp"/>
                         <TextView
@@ -301,7 +301,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_menu_compass"
+                            android:src="@drawable/ic_me_language"
                             android:tint="#7C4DFF"
                             android:layout_marginEnd="14dp"/>
                         <TextView
@@ -334,7 +334,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:src="@android:drawable/ic_menu_info_details"
+                            android:src="@drawable/ic_me_about"
                             android:tint="#7C4DFF"
                             android:layout_marginEnd="14dp"/>
                         <TextView
@@ -381,7 +381,7 @@
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
-                        android:src="@android:drawable/ic_menu_agenda"
+                        android:src="@drawable/ic_me_redeem"
                         android:tint="#7C4DFF"
                         android:layout_marginEnd="14dp"/>
                     <TextView
