@@ -125,15 +125,22 @@ class PairSetupActivity : AppCompatActivity() {
     // ── Poll server for child connection ──────────────────────────────────
     private fun startPolling(code: String) {
         stopPolling()
-        pollRunnable = object : Runnable {
+        // FIX: capture the runnable in a local val so async OkHttp callbacks can
+        // safely re-post it without touching the nullable field `pollRunnable`.
+        // Before this fix, onFailure/onResponse dereferenced pollRunnable!! after
+        // stopPolling() (called in onStop) had already set it to null — NPE crash.
+        val self = object : Runnable {
             override fun run() {
-                if (connected) return
+                if (connected || pollRunnable == null) return  // stopped or connected
                 val req = Request.Builder()
                     .url("$RELAY_HTTP/api/online/$code")
                     .build()
+                val selfRef = this
                 httpClient.newCall(req).enqueue(object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        mainHandler.postDelayed(pollRunnable!!, POLL_INTERVAL_MS)
+                        // Only re-post if polling is still active (not stopped)
+                        if (pollRunnable != null)
+                            mainHandler.postDelayed(selfRef, POLL_INTERVAL_MS)
                     }
                     override fun onResponse(call: Call, response: Response) {
                         val body = response.body?.string() ?: ""
@@ -143,18 +150,20 @@ class PairSetupActivity : AppCompatActivity() {
                                 if (online && !connected) {
                                     connected = true
                                     onChildConnected()
-                                } else if (!connected) {
-                                    mainHandler.postDelayed(pollRunnable!!, POLL_INTERVAL_MS)
+                                } else if (!connected && pollRunnable != null) {
+                                    mainHandler.postDelayed(selfRef, POLL_INTERVAL_MS)
                                 }
                             }
                         } catch (_: Exception) {
-                            mainHandler.postDelayed(pollRunnable!!, POLL_INTERVAL_MS)
+                            if (pollRunnable != null)
+                                mainHandler.postDelayed(selfRef, POLL_INTERVAL_MS)
                         }
                     }
                 })
             }
         }
-        mainHandler.post(pollRunnable!!)
+        pollRunnable = self
+        mainHandler.post(self)
     }
 
     private fun stopPolling() {

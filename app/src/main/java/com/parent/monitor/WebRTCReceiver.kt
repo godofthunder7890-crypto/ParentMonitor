@@ -77,19 +77,21 @@ class WebRTCReceiver(
             override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {}
         }) ?: return
 
-        // FIX: capture peerConnection in a local val before passing to observer callbacks.
-        // Observer methods run on WebRTC internal threads; by the time they fire, stop()
-        // may have been called and peerConnection set to null — causing NPE with !!.
+        // FIX: capture the single PeerConnection instance used for this offer into a local
+        // val. All SdpObserver callbacks for THIS negotiation must operate on the same
+        // instance — re-reading peerConnection (mutable field) in pc2/pc3 risked racing
+        // against a new offer that replaced the connection mid-callback, causing stale-
+        // connection operations or NPE if stop() had cleared the field.
         val pc = peerConnection ?: return
         val offer = SessionDescription(SessionDescription.Type.OFFER, sdpStr)
         pc.setRemoteDescription(object : SdpObserver {
             override fun onSetSuccess() {
-                val pc2 = peerConnection ?: return  // re-check; stop() may have run
-                pc2.createAnswer(object : SdpObserver {
+                if (peerConnection !== pc) return  // connection replaced since offer started
+                pc.createAnswer(object : SdpObserver {
                     override fun onCreateSuccess(sdp: SessionDescription?) {
                         sdp ?: return
-                        val pc3 = peerConnection ?: return
-                        pc3.setLocalDescription(object : SdpObserver {
+                        if (peerConnection !== pc) return
+                        pc.setLocalDescription(object : SdpObserver {
                             override fun onSetSuccess() {
                                 onSignal(JSONObject().apply {
                                     put("type", "webrtc_answer")
