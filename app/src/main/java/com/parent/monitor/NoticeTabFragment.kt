@@ -23,23 +23,23 @@ class NoticeTabFragment : Fragment() {
     )
 
     private val items = listOf(
-        NoticeItem(android.R.drawable.ic_dialog_info, 0xFF1976D2.toInt(), "App Notifications",
+        NoticeItem(R.drawable.ic_notice_app_notifications, 0xFF1976D2.toInt(), "App Notifications",
             tabIndex = 6),
-        NoticeItem(android.R.drawable.ic_dialog_alert, 0xFFF57C00.toInt(), "Alerts & Request",
+        NoticeItem(R.drawable.ic_notice_alerts, 0xFFF57C00.toInt(), "Alerts & Request",
             tabIndex = 10),
-        NoticeItem(android.R.drawable.ic_menu_search, 0xFF1976D2.toInt(), "Browser Safety",
+        NoticeItem(R.drawable.ic_notice_browser, 0xFF0288D1.toInt(), "Browser Safety",
             tabIndex = 14),
-        NoticeItem(android.R.drawable.ic_menu_send, 0xFF212121.toInt(), "TikTok & YouTube History",
+        NoticeItem(R.drawable.ic_notice_video, 0xFF212121.toInt(), "TikTok & YouTube History",
             tabIndex = 15),
-        NoticeItem(android.R.drawable.ic_menu_camera, 0xFF7C4DFF.toInt(), "Snapshot & Recording",
+        NoticeItem(R.drawable.ic_notice_snapshot, 0xFF7C4DFF.toInt(), "Snapshot & Recording",
             tabIndex = 24),
-        NoticeItem(android.R.drawable.ic_menu_recent_history, 0xFFE91E63.toInt(), "Usage Logs",
+        NoticeItem(R.drawable.ic_notice_usage, 0xFFE91E63.toInt(), "Usage Logs",
             tabIndex = 11),
-        NoticeItem(android.R.drawable.ic_dialog_dialer, 0xFF7C4DFF.toInt(), "Social App Keyword Detection",
+        NoticeItem(R.drawable.ic_notice_social, 0xFF673AB7.toInt(), "Social App Keyword Detection",
             tabIndex = 25),
-        NoticeItem(android.R.drawable.ic_call_answer, 0xFF4CAF50.toInt(), "Call & SMS Safety",
+        NoticeItem(R.drawable.ic_notice_call, 0xFF388E3C.toInt(), "Call & SMS Safety",
             tabIndex = 21),
-        NoticeItem(android.R.drawable.ic_menu_gallery, 0xFFFFC107.toInt(), "Albums Safety",
+        NoticeItem(R.drawable.ic_notice_albums, 0xFFF57C00.toInt(), "Albums Safety",
             tabIndex = 17)
     )
 
@@ -64,9 +64,9 @@ class NoticeTabFragment : Fragment() {
             val badge = card.findViewById<View>(R.id.viewBadge)
 
             ivIcon.setImageResource(item.iconRes)
-            ivIcon.setBackgroundResource(R.drawable.circle_purple)
-            ivIcon.setPadding(10, 10, 10, 10)
-            ivIcon.setColorFilter(item.iconTint)
+            ivIcon.setBackgroundResource(0)
+            ivIcon.setPadding(0, 0, 0, 0)
+            ivIcon.clearColorFilter()
 
             tvTitle.text = item.title
             tvPreview.text = item.preview
