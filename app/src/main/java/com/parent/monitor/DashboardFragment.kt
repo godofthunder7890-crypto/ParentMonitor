@@ -741,11 +741,20 @@ class DashboardFragment : Fragment() {
         addLog("📍 Location updated", 0xFFFFD600.toInt())
     }
 
-    fun updateCurrentApp(pkg: String, name: String = pkg.substringAfterLast('.')) {
+    fun updateCurrentApp(pkg: String, name: String = pkg.substringAfterLast('.'), iconB64: String = "") {
         if (!isAdded) return
-        // Truncate friendly name to 20 chars with ellipsis if longer
         val display = if (name.length > 20) name.take(17) + "…" else name
         tvDashCurrentApp?.text = display; popView(tvDashCurrentApp!!)
+        if (iconB64.isNotEmpty()) {
+            try {
+                val bytes = android.util.Base64.decode(iconB64, android.util.Base64.NO_WRAP)
+                val bmp = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                view?.findViewById<android.widget.ImageView>(R.id.ivCurrentAppIcon)?.let {
+                    it.setImageBitmap(bmp)
+                    it.visibility = android.view.View.VISIBLE
+                }
+            } catch (_: Exception) {}
+        }
         addLog("📱 App: $display", 0xFFAA00FF.toInt())
     }
 
