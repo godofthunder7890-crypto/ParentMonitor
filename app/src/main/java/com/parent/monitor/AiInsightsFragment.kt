@@ -155,6 +155,10 @@ class AiInsightsFragment : Fragment(R.layout.fragment_ai_insights) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        http.dispatcher.executorService.shutdown()
+        // FIX: Do not shut down the OkHttpClient dispatcher here — shutting it down
+        // on view destruction (e.g. during ViewPager swipe) permanently breaks future
+        // requests if the Fragment instance survives view recreation. Cancel in-flight
+        // calls by tag instead, and let the client live for the Fragment's lifetime.
+        http.dispatcher.cancelAll()
     }
 }

@@ -99,7 +99,7 @@ object AutoUpdater {
         params.setAppPackageName(ctx.packageName)
         val sessionId = installer.createSession(params)
         val session   = installer.openSession(sessionId)
-        // FIX: Always close session in finally to prevent PackageInstaller resource leak
+        // FIX: Always close session in finally; abandon on failure to discard stale sessions
         try {
             FileInputStream(apk).use { input ->
                 session.openWrite("update", 0, apk.length()).use { out ->
@@ -113,6 +113,9 @@ object AutoUpdater {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
             session.commit(pi.intentSender)
+        } catch (e: Exception) {
+            try { session.abandon() } catch (_: Exception) {}
+            Log.e(TAG, "installApk failed", e)
         } finally {
             session.close()
         }
