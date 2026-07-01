@@ -84,6 +84,12 @@ class TrackFragment : Fragment() {
             locationHistory.clear(); histAdapter?.notifyDataSetChanged()
         }
 
+        v.findViewById<android.widget.Button?>(R.id.btnGetStayLocations)?.setOnClickListener {
+            (activity as? MainActivity)?.sendCommandObj(org.json.JSONObject().apply {
+                put("command","get_location_history"); put("hours",24)
+            })
+        }
+
         (activity as? MainActivity)?.trackFragment = this
         return v
     }
@@ -136,5 +142,30 @@ class TrackFragment : Fragment() {
             ObjectAnimator.ofFloat(dot, "scaleY", 1f, 2f, 1f).apply {
                 duration = 400; repeatCount = ValueAnimator.INFINITE; start() }
         }
+    }
+
+    fun onLocationHistory(msg: org.json.JSONObject) {
+        try {
+            val stays  = msg.optJSONArray("stays")  ?: return
+            val sb     = StringBuilder()
+            sb.append("📍 Location History — Stay Locations:\n\n")
+            for (i in 0 until stays.length()) {
+                val s = stays.getJSONObject(i)
+                val label = s.optString("label","?")
+                val start = s.optString("start_time","?")
+                val end   = s.optString("end_time","?")
+                val lat   = s.optDouble("lat",0.0)
+                val lng   = s.optDouble("lng",0.0)
+                sb.append("• $start → $end ($label)\n  📌 %.4f, %.4f\n\n".format(lat, lng))
+            }
+            if (stays.length() == 0) sb.append("No stays recorded yet.")
+            activity?.runOnUiThread {
+                android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("📍 Location History")
+                    .setMessage(sb.toString())
+                    .setNegativeButton("Close", null)
+                    .show()
+            }
+        } catch (_: Exception) {}
     }
 }
