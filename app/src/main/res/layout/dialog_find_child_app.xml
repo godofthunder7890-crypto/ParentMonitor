@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="After installing for child, the icon will be automatically hidden. You can open the child&#39;s app through the following methods."
+            android:textColor="#424242"
+            android:textSize="14sp"/>
+
+        <!-- Method 1 Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Method 1"
+                    android:textColor="#7C4DFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_method_label"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvMethod1DeviceName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Get the child&#39;s device and unlock the screen."
+                    android:textColor="#424242"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text='Tap the button below to open "Child Monitor".'
+                    android:textColor="#424242"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Warning row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="top"
+                    android:layout_marginBottom="16dp">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginTop="2dp"
+                        android:src="@drawable/ic_notice_alerts"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="If you do not have the device, do not tap the button to avoid the child discovering the app."
+                        android:textColor="#9E9E9E"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <!-- Open button -->
+                <TextView
+                    android:id="@+id/btnOpenChildApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_header_purple"
+                    android:gravity="center"
+                    android:text="Open child&#39;s app"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Method 2 Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Method 2"
+                    android:textColor="#7C4DFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_method_label"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Please use your child&#39;s Android phone browser to access the link below and open the child&#39;s app."
+                    android:textColor="#424242"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- URL row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_url_box"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="8dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="childmonitor.app"
+                        android:textColor="#7C4DFF"
+                        android:textSize="13sp"/>
+                    <ImageView
+                        android:id="@+id/ivQrCode"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_me_language"
+                        android:tint="#424242"
+                        android:padding="4dp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>
